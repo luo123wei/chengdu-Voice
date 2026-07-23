@@ -371,12 +371,12 @@ export const db = {
 
   password: {
     get: async () => {
-      const { data, error } = await supabase.from('settings').select('*').eq('id', 'password').single();
+      const { data, error } = await supabase.from('admin_settings').select('*').eq('id', 'password').single();
       if (error || !data) return 'admin123';
       return data.password || 'admin123';
     },
     set: async (password: string) => {
-      const { error } = await supabase.from('settings').upsert({
+      const { error } = await supabase.from('admin_settings').upsert({
         id: 'password',
         password,
       });
