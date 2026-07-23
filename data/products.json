@@ -1,0 +1,145 @@
+[
+  {
+    "id": "0",
+    "name": "《成都声音地图》白噪音专辑",
+    "nameEn": "Chengdu Sound Map - White Noise Album",
+    "description": "10个成都场景，每段30分钟，可下载",
+    "descriptionEn": "10 Chengdu scenes, 30 minutes each, downloadable",
+    "price": 9.99,
+    "category": "digital",
+    "type": "digital",
+    "images": [
+      "https://picsum.photos/id/237/800/800"
+    ],
+    "stock": 9999,
+    "rating": 4.9,
+    "reviews": 567,
+    "tags": [
+      "digital",
+      "audio",
+      "white-noise"
+    ]
+  },
+  {
+    "id": "1",
+    "name": "蒙顶山茶",
+    "nameEn": "Mengding Mountain Tea",
+    "description": "产自四川蒙山，中国十大名茶之一，香气馥郁，滋味鲜爽。",
+    "descriptionEn": "Produced from Mengshan Mountain in Sichuan, one of China's top ten famous teas with rich aroma and fresh taste.",
+    "price": 49.99,
+    "originalPrice": 69.99,
+    "category": "tea",
+    "type": "physical",
+    "images": [
+      "https://picsum.photos/id/1000/800/800"
+    ],
+    "stock": 150,
+    "rating": 4.9,
+    "reviews": 234,
+    "tags": [
+      "organic",
+      "premium"
+    ]
+  },
+  {
+    "id": "2",
+    "name": "郫县豆瓣",
+    "nameEn": "Pixian Doubanjiang",
+    "description": "川菜之魂，百年传承，红油鲜亮，香气醇厚。",
+    "descriptionEn": "The soul of Sichuan cuisine, with a century-old heritage, bright red oil and rich aroma.",
+    "price": 12.99,
+    "category": "spice",
+    "type": "physical",
+    "images": [
+      "https://picsum.photos/id/1080/800/800"
+    ],
+    "stock": 300,
+    "rating": 4.8,
+    "reviews": 456,
+    "tags": [
+      "authentic",
+      "traditional"
+    ]
+  },
+  {
+    "id": "3",
+    "name": "蜀绣屏风",
+    "nameEn": "Shu Embroidery Screen",
+    "description": "纯手工制作，精美的花鸟图案，是家居装饰的绝佳选择。",
+    "descriptionEn": "Handmade with exquisite flower and bird patterns, perfect for home decoration.",
+    "price": 299.99,
+    "originalPrice": 399.99,
+    "category": "craft",
+    "type": "physical",
+    "images": [
+      "https://picsum.photos/id/1067/800/800"
+    ],
+    "stock": 25,
+    "rating": 5,
+    "reviews": 67,
+    "tags": [
+      "handmade",
+      "art"
+    ]
+  },
+  {
+    "id": "4",
+    "name": "麻辣火锅底料",
+    "nameEn": "Spicy Hot Pot Base",
+    "description": "正宗川味火锅底料，麻辣鲜香，在家也能享受地道火锅。",
+    "descriptionEn": "Authentic Sichuan hot pot base with spicy and numbing flavors, enjoy authentic hot pot at home.",
+    "price": 18.99,
+    "category": "spice",
+    "type": "physical",
+    "images": [
+      "https://picsum.photos/id/1060/800/800"
+    ],
+    "stock": 200,
+    "rating": 4.7,
+    "reviews": 312,
+    "tags": [
+      "spicy",
+      "easy-cook"
+    ]
+  },
+  {
+    "id": "5",
+    "name": "熊猫玩偶",
+    "nameEn": "Panda Plush Toy",
+    "description": "可爱的大熊猫玩偶，采用优质面料，是送给亲友的绝佳礼物。",
+    "descriptionEn": "Cute giant panda plush toy made with high-quality materials, perfect gift for friends and family.",
+    "price": 35.99,
+    "category": "craft",
+    "type": "physical",
+    "images": [
+      "https://picsum.photos/id/1074/800/800"
+    ],
+    "stock": 100,
+    "rating": 4.9,
+    "reviews": 189,
+    "tags": [
+      "gift",
+      "cute"
+    ]
+  },
+  {
+    "id": "6",
+    "name": "张飞牛肉",
+    "nameEn": "Zhang Fei Beef",
+    "description": "阆中特产，色泽红润，肉质细嫩，风味独特。",
+    "descriptionEn": "Specialty of Langzhong, with red color, tender texture and unique flavor.",
+    "price": 24.99,
+    "category": "snack",
+    "type": "physical",
+    "images": [
+      "https://picsum.photos/id/1079/800/800"
+    ],
+    "stock": 80,
+    "rating": 4.8,
+    "reviews": 156,
+    "tags": [
+      "snack",
+      "traditional"
+    ]
+  }
+]

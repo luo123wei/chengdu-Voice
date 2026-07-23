@@ -1,0 +1,75 @@
+[
+  {
+    "id": "5",
+    "title": "成都清晨的声音：盖碗茶、鸟鸣与晨雾",
+    "titleEn": "Sounds of Chengdu Morning: Gaiwan Tea, Bird Songs and Morning Mist",
+    "content": "<h3>成都的早晨</h3><p>在成都，清晨是一首无声的诗。当第一缕阳光穿透薄雾，城市开始苏醒。</p><p><strong>茶馆里传来盖碗茶清脆的碰撞声</strong>，老茶客们用低沉的四川话聊着家常。窗外，鸟儿在竹林间欢快地歌唱，偶尔传来几声清脆的自行车铃声。</p><blockquote>这就是成都的早晨，一个用声音编织的梦境。</blockquote><p>在这里，时间仿佛放慢了脚步，每一个声音都在诉说着这座城市的故事。如果你也想体验这份宁静，可以聆听我们的《成都声音地图》白噪音专辑，让成都的声音陪伴你的每一天。</p>",
+    "contentEn": "<h3>The Morning of Chengdu</h3><p>In Chengdu, the morning is a silent poem. When the first ray of sunlight penetrates the mist, the city begins to wake up.</p><p><strong>The crisp sound of gaiwan tea cups colliding echoes from the teahouses</strong>, as elderly tea drinkers chat in low Sichuan dialect. Outside the window, birds sing cheerfully among the bamboo groves, occasionally interrupted by the crisp ring of bicycle bells.</p><blockquote>This is Chengdu morning, a dream woven with sounds.</blockquote><p>Here, time seems to slow down, and every sound tells the story of this city. If you want to experience this tranquility too, listen to our \"Chengdu Sound Map\" white noise album, and let the sounds of Chengdu accompany you every day.</p>",
+    "category": "culture",
+    "images": [
+      "https://picsum.photos/id/1015/1200/675"
+    ],
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    "author": "Chengdu Voice",
+    "publishDate": "2026-07-21",
+    "views": 1234
+  },
+  {
+    "id": "1",
+    "title": "成都茶文化：一杯清茶的千年传承",
+    "titleEn": "Chengdu Tea Culture: A Thousand-Year Legacy in a Cup",
+    "content": "<h3>千年传承</h3><p>成都，这座有着<strong>三千多年历史</strong>的城市，茶文化早已深深融入人们的日常生活。</p><ul><li>古老的盖碗茶</li><li>现代的茶馆文化</li><li>精致的茶具艺术</li></ul><p>从古老的盖碗茶到现代的茶馆文化，每一杯茶都承载着成都人的生活哲学。</p>",
+    "contentEn": "<h3>Thousand-Year Legacy</h3><p>Chengdu, a city with over <strong>3,000 years of history</strong>, has tea culture deeply integrated into daily life.</p><ul><li>Ancient covered-bowl tea</li><li>Modern tea house culture</li><li>Exquisite tea set art</li></ul><p>From ancient covered-bowl tea to modern tea house culture, every cup carries the philosophy of Chengdu people.</p>",
+    "category": "culture",
+    "images": [
+      "https://picsum.photos/id/1000/1200/675"
+    ],
+    "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    "author": "Chengdu Voice",
+    "publishDate": "2026-07-20",
+    "views": 2341
+  },
+  {
+    "id": "2",
+    "title": "川菜的麻辣艺术：味蕾上的火焰之旅",
+    "titleEn": "Sichuan Cuisine: A Fiery Journey on the Taste Buds",
+    "content": "<h3>四大菜系之一</h3><p>川菜，中国四大菜系之一，以其独特的<strong>麻辣风味</strong>闻名于世。</p><ol><li>麻婆豆腐</li><li>水煮鱼</li><li>回锅肉</li></ol><p>每一道菜都是一场味觉的盛宴。</p>",
+    "contentEn": "<h3>One of Four Major Cuisines</h3><p>Sichuan cuisine, one of China's four major cuisines, is famous for its unique <strong>spicy and numbing flavors</strong>.</p><ol><li>Mapo Tofu</li><li>Sichuan Boiled Fish</li><li>Twice-Cooked Pork</li></ol><p>Every dish is a feast for the senses.</p>",
+    "category": "food",
+    "images": [
+      "https://picsum.photos/id/1080/1200/675"
+    ],
+    "video": "https://www.w3schools.com/html/mov_bbb.mp4",
+    "author": "Chengdu Voice",
+    "publishDate": "2026-07-18",
+    "views": 3521
+  },
+  {
+    "id": "3",
+    "title": "宽窄巷子：穿越时光的成都记忆",
+    "titleEn": "Wide and Narrow Alleys: Chengdu Memories Through Time",
+    "content": "<h3>历史文化街区</h3><p>宽窄巷子，成都最具代表性的历史文化街区。在这里，<em>传统与现代交融</em>，每一条巷子都诉说着老成都的故事。</p>",
+    "contentEn": "<h3>Historical and Cultural District</h3><p>Wide and Narrow Alleys, Chengdu's most representative historical and cultural district. Here, <em>tradition meets modernity</em>, and every alley tells stories of old Chengdu.</p>",
+    "category": "travel",
+    "images": [
+      "https://picsum.photos/id/1067/1200/675"
+    ],
+    "author": "Chengdu Voice",
+    "publishDate": "2026-07-15",
+    "views": 1892
+  },
+  {
+    "id": "4",
+    "title": "蜀绣：针尖上的锦绣中华",
+    "titleEn": "Shu Embroidery: Splendid China on the Tip of a Needle",
+    "content": "<h3>四大名绣</h3><p>蜀绣，中国四大名绣之一，以其精细的针法和丰富的色彩著称。<strong>每一件作品都是艺术与工艺的完美结合</strong>。</p>",
+    "contentEn": "<h3>One of Four Famous Embroideries</h3><p>Shu Embroidery, one of China's four famous embroideries, is known for its exquisite stitching and rich colors. <strong>Each piece is a perfect blend of art and craftsmanship</strong>.</p>",
+    "category": "art",
+    "images": [
+      "https://picsum.photos/id/1060/1200/675"
+    ],
+    "author": "Chengdu Voice",
+    "publishDate": "2026-07-12",
+    "views": 1567
+  }
+]

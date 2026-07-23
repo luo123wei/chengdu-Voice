@@ -1,0 +1,62 @@
+[
+  {
+    "country": "United States",
+    "standard": 4.99,
+    "express": 10.99,
+    "freeThreshold": 49.99
+  },
+  {
+    "country": "Canada",
+    "standard": 6.99,
+    "express": 12.99,
+    "freeThreshold": 59.99
+  },
+  {
+    "country": "United Kingdom",
+    "standard": 5.99,
+    "express": 11.99,
+    "freeThreshold": 49.99
+  },
+  {
+    "country": "Germany",
+    "standard": 5.99,
+    "express": 11.99,
+    "freeThreshold": 49.99
+  },
+  {
+    "country": "France",
+    "standard": 5.99,
+    "express": 11.99,
+    "freeThreshold": 49.99
+  },
+  {
+    "country": "Italy",
+    "standard": 6.99,
+    "express": 12.99,
+    "freeThreshold": 59.99
+  },
+  {
+    "country": "Spain",
+    "standard": 6.99,
+    "express": 12.99,
+    "freeThreshold": 59.99
+  },
+  {
+    "country": "Australia",
+    "standard": 7.99,
+    "express": 14.99,
+    "freeThreshold": 69.99
+  },
+  {
+    "country": "Japan",
+    "standard": 5.99,
+    "express": 11.99,
+    "freeThreshold": 49.99
+  },
+  {
+    "country": "Other",
+    "standard": 9.99,
+    "express": 18.99,
+    "freeThreshold": 89.99
+  }
+]
