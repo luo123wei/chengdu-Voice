@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const storedPassword = db.password.get();
+    const storedPassword = await db.password.get();
 
     if (username === ADMIN_CREDENTIALS.username && password === storedPassword) {
       const token = jwt.sign(
