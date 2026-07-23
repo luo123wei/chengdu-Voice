@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const storedPassword = db.password.get();
+    const storedPassword = await db.password.get();
 
     if (currentPassword !== storedPassword) {
       return NextResponse.json(
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       );
     }
 
-    db.password.set(newPassword);
+    await db.password.set(newPassword);
 
     return NextResponse.json({
       success: true,
