@@ -23,6 +23,12 @@ const maxSizes = {
   video: 200 * 1024 * 1024,
 };
 
+const bucketNames = {
+  image: 'uploads',
+  audio: 'audio',
+  video: 'uploads',
+};
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -30,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { error: '没有选择文件' },
+        { success: false, error: '没有选择文件' },
         { status: 400 }
       );
     }
@@ -38,10 +44,11 @@ export async function POST(request: NextRequest) {
     const fileType = file.type.split('/')[0];
     const typeConfig = allowedTypes[fileType as keyof typeof allowedTypes];
     const maxSize = maxSizes[fileType as keyof typeof maxSizes];
+    const bucketName = bucketNames[fileType as keyof typeof bucketNames];
 
     if (!typeConfig || !typeConfig.includes(file.type)) {
       return NextResponse.json(
-        { error: '不支持的文件类型' },
+        { success: false, error: '不支持的文件类型' },
         { status: 400 }
       );
     }
@@ -49,7 +56,7 @@ export async function POST(request: NextRequest) {
     if (file.size > maxSize) {
       const sizeMB = maxSize / (1024 * 1024);
       return NextResponse.json(
-        { error: `文件大小超过限制（最大 ${sizeMB}MB）` },
+        { success: false, error: `文件大小超过限制（最大 ${sizeMB}MB）` },
         { status: 400 }
       );
     }
@@ -61,7 +68,7 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const { data, error } = await supabase.storage.from('uploads').upload(filePath, buffer, {
+    const { data, error } = await supabase.storage.from(bucketName).upload(filePath, buffer, {
       contentType: file.type,
       upsert: false,
     });
@@ -69,17 +76,17 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('上传失败:', error);
       return NextResponse.json(
-        { error: `上传失败: ${error.message || '未知错误'}` },
+        { success: false, error: `上传失败: ${error.message || '未知错误'}` },
         { status: 500 }
       );
     }
 
-    const { data: publicUrlData } = supabase.storage.from('uploads').getPublicUrl(filePath);
+    const { data: publicUrlData } = supabase.storage.from(bucketName).getPublicUrl(filePath);
     
     if (!publicUrlData?.publicUrl) {
       console.error('获取公网链接失败');
       return NextResponse.json(
-        { error: '上传成功但无法获取链接' },
+        { success: false, error: '上传成功但无法获取链接' },
         { status: 500 }
       );
     }
@@ -94,7 +101,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('File upload error:', error);
     return NextResponse.json(
-      { error: '文件上传失败' },
+      { success: false, error: '文件上传失败' },
       { status: 500 }
     );
   }
