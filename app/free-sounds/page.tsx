@@ -103,7 +103,7 @@ export default function FreeSoundsPage() {
             {sounds.map((sound) => (
               <div
                 key={sound.id}
-                className="bg-cream rounded-xl p-6 flex items-center justify-between hover:shadow-lg transition-shadow"
+                className="bg-cream rounded-xl p-6 flex items-center justify-between hover:shadow-lg transition-shadow relative"
               >
                 <div className="flex items-center gap-4">
                   <button
@@ -129,6 +129,7 @@ export default function FreeSoundsPage() {
                   ref={(el) => { audioRefs.current[sound.id] = el; }}
                   src={sound.audio}
                   onEnded={() => handleAudioEnded(sound.id)}
+                  className="hidden"
                 />
               </div>
             ))}
