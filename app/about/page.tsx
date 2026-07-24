@@ -26,16 +26,28 @@ export default function AboutPage() {
                 <br />
                 <span className="text-primary">成都之音</span>
               </h1>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                Founded in the heart of Chengdu, the cultural capital of western China, 
-                Chengdu Voice is dedicated to bringing the authentic taste of Chinese 
-                traditional culture to the world.
+              <p className="text-lg text-gray-600 mb-4 leading-relaxed">
+                We believe the most honest way to know a city is through its sounds.
               </p>
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                Our mission is to bridge the gap between East and West, sharing the 
-                richness of Chinese heritage through carefully curated products and 
-                engaging content. From premium teas to exquisite crafts, every item 
-                we offer tells a story of centuries-old traditions.
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                Here, you'll hear the gentle clink of tea bowls in a traditional Chengdu teahouse, 
+                the rain tapping on the bluestone alleys of Kuanzhai, and the sizzle of Sichuan 
+                peppercorns hitting hot oil in a bustling market.
+              </p>
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                Through these real, unfiltered sounds, we share the unhurried rhythm and the warmth 
+                of Chengdu's culture with the world.
+              </p>
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                And when those sounds make you curious — when you want to taste the city for yourself — 
+                Hanyuan Sichuan Pepper becomes the natural next step. It's the soul of the numbing 
+                flavor, a gift from the mountains of Sichuan.
+              </p>
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                From sound to taste, from Chengdu to your home.
+              </p>
+              <p className="text-gray-600 mb-8 leading-relaxed font-serif font-medium">
+                Chengdu Voice. Hear the city. Taste the story.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
