@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Volume2, Check } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -20,6 +20,7 @@ export default function FreeSoundsPage() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 
   useEffect(() => {
     fetch('/api/free-sounds')
@@ -35,11 +36,25 @@ export default function FreeSoundsPage() {
   }, []);
 
   const togglePlay = (id: string) => {
+    const audio = audioRefs.current[id];
+    if (!audio) return;
+
     if (playingId === id) {
+      audio.pause();
       setPlayingId(null);
     } else {
+      Object.values(audioRefs.current).forEach((a) => {
+        if (a) a.pause();
+      });
+      audio.play().catch((error) => {
+        console.error('播放失败:', error);
+      });
       setPlayingId(id);
     }
+  };
+
+  const handleAudioEnded = (id: string) => {
+    setPlayingId(null);
   };
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -103,13 +118,18 @@ export default function FreeSoundsPage() {
                   </button>
                   <div>
                     <h3 className="font-bold text-secondary text-lg">{sound.title}</h3>
-                    <p className="text-sm text-gray-500">{sound.description}</p>
+                    <p className="text-sm text-gray-500" dangerouslySetInnerHTML={{ __html: sound.description }}></p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-500">{sound.duration}</span>
                   <Volume2 className="w-5 h-5 text-gray-400" />
                 </div>
+                <audio
+                  ref={(el) => { audioRefs.current[sound.id] = el; }}
+                  src={sound.audio}
+                  onEnded={() => handleAudioEnded(sound.id)}
+                />
               </div>
             ))}
 

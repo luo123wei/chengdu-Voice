@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Music, Plus, Edit, Trash2, Search, X, Save, Upload, Link, CheckCircle } from 'lucide-react';
+import { Music, Plus, Edit, Trash2, Search, X, Save, Upload, Link, CheckCircle, Bold, Italic, List, ListOrdered, Undo, Redo } from 'lucide-react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
 
 interface FreeSound {
   id: string;
@@ -23,9 +27,16 @@ export default function AdminFreeSounds() {
   const [formData, setFormData] = useState({
     title: '',
     titleEn: '',
-    description: '',
     duration: '',
     audio: '',
+  });
+
+  const editor = useEditor({
+    extensions: [StarterKit, TextStyle, Color],
+    content: '',
+    onUpdate: ({ editor }) => {
+      console.log('Editor updated');
+    },
   });
 
   const fetchSounds = async () => {
@@ -53,20 +64,24 @@ export default function AdminFreeSounds() {
       setFormData({
         title: sound.title,
         titleEn: sound.titleEn,
-        description: sound.description,
         duration: sound.duration,
         audio: sound.audio,
       });
+      setTimeout(() => {
+        editor?.commands.setContent(sound.description || '<p></p>');
+      }, 100);
     } else {
       setEditingSound(null);
       setUploadMode('file');
       setFormData({
         title: '',
         titleEn: '',
-        description: '',
         duration: '',
         audio: '',
       });
+      setTimeout(() => {
+        editor?.commands.setContent('<p></p>');
+      }, 100);
     }
     setUploading(false);
     setUploadProgress(0);
@@ -119,6 +134,8 @@ export default function AdminFreeSounds() {
       return;
     }
 
+    const description = editor?.getHTML() || '';
+
     try {
       if (editingSound) {
         await fetch('/api/free-sounds', {
@@ -127,13 +144,17 @@ export default function AdminFreeSounds() {
           body: JSON.stringify({
             id: editingSound.id,
             ...formData,
+            description,
           }),
         });
       } else {
         await fetch('/api/free-sounds', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            description,
+          }),
         });
       }
 
@@ -303,14 +324,61 @@ export default function AdminFreeSounds() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   描述 <span className="text-red-500">*</span>
                 </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
-                  placeholder="例如：成都老茶馆里盖碗茶碰撞的清脆声音"
-                  rows={3}
-                  required
-                />
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBold().run()}
+                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      title="粗体"
+                    >
+                      <Bold className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleItalic().run()}
+                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      title="斜体"
+                    >
+                      <Italic className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      title="无序列表"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      title="有序列表"
+                    >
+                      <ListOrdered className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().undo().run()}
+                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      title="撤销"
+                    >
+                      <Undo className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().redo().run()}
+                      className="p-2 hover:bg-gray-200 rounded transition-colors"
+                      title="重做"
+                    >
+                      <Redo className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <EditorContent editor={editor} className="p-4 min-h-[120px] focus:outline-none" />
+                </div>
               </div>
 
               <div>
