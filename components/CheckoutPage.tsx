@@ -512,11 +512,11 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+          <div className="lg:sticky lg:top-24 space-y-6">
+            <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-serif font-bold text-secondary mb-6">Order Summary</h2>
               
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2">
                 {cartItems.map((item) => (
                   <div key={item.productId} className="flex items-center space-x-4">
                     <img
