@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Pause, Volume2, Check } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -35,27 +35,47 @@ export default function FreeSoundsPage() {
       });
   }, []);
 
-  const togglePlay = (id: string) => {
-    const audio = audioRefs.current[id];
+  const createAudio = useCallback((id: string, audioUrl: string) => {
+    if (!audioRefs.current[id]) {
+      const audio = new Audio(audioUrl);
+      audio.preload = 'metadata';
+      audio.addEventListener('ended', () => {
+        if (playingId === id) {
+          setPlayingId(null);
+        }
+      });
+      audio.addEventListener('error', (e) => {
+        console.error(`Audio error for ${id}:`, e);
+      });
+      audioRefs.current[id] = audio;
+    }
+    return audioRefs.current[id];
+  }, [playingId]);
+
+  const togglePlay = useCallback((id: string) => {
+    const sound = sounds.find((s) => s.id === id);
+    if (!sound) return;
+
+    const audio = createAudio(id, sound.audio);
     if (!audio) return;
 
     if (playingId === id) {
       audio.pause();
+      audio.currentTime = 0;
       setPlayingId(null);
     } else {
       Object.values(audioRefs.current).forEach((a) => {
-        if (a) a.pause();
+        if (a) {
+          a.pause();
+          a.currentTime = 0;
+        }
       });
       audio.play().catch((error) => {
         console.error('播放失败:', error);
       });
       setPlayingId(id);
     }
-  };
-
-  const handleAudioEnded = (id: string) => {
-    setPlayingId(null);
-  };
+  }, [sounds, playingId, createAudio]);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,12 +123,12 @@ export default function FreeSoundsPage() {
             {sounds.map((sound) => (
               <div
                 key={sound.id}
-                className="bg-cream rounded-xl p-6 flex items-center justify-between hover:shadow-lg transition-shadow relative"
+                className="bg-cream rounded-xl p-6 flex items-center justify-between hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => togglePlay(sound.id)}
-                    className="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition-colors"
+                    className="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition-colors flex-shrink-0"
                   >
                     {playingId === sound.id ? (
                       <Pause className="w-6 h-6" />
@@ -116,22 +136,15 @@ export default function FreeSoundsPage() {
                       <Play className="w-6 h-6 ml-1" />
                     )}
                   </button>
-                  <div>
-                    <h3 className="font-bold text-secondary text-lg">{sound.title}</h3>
-                    <p className="text-sm text-gray-500" dangerouslySetInnerHTML={{ __html: sound.description }}></p>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-secondary text-lg truncate">{sound.title}</h3>
+                    <p className="text-sm text-gray-500 line-clamp-2" dangerouslySetInnerHTML={{ __html: sound.description }}></p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-shrink-0">
                   <span className="text-sm text-gray-500">{sound.duration}</span>
                   <Volume2 className="w-5 h-5 text-gray-400" />
                 </div>
-                <audio
-                  ref={(el) => { audioRefs.current[sound.id] = el; }}
-                  src={sound.audio}
-                  onEnded={() => handleAudioEnded(sound.id)}
-                  preload="metadata"
-                  style={{ display: 'none' }}
-                />
               </div>
             ))}
 
