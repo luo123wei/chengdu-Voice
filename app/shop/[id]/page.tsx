@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-3xl font-bold text-secondary mb-4">Product Not Found</h1>
             <Link href="/shop" className="text-primary hover:underline">
-              Return to Shop
+              Return to Taste
             </Link>
           </div>
         </div>
@@ -71,7 +71,7 @@ export default function ProductDetailPage() {
             className="inline-flex items-center text-gray-600 hover:text-primary transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Shop
+            Back to Taste
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

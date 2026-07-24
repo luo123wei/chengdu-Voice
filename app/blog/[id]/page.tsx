@@ -21,7 +21,7 @@ export default function BlogDetailPage() {
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h1 className="text-3xl font-bold text-secondary mb-4">Post Not Found</h1>
             <Link href="/blog" className="text-primary hover:underline">
-              Return to Blog
+              Return to Discover
             </Link>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function BlogDetailPage() {
             className="inline-flex items-center text-gray-600 hover:text-primary transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Blog
+            Back to Discover
           </Link>
 
           <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm rounded-full mb-4">
