@@ -1,15 +1,16 @@
 'use client';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Music, Video, Calendar, Eye } from 'lucide-react';
+import { ArrowLeft, Music, Video, Calendar, Eye, Volume2, Utensils, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { categoryLabels } from '@/data/mockData';
-import { useBlogs } from '@/hooks/useDataStore';
+import { useBlogs, useProducts } from '@/hooks/useDataStore';
 
 export default function BlogDetailPage() {
   const params = useParams();
   const { blogs } = useBlogs();
+  const { products } = useProducts();
   const post = blogs.find((p) => p.id === params.id);
 
   if (!post) {
@@ -28,6 +29,8 @@ export default function BlogDetailPage() {
       </div>
     );
   }
+
+  const relatedProducts = products.filter(p => p.category === 'spice').slice(0, 2);
 
   return (
     <div className="min-h-screen">
@@ -106,6 +109,45 @@ export default function BlogDetailPage() {
             
             <h2 className="text-2xl font-bold text-secondary mb-4">中文</h2>
             <div className="text-gray-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content || '<p>暂无内容</p>' }} />
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12 bg-cream">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h3 className="text-xl font-serif font-bold text-secondary mb-2">Continue your Chengdu journey</h3>
+          <p className="text-gray-600 mb-8">Explore more sounds, stories and flavors from Chengdu</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Link
+              href="/free-sounds"
+              className="bg-white rounded-xl p-6 flex items-center gap-4 hover:shadow-lg transition-all group"
+            >
+              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                <Volume2 className="w-7 h-7" />
+              </div>
+              <div>
+                <h4 className="font-bold text-secondary group-hover:text-primary transition-colors">Hear the city</h4>
+                <p className="text-sm text-gray-500">Free Chengdu Sounds - Experience China through your ears</p>
+              </div>
+              <ArrowRight className="w-5 h-5 ml-auto text-gray-400 group-hover:text-primary group-hover:translate-x-2 transition-all" />
+            </Link>
+            
+            {relatedProducts.length > 0 && (
+              <Link
+                href={`/shop/${relatedProducts[0].id}`}
+                className="bg-white rounded-xl p-6 flex items-center gap-4 hover:shadow-lg transition-all group"
+              >
+                <div className="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center group-hover:bg-gold group-hover:text-white transition-all">
+                  <Utensils className="w-7 h-7" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-secondary group-hover:text-primary transition-colors">Taste the original flavor</h4>
+                  <p className="text-sm text-gray-500">{relatedProducts[0].nameEn}</p>
+                </div>
+                <ArrowRight className="w-5 h-5 ml-auto text-gray-400 group-hover:text-primary group-hover:translate-x-2 transition-all" />
+              </Link>
+            )}
           </div>
         </div>
       </section>

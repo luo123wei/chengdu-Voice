@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, Volume2, Check } from 'lucide-react';
+import { Play, Pause, Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -12,28 +12,30 @@ interface FreeSound {
   description: string;
   duration: string;
   audio: string;
+  location?: string;
 }
 
 export default function FreeSoundsPage() {
   const [sounds, setSounds] = useState<FreeSound[]>([]);
   const [playingId, setPlayingId] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [limit] = useState(6);
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 
   useEffect(() => {
-    fetch('/api/free-sounds')
+    fetch(`/api/free-sounds?page=${currentPage}&limit=${limit}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           setSounds(data.data);
+          setTotal(data.total || 0);
         }
       })
       .catch((error) => {
         console.error('Failed to fetch sounds:', error);
       });
-  }, []);
+  }, [currentPage, limit]);
 
   const createAudio = useCallback((id: string, audioUrl: string) => {
     if (!audioRefs.current[id]) {
@@ -77,29 +79,6 @@ export default function FreeSoundsPage() {
     }
   }, [sounds, playingId, createAudio]);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (res.ok) {
-        setSubscribed(true);
-        setEmail('');
-      }
-    } catch (error) {
-      console.error('Subscription failed:', error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -107,12 +86,12 @@ export default function FreeSoundsPage() {
       <section className="pt-24 pb-16 bg-gradient-to-br from-primary to-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-serif font-bold text-white mb-4">
-            Free Sounds
+            Free Chengdu Sounds
             <br />
-            <span className="text-cream">免费声音</span>
+            <span className="text-cream">Experience China Through Your Ears</span>
           </h1>
-          <p className="text-white/80 text-lg">
-            聆听成都的声音，感受这座城市的脉搏
+          <p className="text-white/80 text-lg max-w-2xl mx-auto">
+            Listen to authentic Chengdu sounds - from traditional teahouses to rain-soaked streets. Experience the soul of Chengdu through your ears.
           </p>
         </div>
       </section>
@@ -123,9 +102,9 @@ export default function FreeSoundsPage() {
             {sounds.map((sound) => (
               <div
                 key={sound.id}
-                className="bg-cream rounded-xl p-6 flex items-center justify-between hover:shadow-lg transition-shadow"
+                className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   <button
                     onClick={() => togglePlay(sound.id)}
                     className="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition-colors flex-shrink-0"
@@ -136,14 +115,30 @@ export default function FreeSoundsPage() {
                       <Play className="w-6 h-6 ml-1" />
                     )}
                   </button>
-                  <div className="min-w-0">
-                    <h3 className="font-bold text-secondary text-lg truncate">{sound.title}</h3>
-                    <p className="text-sm text-gray-500 line-clamp-2" dangerouslySetInnerHTML={{ __html: sound.description }}></p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-secondary text-xl">{sound.title}</h3>
+                    <p className="text-sm text-gray-500 mb-2">{sound.titleEn}</p>
+                    
+                    {sound.location && (
+                      <div className="flex items-center gap-2 text-sm text-primary mb-3">
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                        <span>{sound.location}</span>
+                      </div>
+                    )}
+                    
+                    <p className="text-gray-600 mb-4 line-clamp-3" dangerouslySetInnerHTML={{ __html: sound.description }}></p>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{sound.duration}</span>
+                      <button
+                        onClick={() => togglePlay(sound.id)}
+                        className="flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all"
+                      >
+                        <Volume2 className="w-5 h-5" />
+                        {playingId === sound.id ? 'Pause' : 'Listen'}
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4 flex-shrink-0">
-                  <span className="text-sm text-gray-500">{sound.duration}</span>
-                  <Volume2 className="w-5 h-5 text-gray-400" />
                 </div>
               </div>
             ))}
@@ -154,39 +149,41 @@ export default function FreeSoundsPage() {
                 <p className="text-gray-500">暂无声音内容</p>
               </div>
             )}
-          </div>
-
-          <div className="mt-12 bg-secondary/10 rounded-xl p-8 text-center">
-            <h3 className="text-xl font-serif font-bold text-secondary mb-4">
-              Want more sounds of Chengdu?
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Subscribe to our newsletter and get the full Chengdu Sound Map white noise album.
-            </p>
             
-            {subscribed ? (
-              <div className="flex items-center justify-center gap-2 text-green-600">
-                <Check className="w-5 h-5" />
-                <span className="font-medium">Subscribed! Check your email for the download link</span>
+            {total > limit && (
+              <div className="flex items-center justify-center mt-8">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  
+                  {Array.from({ length: Math.ceil(total / limit) }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        currentPage === i + 1
+                          ? 'bg-primary text-white'
+                          : 'border border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(Math.ceil(total / limit), prev + 1))}
+                    disabled={currentPage === Math.ceil(total / limit)}
+                    className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  className="flex-1 px-6 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submitting ? 'Sending...' : 'For free'}
-                </button>
-              </form>
             )}
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { ArrowRight, Star } from 'lucide-react';
+import { ArrowRight, Star, Volume2, BookOpen, Utensils } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -13,6 +13,7 @@ export default async function HomePage() {
   ]);
   const featuredPosts = blogs.slice(0, 3);
   const featuredProducts = products.slice(0, 4);
+  const featuredStory = blogs[0];
 
   return (
     <div className="min-h-screen bg-white">
@@ -28,47 +29,160 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
-        <div className="relative z-10 text-center px-4">
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6">
-            Chengdu Voice
+            Experience Chengdu
             <br />
-            <span className="text-primary">成都之音</span>
+            <span className="text-primary">Through Sound & Flavor</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-200 mb-8">
-            闭上眼，听成都
+          <p className="text-xl md:text-2xl text-gray-200 mb-4">
+            We share the hidden rhythm of Chengdu — from traditional teahouses to mountain-grown Sichuan flavors.
+          </p>
+          <p className="text-lg text-gray-300 mb-12">
+            A gateway to experience Chengdu through sound, taste and stories.
           </p>
           
-          <button className="group inline-flex items-center justify-center gap-4 px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-full text-lg font-medium transition-all mb-6">
-            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-            <span>免费收听成都声音</span>
-          </button>
+          <Link
+            href="#explore"
+            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-full text-lg font-medium transition-all animate-bounce"
+          >
+            <span>Explore Chengdu</span>
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      <section id="explore" className="py-20 bg-cream">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-serif font-bold text-secondary mb-4">Explore Chengdu</h2>
+            <p className="text-gray-600">Discover the soul of Chengdu through our three pillars</p>
+          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Link
+              href="/free-sounds"
+              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
+            >
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src="https://picsum.photos/id/1025/800/600"
+                  alt="Hear Chengdu"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="w-14 h-14 bg-primary/90 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Volume2 className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Hear Chengdu</h3>
+                  <p className="text-white/80 text-sm mb-4">Listen to authentic Chengdu sounds - tea houses, rain streets, and local markets.</p>
+                  <div className="inline-flex items-center gap-2 text-primary bg-white/90 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-white group-hover:scale-105 transition-all">
+                    <span>Explore</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+            
             <Link
               href="/blog"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white border border-white/30 rounded-lg hover:bg-white/20 transition-all"
+              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
             >
-              探索博客
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src="https://picsum.photos/id/1035/800/600"
+                  alt="Discover Stories"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="w-14 h-14 bg-secondary/90 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <BookOpen className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Discover Stories</h3>
+                  <p className="text-white/80 text-sm mb-4">Explore Chengdu's rich culture, history, and way of life through our stories.</p>
+                  <div className="inline-flex items-center gap-2 text-secondary bg-white/90 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-white group-hover:scale-105 transition-all">
+                    <span>Explore</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
             </Link>
+            
             <Link
               href="/shop"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-secondary rounded-lg hover:bg-gray-100 transition-all"
+              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
             >
-              浏览商店
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src="https://picsum.photos/id/1080/800/600"
+                  alt="Taste Chengdu"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="w-14 h-14 bg-gold/90 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Utensils className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Taste Chengdu</h3>
+                  <p className="text-white/80 text-sm mb-4">Bring authentic Chengdu flavors home - from Sichuan pepper to premium tea.</p>
+                  <div className="inline-flex items-center gap-2 text-gold bg-white/90 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-white group-hover:scale-105 transition-all">
+                    <span>Explore</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
             </Link>
           </div>
         </div>
       </section>
 
+      {featuredStory && (
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="relative">
+                <div className="rounded-2xl overflow-hidden shadow-xl">
+                  <img
+                    src={featuredStory.images[0]}
+                    alt={featuredStory.titleEn}
+                    className="w-full h-80 object-cover"
+                  />
+                </div>
+                <div className="absolute -bottom-6 -right-6 bg-primary text-white p-6 rounded-xl shadow-lg">
+                  <p className="text-sm opacity-80">Featured Story</p>
+                  <p className="text-xl font-bold">{featuredStory.category}</p>
+                </div>
+              </div>
+              <div>
+                <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm mb-6">
+                  {featuredStory.category}
+                </span>
+                <h2 className="text-3xl font-serif font-bold text-secondary mb-6">
+                  {featuredStory.titleEn}
+                </h2>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  {featuredStory.contentEn.replace(/<[^>]*>/g, '').substring(0, 300)}...
+                </p>
+                <Link
+                  href={`/blog/${featuredStory.id}`}
+                  className="inline-flex items-center gap-2 text-primary font-medium hover:gap-4 transition-all"
+                >
+                  <span>Read Full Story</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Featured Products</h2>
-            <p className="text-gray-600">Discover authentic Chinese treasures</p>
+            <p className="text-gray-600">Bring authentic Chengdu flavors home</p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -119,48 +233,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Latest Blog Posts</h2>
-            <p className="text-gray-300">Explore Chinese culture, food, travel and art</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredPosts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/blog/${post.id}`}
-                className="bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all"
-              >
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src={post.images[0]}
-                    alt={post.titleEn}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-5">
-                  <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full mb-3 inline-block">
-                    {post.category}
-                  </span>
-                  <h3 className="font-bold text-gray-800 mb-2">{post.titleEn}</h3>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.contentEn}</p>
-                  <span className="text-xs text-gray-500">{post.publishDate}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="py-16 bg-primary">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-serif font-bold text-white mb-4">
-            订阅我们，免费获取《成都声音地图》白噪音专辑
+            Want more sounds of Chengdu?
           </h2>
           <p className="text-white/80 mb-8">
-            输入您的邮箱，立即免费获得价值$9.99的白噪音专辑下载链接
+            Subscribe to our newsletter and get the full Chengdu Sound Map white noise album for free.
           </p>
           
           <SubscribeForm />

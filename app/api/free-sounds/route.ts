@@ -22,12 +22,24 @@ interface FreeSound {
 
 const defaultSounds: FreeSound[] = [];
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const { data, error } = await supabase.from('free_sounds').select('*').order('created_at', { ascending: false });
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '6');
+    const offset = (page - 1) * limit;
+
+    const countResult = await supabase.from('free_sounds').select('id', { count: 'exact' });
+    const total = countResult.count || 0;
+
+    const { data, error } = await supabase.from('free_sounds')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
     if (error) {
       console.error('Failed to get free sounds:', error);
-      return NextResponse.json({ success: true, data: defaultSounds });
+      return NextResponse.json({ success: true, data: defaultSounds, total: 0, page: 1, limit: 6 });
     }
     const sounds = data.map((row: any) => ({
       id: row.id,
@@ -37,10 +49,16 @@ export async function GET() {
       duration: row.duration,
       audio: row.audio,
     }));
-    return NextResponse.json({ success: true, data: sounds.length > 0 ? sounds : defaultSounds });
+    return NextResponse.json({ 
+      success: true, 
+      data: sounds.length > 0 ? sounds : defaultSounds,
+      total,
+      page,
+      limit 
+    });
   } catch (error) {
     console.error('Get free sounds error:', error);
-    return NextResponse.json({ success: true, data: defaultSounds });
+    return NextResponse.json({ success: true, data: defaultSounds, total: 0, page: 1, limit: 6 });
   }
 }
 

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Search, Filter, Star, Camera, Music, Video, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Star, Camera, Music, Video, ChevronLeft, ChevronRight, Volume2, Utensils, Home } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -8,6 +8,12 @@ import { categoryLabels } from '@/data/mockData';
 import { useBlogs } from '@/hooks/useDataStore';
 
 const ITEMS_PER_PAGE = 12;
+
+const chengduCategories = [
+  { id: 'sounds', name: 'Sounds of Chengdu', icon: Volume2, color: 'bg-primary' },
+  { id: 'taste', name: 'Taste of Chengdu', icon: Utensils, color: 'bg-gold' },
+  { id: 'life', name: 'Life in Chengdu', icon: Home, color: 'bg-secondary' },
+];
 
 export default function BlogPage() {
   const { blogs } = useBlogs();
@@ -28,8 +34,6 @@ export default function BlogPage() {
       (selectedMediaType === 'video' && post.video);
     return matchesSearch && matchesCategory && matchesMediaType;
   });
-
-  const categories = ['culture', 'food', 'travel', 'art'] as const;
 
   const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -54,9 +58,9 @@ export default function BlogPage() {
       <section className="pt-24 pb-12 bg-gradient-to-br from-secondary to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-4">Our Blog</h1>
-            <p className="text-gray-300 max-w-2xl mx-auto">
-              Explore Chinese culture, food, travel and art through our stories
+            <h1 className="text-4xl font-serif font-bold text-white mb-4">Chengdu Encyclopedia</h1>
+            <p className="text-gray-300 max-w-2xl mx-auto text-lg">
+              Discover Chengdu through sounds, stories and flavors. Your guide to experiencing the soul of Chengdu.
             </p>
           </div>
         </div>
@@ -93,22 +97,26 @@ export default function BlogPage() {
               >
                 All
               </button>
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    resetPagination();
-                  }}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    selectedCategory === category
-                      ? 'bg-primary text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {categoryLabels[category].en}
-                </button>
-              ))}
+              {chengduCategories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => {
+                      setSelectedCategory(category.id);
+                      resetPagination();
+                    }}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                      selectedCategory === category.id
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {category.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -124,7 +132,7 @@ export default function BlogPage() {
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 !selectedMediaType
-                  ? 'bg-secondary text-white'
+                  ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -137,7 +145,7 @@ export default function BlogPage() {
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                 selectedMediaType === 'image'
-                  ? 'bg-secondary text-white'
+                  ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -151,7 +159,7 @@ export default function BlogPage() {
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                 selectedMediaType === 'audio'
-                  ? 'bg-secondary text-white'
+                  ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -165,7 +173,7 @@ export default function BlogPage() {
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                 selectedMediaType === 'video'
-                  ? 'bg-secondary text-white'
+                  ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >

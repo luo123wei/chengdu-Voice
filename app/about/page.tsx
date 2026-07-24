@@ -19,15 +19,18 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm mb-6">
-                About Us
+                Why Chengdu Voice?
               </span>
               <h1 className="text-4xl font-serif font-bold text-secondary mb-6">
-                Chengdu Voice
+                Experience Chengdu
                 <br />
-                <span className="text-primary">成都之音</span>
+                <span className="text-primary">Through Sound & Flavor</span>
               </h1>
               <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-                We believe the most honest way to know a city is through its sounds.
+                Chengdu is a city that is experienced slowly. We want to share its sounds, flavors and stories with people around the world.
+              </p>
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                Chengdu Voice brings the soul of Chengdu to the world — through sounds, stories and flavors.
               </p>
               <p className="text-gray-600 mb-4 leading-relaxed">
                 Here, you'll hear the gentle clink of tea bowls in a traditional Chengdu teahouse, 
@@ -43,24 +46,21 @@ export default function AboutPage() {
                 Hanyuan Sichuan Pepper becomes the natural next step. It's the soul of the numbing 
                 flavor, a gift from the mountains of Sichuan.
               </p>
-              <p className="text-gray-600 mb-4 leading-relaxed">
-                From sound to taste, from Chengdu to your home.
-              </p>
               <p className="text-gray-600 mb-8 leading-relaxed font-serif font-medium">
-                Chengdu Voice. Hear the city. Taste the story.
+                From sound to taste, from Chengdu to your home.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="/shop"
                   className="inline-flex items-center justify-center px-8 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-all"
                 >
-                  Shop Now
+                  Bring Chengdu Home
                 </a>
                 <a
-                  href="/blog"
+                  href="/free-sounds"
                   className="inline-flex items-center justify-center px-8 py-3 border-2 border-secondary text-secondary rounded-xl font-medium hover:bg-secondary hover:text-white transition-all"
                 >
-                  Learn More
+                  Hear Chengdu Sounds
                 </a>
               </div>
             </div>
@@ -107,8 +107,8 @@ export default function AboutPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold text-secondary mb-4">Our Story</h2>
-            <p className="text-gray-600">From a small teahouse to a global brand</p>
+            <h2 className="text-3xl font-serif font-bold text-secondary mb-4">Founder Story</h2>
+            <p className="text-gray-600">The story behind Chengdu Voice</p>
           </div>
           
           <div className="bg-cream rounded-2xl p-8 mb-8">
@@ -125,28 +125,13 @@ export default function AboutPage() {
             <p className="text-right mt-4 text-primary font-serif font-medium">— 创始人 / Founder</p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-primary">2015</span>
-              </div>
-              <h3 className="font-serif font-bold text-secondary text-xl mb-2">Our Beginning</h3>
-              <p className="text-gray-600">Started as a small teahouse in Chengdu, sharing local tea culture with visitors.</p>
-            </div>
-            <div className="text-center p-6">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-primary">2018</span>
-              </div>
-              <h3 className="font-serif font-bold text-secondary text-xl mb-2">Expansion</h3>
-              <p className="text-gray-600">Expanded to include traditional crafts and food products from Sichuan.</p>
-            </div>
-            <div className="text-center p-6">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-primary">2026</span>
-              </div>
-              <h3 className="font-serif font-bold text-secondary text-xl mb-2">Global Reach</h3>
-              <p className="text-gray-600">Serving customers in over 50 countries, sharing Chinese culture worldwide.</p>
-            </div>
+          <div className="text-center">
+            <a
+              href="/shop"
+              className="inline-flex items-center justify-center px-8 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-all"
+            >
+              Start Your Chengdu Journey
+            </a>
           </div>
         </div>
       </section>
