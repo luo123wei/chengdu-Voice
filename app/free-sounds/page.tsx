@@ -129,7 +129,8 @@ export default function FreeSoundsPage() {
                   ref={(el) => { audioRefs.current[sound.id] = el; }}
                   src={sound.audio}
                   onEnded={() => handleAudioEnded(sound.id)}
-                  className="hidden"
+                  preload="metadata"
+                  style={{ display: 'none' }}
                 />
               </div>
             ))}
