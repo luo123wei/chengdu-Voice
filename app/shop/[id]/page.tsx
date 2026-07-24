@@ -108,22 +108,12 @@ export default function ProductDetailPage() {
                   <Globe className="w-5 h-5 text-primary" />
                   Origin
                 </h4>
-                <p className="text-gray-600 text-sm mb-3">
+                <p className="text-gray-600 text-sm">
                   {product.category === 'spice' 
                     ? 'Hanyuan, Sichuan Province, China'
                     : 'Chengdu, Sichuan Province, China'
                   }
                 </p>
-                <div className="rounded-lg overflow-hidden">
-                  <img
-                    src={product.category === 'spice' 
-                      ? 'https://picsum.photos/id/29/600/300'
-                      : 'https://picsum.photos/id/1035/600/300'
-                    }
-                    alt="Origin"
-                    className="w-full h-32 object-cover"
-                  />
-                </div>
               </div>
             </div>
 
