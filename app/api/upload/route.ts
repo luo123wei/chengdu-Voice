@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
 
 const allowedTypes = {
   image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
@@ -47,22 +54,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-    }
-
-    const fileExtension = path.extname(file.name);
-    const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${fileExtension}`;
-    const filePath = path.join(UPLOAD_DIR, fileName);
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+    const filePath = `${fileType}/${fileName}`;
 
     const bytes = await file.arrayBuffer();
-    fs.writeFileSync(filePath, Buffer.from(bytes));
+    const buffer = Buffer.from(bytes);
 
-    const fileUrl = `/uploads/${fileName}`;
+    const { data, error } = await supabase.storage.from('uploads').upload(filePath, buffer, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+    if (error) {
+      console.error('上传失败:', error);
+      return NextResponse.json(
+        { error: `上传失败: ${error.message || '未知错误'}` },
+        { status: 500 }
+      );
+    }
+
+    const { data: publicUrlData } = supabase.storage.from('uploads').getPublicUrl(filePath);
+    
+    if (!publicUrlData?.publicUrl) {
+      console.error('获取公网链接失败');
+      return NextResponse.json(
+        { error: '上传成功但无法获取链接' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      url: fileUrl,
+      url: publicUrlData.publicUrl,
       filename: fileName,
       size: file.size,
       type: file.type,
