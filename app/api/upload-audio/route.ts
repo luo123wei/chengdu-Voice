@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('上传失败:', error);
-      return NextResponse.json({ success: false, message: '上传失败' }, { status: 500 });
+      return NextResponse.json({ success: false, message: `上传失败: ${error.message || '未知错误'}` }, { status: 500 });
     }
 
     const { data: publicUrlData } = supabase.storage.from('audio').getPublicUrl(filePath);

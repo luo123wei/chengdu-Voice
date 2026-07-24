@@ -158,16 +158,16 @@ export default function FreeSoundsPage() {
 
           <div className="mt-12 bg-secondary/10 rounded-xl p-8 text-center">
             <h3 className="text-xl font-serif font-bold text-secondary mb-4">
-              想要更多成都声音？
+              Want more sounds of Chengdu?
             </h3>
             <p className="text-gray-600 mb-6">
-              订阅我们的邮件，免费获取完整的《成都声音地图》白噪音专辑
+              Subscribe to our newsletter and get the full Chengdu Sound Map white noise album.
             </p>
             
             {subscribed ? (
               <div className="flex items-center justify-center gap-2 text-green-600">
                 <Check className="w-5 h-5" />
-                <span className="font-medium">订阅成功！请查收邮件获取下载链接</span>
+                <span className="font-medium">Subscribed! Check your email for the download link</span>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
@@ -175,7 +175,7 @@ export default function FreeSoundsPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="请输入您的邮箱地址"
+                  placeholder="Enter your email address"
                   className="flex-1 px-6 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 />
@@ -184,7 +184,7 @@ export default function FreeSoundsPage() {
                   disabled={submitting}
                   className="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {submitting ? '发送中...' : '免费获取'}
+                  {submitting ? 'Sending...' : 'For free'}
                 </button>
               </form>
             )}
