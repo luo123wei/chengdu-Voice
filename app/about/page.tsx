@@ -115,7 +115,14 @@ export default function AboutPage() {
             <blockquote className="text-lg md:text-xl text-gray-700 italic leading-relaxed">
               "我生长在成都，小时候最深的记忆是茶馆里盖碗茶碰撞的声音。后来去了国外，发现最想念的不是火锅，而是成都的声音。于是我决定把成都的声音带给世界。"
             </blockquote>
-            <p className="text-right mt-4 text-primary font-serif font-medium">— 创始人</p>
+            <blockquote className="text-base md:text-lg text-gray-600 italic leading-relaxed mt-6">
+              I grew up in Chengdu. My earliest and deepest memory is the sound of teacups clinking in a local teahouse.
+              <br />
+              When I later moved abroad, I realized what I missed most wasn't the hotpot — it was the sounds of Chengdu.
+              <br />
+              So I decided to bring the sounds of Chengdu to the world.
+            </blockquote>
+            <p className="text-right mt-4 text-primary font-serif font-medium">— 创始人 / Founder</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
