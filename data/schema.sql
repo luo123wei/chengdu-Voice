@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS products (
   stock INT NOT NULL DEFAULT 0,
   rating DECIMAL(2,1) NOT NULL DEFAULT 0,
   reviews INT NOT NULL DEFAULT 0,
-  tags TEXT[] NOT NULL DEFAULT '{}'
+  tags TEXT[] NOT NULL DEFAULT '{}',
+  story TEXT,
+  culture TEXT,
+  use TEXT
 );
 
 CREATE TABLE IF NOT EXISTS blogs (

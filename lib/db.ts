@@ -49,6 +49,9 @@ function mapProduct(row: any): Product {
     rating: parseFloat(row.rating),
     reviews: row.reviews || 0,
     tags: row.tags || [],
+    story: row.story,
+    culture: row.culture,
+    use: row.use,
   };
 }
 
@@ -139,6 +142,9 @@ export const db = {
         rating: newProduct.rating,
         reviews: newProduct.reviews,
         tags: newProduct.tags,
+        story: newProduct.story,
+        culture: newProduct.culture,
+        use: newProduct.use,
       }).select('*').single();
       if (error) {
         console.error('Failed to create product:', error);
@@ -161,6 +167,9 @@ export const db = {
       if (updates.rating !== undefined) updateData.rating = updates.rating;
       if (updates.reviews !== undefined) updateData.reviews = updates.reviews;
       if (updates.tags !== undefined) updateData.tags = updates.tags;
+      if (updates.story !== undefined) updateData.story = updates.story;
+      if (updates.culture !== undefined) updateData.culture = updates.culture;
+      if (updates.use !== undefined) updateData.use = updates.use;
 
       const { data, error } = await supabase.from('products').update(updateData).eq('id', id).select('*').single();
       if (error || !data) return null;

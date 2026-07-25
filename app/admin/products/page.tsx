@@ -43,6 +43,9 @@ export default function AdminProducts() {
     rating: 0,
     reviews: 0,
     tags: [] as string[],
+    story: '',
+    culture: '',
+    use: '',
   });
 
   const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts();
@@ -70,6 +73,9 @@ export default function AdminProducts() {
         rating: product.rating,
         reviews: product.reviews,
         tags: [...product.tags],
+        story: product.story || '',
+        culture: product.culture || '',
+        use: product.use || '',
       });
     } else {
       setEditingProduct(null);
@@ -87,6 +93,9 @@ export default function AdminProducts() {
         rating: 0,
         reviews: 0,
         tags: [],
+        story: '',
+        culture: '',
+        use: '',
       });
     }
     setIsModalOpen(true);
@@ -107,6 +116,9 @@ export default function AdminProducts() {
       id: editingProduct?.id || `prod-${Date.now()}`,
       ...formData,
       rating: parseFloat(formData.rating.toString()) || 0,
+      story: formData.story,
+      culture: formData.culture,
+      use: formData.use,
     };
 
     if (editingProduct) {
@@ -434,6 +446,39 @@ export default function AdminProducts() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">The Story（故事）</label>
+                <textarea
+                  value={formData.story}
+                  onChange={(e) => setFormData({ ...formData, story: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  rows={5}
+                  placeholder="请输入产品故事，可以使用HTML标签如 &lt;p&gt;&lt;strong&gt;&lt;ul&gt;&lt;li&gt;等"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cultural Significance（文化意义）</label>
+                <textarea
+                  value={formData.culture}
+                  onChange={(e) => setFormData({ ...formData, culture: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  rows={5}
+                  placeholder="请输入文化意义描述，可以使用HTML标签"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">How to Use（使用方法）</label>
+                <textarea
+                  value={formData.use}
+                  onChange={(e) => setFormData({ ...formData, use: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  rows={5}
+                  placeholder="请输入使用方法，可以使用HTML标签"
+                />
               </div>
             </div>
 

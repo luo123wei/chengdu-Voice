@@ -28,6 +28,9 @@ export interface Product {
   rating: number;
   reviews: number;
   tags: string[];
+  story?: string;
+  culture?: string;
+  use?: string;
 }
 
 export interface Order {
