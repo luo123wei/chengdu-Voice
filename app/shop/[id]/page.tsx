@@ -9,6 +9,29 @@ import ProductReviews from '@/components/ProductReviews';
 import { productCategoryLabels } from '@/data/mockData';
 import { useProducts } from '@/hooks/useDataStore';
 
+function formatRichText(text: string): string {
+  if (!text) return '';
+  
+  if (text.includes('<p>') || text.includes('<h') || text.includes('<ul') || text.includes('<ol')) {
+    return text;
+  }
+  
+  const paragraphs = text.split(/\n\n+/);
+  return paragraphs.map(p => {
+    p = p.trim();
+    if (!p) return '';
+    if (p.match(/^\d+\.\s/)) {
+      const items = p.split(/\n/).filter(item => item.trim());
+      return `<ol>${items.map(item => `<li>${item.replace(/^\d+\.\s*/, '')}</li>`).join('')}</ol>`;
+    }
+    if (p.match(/^[\-\*•]\s/)) {
+      const items = p.split(/\n/).filter(item => item.trim());
+      return `<ul>${items.map(item => `<li>${item.replace(/^[\-\*•]\s*/, '')}</li>`).join('')}</ul>`;
+    }
+    return `<p>${p}</p>`;
+  }).join('');
+}
+
 export default function ProductDetailPage() {
   const params = useParams();
   const { products } = useProducts();
@@ -279,54 +302,60 @@ export default function ProductDetailPage() {
             
             <div className="py-6">
               {activeTab === 'story' && (
-                <div className="max-w-3xl mx-auto prose prose-lg">
-                  {product.story ? (
-                    <div 
-                      className="text-gray-600 leading-relaxed text-lg"
-                      dangerouslySetInnerHTML={{ __html: product.story }}
-                    />
-                  ) : (
-                    <p className="text-gray-600 leading-relaxed text-lg">
-                      {product.category === 'spice' 
-                        ? 'From the mountains of Hanyuan, Sichuan pepper has been cultivated for generations. This unique spice carries the essence of Sichuan\'s mountainous terrain and rich culinary heritage. Hanyuan, known as the "home of Sichuan pepper," has ideal climate and soil conditions for growing this precious spice.'
-                        : product.descriptionEn
-                      }
-                    </p>
-                  )}
+                <div className="max-w-3xl mx-auto">
+                  <div className="prose prose-lg">
+                    {product.story ? (
+                      <div 
+                        className="text-gray-600 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: formatRichText(product.story) }}
+                      />
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-lg">
+                        {product.category === 'spice' 
+                          ? 'From the mountains of Hanyuan, Sichuan pepper has been cultivated for generations. This unique spice carries the essence of Sichuan\'s mountainous terrain and rich culinary heritage. Hanyuan, known as the "home of Sichuan pepper," has ideal climate and soil conditions for growing this precious spice.'
+                          : product.descriptionEn
+                        }
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
               {activeTab === 'culture' && (
-                <div className="max-w-3xl mx-auto prose prose-lg">
-                  {product.culture ? (
-                    <div 
-                      className="text-gray-600 leading-relaxed text-lg"
-                      dangerouslySetInnerHTML={{ __html: product.culture }}
-                    />
-                  ) : (
-                    <p className="text-gray-600 leading-relaxed text-lg">
-                      {product.category === 'spice'
-                        ? 'Sichuan pepper is not only a spice. It is part of Chengdu\'s identity. The unique numbing sensation (ma la) is more than just taste - it represents home for people in Sichuan. In traditional Chinese medicine, Sichuan pepper is also valued for its warming properties.'
-                        : 'This product embodies the rich cultural traditions of Chengdu, connecting you to centuries of Chinese heritage. Every piece tells a story of craftsmanship and dedication passed down through generations.'
-                      }
-                    </p>
-                  )}
+                <div className="max-w-3xl mx-auto">
+                  <div className="prose prose-lg">
+                    {product.culture ? (
+                      <div 
+                        className="text-gray-600 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: formatRichText(product.culture) }}
+                      />
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-lg">
+                        {product.category === 'spice'
+                          ? 'Sichuan pepper is not only a spice. It is part of Chengdu\'s identity. The unique numbing sensation (ma la) is more than just taste - it represents home for people in Sichuan. In traditional Chinese medicine, Sichuan pepper is also valued for its warming properties.'
+                          : 'This product embodies the rich cultural traditions of Chengdu, connecting you to centuries of Chinese heritage. Every piece tells a story of craftsmanship and dedication passed down through generations.'
+                        }
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
               {activeTab === 'use' && (
-                <div className="max-w-3xl mx-auto prose prose-lg">
-                  {product.howToUse ? (
-                    <div 
-                      className="text-gray-600 leading-relaxed text-lg"
-                      dangerouslySetInnerHTML={{ __html: product.howToUse }}
-                    />
-                  ) : (
-                    <p className="text-gray-600 leading-relaxed text-lg">
-                      {product.category === 'spice'
-                        ? 'Toast Sichuan pepper lightly before grinding for maximum aroma. Use in stir-fries, soups, and marinades. Pair with chili for the classic Sichuan "ma la" numbing-spicy flavor. For best results, grind just before use to preserve its unique fragrance.'
-                        : 'Enjoy this authentic product as part of your daily routine or special occasions. Follow traditional preparation methods for the best experience. Each piece is hand-selected to ensure the highest quality.'
-                      }
-                    </p>
-                  )}
+                <div className="max-w-3xl mx-auto">
+                  <div className="prose prose-lg">
+                    {product.howToUse ? (
+                      <div 
+                        className="text-gray-600 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: formatRichText(product.howToUse) }}
+                      />
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-lg">
+                        {product.category === 'spice'
+                          ? 'Toast Sichuan pepper lightly before grinding for maximum aroma. Use in stir-fries, soups, and marinades. Pair with chili for the classic Sichuan "ma la" numbing-spicy flavor. For best results, grind just before use to preserve its unique fragrance.'
+                          : 'Enjoy this authentic product as part of your daily routine or special occasions. Follow traditional preparation methods for the best experience. Each piece is hand-selected to ensure the highest quality.'
+                        }
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

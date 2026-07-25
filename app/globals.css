@@ -15,3 +15,66 @@ html {
 body {
   font-family: 'Inter', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
 }
+
+.prose h1 {
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+  color: #1a1a1a;
+}
+
+.prose h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  color: #2d2d2d;
+}
+
+.prose h3 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  color: #3d3d3d;
+}
+
+.prose p {
+  margin-bottom: 1em;
+  line-height: 1.8;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-bottom: 0.5em;
+  line-height: 1.8;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose a {
+  color: #d97706;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #b45309;
+}
+
+.prose blockquote {
+  border-left: 4px solid #d97706;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #666;
+  font-style: italic;
+}
