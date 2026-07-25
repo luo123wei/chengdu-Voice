@@ -67,23 +67,29 @@ export default function ProductReviews({ productId, productRating, productReview
   }, [productId, user]);
 
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && reviews.length > 1) {
       const container = scrollRef.current;
       let scrollPosition = 0;
       const scrollSpeed = 1;
       const cardWidth = 300;
       const gap = 20;
       const scrollAmount = cardWidth + gap;
-      const totalWidth = reviews.length * scrollAmount;
 
       const scroll = () => {
-        scrollPosition += scrollSpeed;
-        if (scrollPosition >= scrollAmount) {
-          scrollPosition = 0;
-          const first = reviews[0];
-          setReviews((prev) => [...prev.slice(1), first]);
-        } else {
-          container.scrollLeft = scrollPosition;
+        try {
+          scrollPosition += scrollSpeed;
+          if (scrollPosition >= scrollAmount) {
+            scrollPosition = 0;
+            setReviews((prev) => {
+              if (prev.length <= 1) return prev;
+              const [first, ...rest] = prev;
+              return [...rest, first];
+            });
+          } else {
+            container.scrollLeft = scrollPosition;
+          }
+        } catch (error) {
+          console.error('Auto-scroll error:', error);
         }
       };
 

@@ -2,7 +2,7 @@ name: Keep Render App Alive
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,4 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Render app
-        run: curl -s https://chengdu-voice.onrender.com > /dev/null
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" https://chengdu-voice.onrender.com
+          curl -s -o /dev/null -w "%{http_code}" https://chengdu-voice.onrender.com/api/products
+          curl -s -o /dev/null -w "%{http_code}" https://chengdu-voice.onrender.com/api/blogs
