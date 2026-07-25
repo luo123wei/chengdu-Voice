@@ -6,15 +6,18 @@ import Link from '@tiptap/extension-link';
 import BulletList from '@tiptap/extension-bullet-list';
 import OrderedList from '@tiptap/extension-ordered-list';
 import ListItem from '@tiptap/extension-list-item';
+import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, Underline, List, ListOrdered, Link2, Undo, Redo, Heading1, Heading2, Heading3 } from 'lucide-react';
 
 interface RichTextEditorProps {
   value: string;
   onChange: (content: string) => void;
   placeholder?: string;
+  label?: string;
+  maxLength?: number;
 }
 
-export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+export default function RichTextEditor({ value, onChange, placeholder, label, maxLength }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -24,6 +27,9 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       BulletList,
       OrderedList,
       ListItem,
+      Placeholder.configure({
+        placeholder: placeholder || 'Start typing...',
+      }),
     ],
     content: value || '<p></p>',
     onUpdate: ({ editor }) => {
@@ -33,7 +39,6 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       attributes: {
         class: 'w-full h-40 p-4 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors prose prose-lg',
       },
-      placeholder: placeholder || 'Start typing...',
     },
   });
 
@@ -110,7 +115,12 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         <div className="w-px h-6 bg-gray-300 mx-1" />
 
         <button
-          onClick={() => editor.chain().focus().toggleLink({ href: window.prompt('Enter URL:') }).run()}
+          onClick={() => {
+            const url = window.prompt('Enter URL:');
+            if (url) {
+              editor.chain().focus().toggleLink({ href: url }).run();
+            }
+          }}
           className={`p-2 rounded transition-colors ${editor.isActive('link') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
           title="Link"
         >
