@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS products (
   tags TEXT[] NOT NULL DEFAULT '{}',
   story TEXT,
   culture TEXT,
-  use TEXT
+  how_to_use TEXT
 );
 
 CREATE TABLE IF NOT EXISTS blogs (

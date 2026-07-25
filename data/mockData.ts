@@ -30,7 +30,7 @@ export interface Product {
   tags: string[];
   story?: string;
   culture?: string;
-  use?: string;
+  howToUse?: string;
 }
 
 export interface Order {

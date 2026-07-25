@@ -314,10 +314,10 @@ export default function ProductDetailPage() {
               )}
               {activeTab === 'use' && (
                 <div className="max-w-3xl mx-auto prose prose-lg">
-                  {product.use ? (
+                  {product.howToUse ? (
                     <div 
                       className="text-gray-600 leading-relaxed text-lg"
-                      dangerouslySetInnerHTML={{ __html: product.use }}
+                      dangerouslySetInnerHTML={{ __html: product.howToUse }}
                     />
                   ) : (
                     <p className="text-gray-600 leading-relaxed text-lg">

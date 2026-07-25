@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chengdu Voice - Optimization Prototype</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #1e293b; }
+    
+    :root {
+      --primary: #C59B6D;
+      --primary-dark: #A68455;
+      --secondary: #2C3E50;
+      --cream: #FDF5E6;
+      --gold: #D4AF37;
+      --green: #22c55e;
+      --gray: #64748b;
+    }
+
+    .header {
+      background: var(--secondary);
+      color: white;
+      padding: 20px 40px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header h1 { font-size: 28px; margin-bottom: 8px; }
+    .header p { opacity: 0.8; font-size: 14px; }
+
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      background: white;
+      padding: 16px 40px;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+    }
+
+    .nav-tab {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .nav-tab:hover:not(.active) {
+      background: var(--cream);
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      padding: 12px 40px;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .legend-dot.green { background: var(--green); }
+    .legend-dot.gray { background: var(--gray); }
+
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    .preview-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 24px;
+    }
+
+    .card-header h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .card-header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .component {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .component:hover {
+      border-color: var(--primary);
+      background: #fafafa;
+    }
+
+    .component-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: white;
+      padding: 2px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .label-dot.green { background: var(--green); }
+    .label-dot.gray { background: var(--gray); }
+
+    .component-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--secondary);
+    }
+
+    .component-desc {
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    .component-desc strong {
+      color: var(--secondary);
+    }
+
+    .layout-preview {
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 12px;
+    }
+
+    .layout-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .layout-box {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--gray);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .layout-box.large {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .layout-box.medium {
+      flex: 0.5;
+      min-width: 150px;
+    }
+
+    .layout-box.small {
+      flex: 0.3;
+      min-width: 100px;
+    }
+
+    .highlight-box {
+      background: rgba(34, 197, 94, 0.1);
+      border-left: 4px solid var(--green);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 8px;
+    }
+
+    .highlight-box.gray {
+      background: rgba(100, 116, 139, 0.1);
+      border-left-color: var(--gray);
+    }
+
+    .highlight-box p {
+      font-size: 12px;
+      color: var(--secondary);
+      line-height: 1.5;
+    }
+
+    .user-flow {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+      border: 2px solid #e2e8f0;
+    }
+
+    .flow-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--secondary);
+    }
+
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .flow-node {
+      background: var(--cream);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--secondary);
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .flow-node.optimized {
+      background: rgba(34, 197, 94, 0.15);
+      border: 2px solid var(--green);
+    }
+
+    .flow-arrow {
+      font-size: 20px;
+      color: var(--primary);
+      margin: 0 4px;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .comparison-item {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .comparison-item.bad {
+      border-left: 4px solid #ef4444;
+    }
+
+    .comparison-item.good {
+      border-left: 4px solid var(--green);
+    }
+
+    .comparison-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .comparison-label.bad { color: #ef4444; }
+    .comparison-label.good { color: var(--green); }
+
+    .comparison-text {
+      font-size: 13px;
+      color: var(--secondary);
+    }
+
+    @media (max-width: 768px) {
+      .page-container { padding: 20px; }
+      .header { padding: 16px 20px; }
+      .header h1 { font-size: 22px; }
+      .legend { gap: 12px; flex-wrap: wrap; }
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Chengdu Voice - Optimization Prototype</h1>
+    <p>文化品牌商业闭环优化方案 - 点击下方标签查看各页面优化对比</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot green"></div>
+      <span>优化后功能 (Optimized)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot gray"></div>
+      <span>保留功能 (Retained)</span>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-target="home">首页 (Home)</button>
+    <button class="nav-tab" data-target="blog">博客 (Blog)</button>
+    <button class="nav-tab" data-target="free-sounds">声音 (Free Sounds)</button>
+    <button class="nav-tab" data-target="shop">商店 (Shop)</button>
+    <button class="nav-tab" data-target="about">关于 (About)</button>
+  </div>
+
+  <div class="page-container">
+    <div class="page-section active" id="home">
+      <div class="preview-card">
+        <div class="card-header">
+          <h2>🏠 首页优化方案 (Home Page)</h2>
+          <p>核心：建立品牌认知，引导用户进入文化消费路径</p>
+        </div>
+        <div class="card-body">
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">Hero Section - 重新定位</div>
+            <div class="component-desc">
+              <strong>优化前：</strong>"成都之音 - 闭上眼，听成都"<br>
+              <strong>优化后：</strong>"Experience Chengdu through authentic sounds, stories and flavors."<br>
+              回答三个核心问题：你是谁？为什么特别？下一步做什么？
+            </div>
+            <div class="comparison-grid">
+              <div class="comparison-item bad">
+                <div class="comparison-label bad">Before</div>
+                <div class="comparison-text">"成都很美"<br>"成都有文化"<br>"成都有故事"</div>
+              </div>
+              <div class="comparison-item good">
+                <div class="comparison-label good">After</div>
+                <div class="comparison-text">Who? → Experience Chengdu<br>Why? → Hidden rhythm of Chengdu<br>Action → Three entry points</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">Explore Chengdu - 三个入口</div>
+            <div class="component-desc">
+              新增三个引导入口，打通文化消费路径：
+            </div>
+            <div class="layout-preview">
+              <div class="layout-row">
+                <div class="layout-box medium" style="background: rgba(34,197,94,0.1); border:1px solid var(--green);">
+                  🎧 Hear Chengdu → Free Sounds
+                </div>
+                <div class="layout-box medium" style="background: rgba(34,197,94,0.1); border:1px solid var(--green);">
+                  📖 Discover Stories → Blog
+                </div>
+                <div class="layout-box medium" style="background: rgba(34,197,94,0.1); border:1px solid var(--green);">
+                  🌶️ Taste Chengdu → Shop
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">Featured Products - 精选产品展示</div>
+            <div class="component-desc">
+              保留产品卡片展示，但位置调整到"探索成都"模块之后，作为文化体验的自然延伸。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">Featured Story - 精选故事</div>
+            <div class="component-desc">
+              新增精选故事区域，如"The Sounds of Chengdu Tea Houses"，连接声音与文化，引导用户进入Blog。
+            </div>
+            <div class="highlight-box">
+              <p><strong>目的：</strong>建立情感连接 → 文化认同 → 购买转化</p>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">Newsletter - 邮件订阅</div>
+            <div class="component-desc">
+              保留邮件订阅功能，文案已优化为英文，用于用户留存。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-flow">
+        <div class="flow-title">🚶 用户路径优化</div>
+        <div class="flow-diagram">
+          <div class="flow-node">Google Search</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node optimized">Hero Section</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node optimized">Explore Chengdu</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Free Sounds / Blog / Shop</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Newsletter</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Purchase</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-section" id="blog">
+      <div class="preview-card">
+        <div class="card-header">
+          <h2>📝 博客优化方案 (Blog Page)</h2>
+          <p>核心：从普通博客变成"成都文化百科全书"</p>
+        </div>
+        <div class="card-body">
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">分类重构 - 文化主题分类</div>
+            <div class="component-desc">
+              <strong>优化前：</strong>Food / Travel / Culture / Art (太普通)<br>
+              <strong>优化后：</strong>Sounds of Chengdu / Taste of Chengdu / Life in Chengdu
+            </div>
+            <div class="comparison-grid">
+              <div class="comparison-item bad">
+                <div class="comparison-label bad">Before</div>
+                <div class="comparison-text">Food, Travel, Culture, Art</div>
+              </div>
+              <div class="comparison-item good">
+                <div class="comparison-label good">After</div>
+                <div class="comparison-text">🔊 Sounds of Chengdu<br>🌶️ Taste of Chengdu<br>🏮 Life in Chengdu</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">文章结构 - 文化入口</div>
+            <div class="component-desc">
+              每篇文章必须包含：科学解释 → 文化故事 → 产品推荐，形成完整的内容闭环。
+            </div>
+            <div class="layout-preview">
+              <div class="layout-row">
+                <div class="layout-box large" style="border-left:4px solid #ef4444;">
+                  科学：Sichuan pepper contains hydroxy-alpha-sanshool...
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="border-left:4px solid var(--primary);">
+                  文化：For people in Sichuan, this sensation represents home.
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="border-left:4px solid var(--green);">
+                  产品：Experience authentic Hanyuan Sichuan Pepper → [Buy Now]
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">文章底部 - 固定推荐</div>
+            <div class="component-desc">
+              <strong>优化前：</strong>"Read more" (无意义)<br>
+              <strong>优化后：</strong>"Continue your Chengdu journey" 固定显示相关产品和声音链接
+            </div>
+            <div class="highlight-box">
+              <p><strong>示例：</strong><br>
+                Continue your Chengdu journey:<br>
+                → Taste the original flavor: Hanyuan Sichuan Pepper<br>
+                → Hear the city: Free Chengdu Sounds
+              </p>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">搜索和筛选功能</div>
+            <div class="component-desc">
+              保留搜索、分类筛选、媒体类型筛选等功能，保持用户体验一致性。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">分页功能</div>
+            <div class="component-desc">
+              保留分页导航，方便用户浏览大量内容。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-section" id="free-sounds">
+      <div class="preview-card">
+        <div class="card-header">
+          <h2>🎧 Free Sounds 优化方案</h2>
+          <p>核心：这是你的最大优势，从"免费下载"变成"文化体验入口"</p>
+        </div>
+        <div class="card-body">
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">页面标题 - 重新定位</div>
+            <div class="component-desc">
+              <strong>优化前：</strong>"Free Sounds - 免费声音"<br>
+              <strong>优化后：</strong>"Free Chengdu Sounds — Experience China Through Your Ears"
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">声音卡片 - 添加故事和位置</div>
+            <div class="component-desc">
+              每个声音不再只是播放按钮，而是一个文化故事：
+            </div>
+            <div class="layout-preview">
+              <div class="layout-row">
+                <div class="layout-box small" style="background: var(--primary); color:white;">▶ Play</div>
+                <div class="layout-box large">
+                  <strong>Rain in Kuanzhai Alley</strong><br>
+                  <span style="font-size:11px; color:var(--gray);">Location: Chengdu, Sichuan</span><br>
+                  <span style="font-size:12px; color:var(--secondary);">Story: After rain, old stone streets become quieter...</span>
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box small">[Listen]</div>
+                <div class="layout-box small">[Download]</div>
+                <div class="layout-box small" style="border:1px dashed var(--green); color:var(--green);">Explore: Why Kuanzhai matters</div>
+              </div>
+            </div>
+            <div class="highlight-box">
+              <p><strong>路径：</strong>声音 → 文化故事 → SEO流量 → Blog → Shop</p>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">探索链接 - 连接Blog</div>
+            <div class="component-desc">
+              每个声音卡片添加"Explore"链接，指向相关的Blog文章，形成内容闭环。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">播放功能</div>
+            <div class="component-desc">
+              保留音频播放、暂停、进度控制等核心功能。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">邮件订阅</div>
+            <div class="component-desc">
+              保留邮件订阅功能，文案已优化为英文。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-section" id="shop">
+      <div class="preview-card">
+        <div class="card-header">
+          <h2>🛒 Shop 优化方案</h2>
+          <p>核心：不要做普通电商页面，而是"成都故事商店"</p>
+        </div>
+        <div class="card-body">
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">产品页面结构 - 情感连接</div>
+            <div class="component-desc">
+              重新设计产品页面，遵循"文化→产品"路径：
+            </div>
+            <div class="layout-preview">
+              <div class="layout-row">
+                <div class="layout-box large" style="background: rgba(34,197,94,0.1); border:2px solid var(--green); padding:20px;">
+                  <strong>第一屏：情感连接</strong><br>
+                  "Bring the authentic flavor of Chengdu home."
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="padding:20px; border-left:4px solid var(--primary);">
+                  <strong>第二屏：故事</strong><br>
+                  "From the mountains of Hanyuan, Sichuan..."
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="padding:20px; border-left:4px solid var(--gold);">
+                  <strong>第三屏：文化</strong><br>
+                  "Sichuan pepper is not only a spice. It is part of Chengdu's identity."
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="padding:20px; border-left:4px solid #3b82f6;">
+                  <strong>第四屏：使用方法</strong><br>
+                  "How to cook with Sichuan pepper" + recipes
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="padding:20px; background: var(--secondary); color:white; text-align:center;">
+                  <strong>第五屏：购买</strong><br>
+                  "Own a taste of Chengdu." → [Add to cart]
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">产品标题 - 文化叙事</div>
+            <div class="component-desc">
+              <strong>优化前：</strong>"Premium Sichuan Peppercorn 100g" (只是一个调料)<br>
+              <strong>优化后：</strong>"Hanyuan Sichuan Pepper - The Mountain Spice Behind Chengdu's Famous Numbing Flavor" (成都味道的一部分)
+            </div>
+            <div class="comparison-grid">
+              <div class="comparison-item bad">
+                <div class="comparison-label bad">Before</div>
+                <div class="comparison-text">Premium Sichuan Peppercorn 100g<br>"又一个调料"</div>
+              </div>
+              <div class="comparison-item good">
+                <div class="comparison-label good">After</div>
+                <div class="comparison-text">Hanyuan Sichuan Pepper<br>The Mountain Spice Behind Chengdu's Famous Numbing Flavor<br>"哦，这是成都味道的一部分"</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="label-dot green"></div>
+            <span>优化后</span>
+            </div>
+            <div class="component-title">食谱部分 - 使用指南</div>
+            <div class="component-desc">
+              新增食谱部分，教用户如何使用四川花椒烹饪，增加产品价值。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">产品列表和搜索</div>
+            <div class="component-desc">
+              保留产品卡片展示、分类筛选、搜索、排序等功能。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">购物车功能</div>
+            <div class="component-desc">
+              保留加入购物车、价格显示、折扣标签等功能。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-section" id="about">
+      <div class="preview-card">
+        <div class="card-header">
+          <h2>🏮 About 优化方案</h2>
+          <p>核心：从介绍公司变成介绍使命</p>
+        </div>
+        <div class="card-body">
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">页面结构 - 使命优先</div>
+            <div class="component-desc">
+              <strong>优化前：</strong>"我们成立于2025年..." (没人关心)<br>
+              <strong>优化后：</strong>"Why Chengdu Voice?" → "Founder story" → "Shop link"
+            </div>
+            <div class="layout-preview">
+              <div class="layout-row">
+                <div class="layout-box large" style="border-left:4px solid var(--green); padding:16px;">
+                  <strong>Why Chengdu Voice?</strong><br>
+                  "Chengdu is a city that is experienced slowly. We want to share its sounds, flavors and stories..."
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="border-left:4px solid var(--primary); padding:16px;">
+                  <strong>Founder Story</strong><br>
+                  "I grew up in Chengdu. My earliest memory is the sound of teacups clinking..."
+                </div>
+              </div>
+              <div class="layout-row">
+                <div class="layout-box large" style="background: var(--secondary); color:white; text-align:center; padding:16px;">
+                  <strong>[Shop Now]</strong><br>
+                  Bring Chengdu home
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">品牌定位声明</div>
+            <div class="component-desc">
+              新增清晰的品牌定位："Chengdu Voice brings the soul of Chengdu to the world — through sounds, stories and flavors."
+            </div>
+            <div class="highlight-box">
+              <p><strong>声音负责建立情感 → 故事负责建立价值 → 产品负责完成购买</strong></p>
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">创始人故事</div>
+            <div class="component-desc">
+              保留中英文创始人语录，这是建立情感连接的重要部分。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot gray"></div>
+              <span>保留</span>
+            </div>
+            <div class="component-title">联系方式</div>
+            <div class="component-desc">
+              保留地址、邮箱等联系信息。
+            </div>
+          </div>
+
+          <div class="component">
+            <div class="component-label">
+              <div class="label-dot green"></div>
+              <span>优化后</span>
+            </div>
+            <div class="component-title">数据统计 - 精简</div>
+            <div class="component-desc">
+              保留统计数据展示，但调整位置和文案，更注重文化价值而非商业数字。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.nav-tab');
+    const sections = document.querySelectorAll('.page-section');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const targetId = tab.dataset.target;
+        document.getElementById(targetId).classList.add('active');
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -45,7 +45,7 @@ export default function AdminProducts() {
     tags: [] as string[],
     story: '',
     culture: '',
-    use: '',
+    howToUse: '',
   });
 
   const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts();
@@ -75,7 +75,7 @@ export default function AdminProducts() {
         tags: [...product.tags],
         story: product.story || '',
         culture: product.culture || '',
-        use: product.use || '',
+        howToUse: product.howToUse || '',
       });
     } else {
       setEditingProduct(null);
@@ -95,7 +95,7 @@ export default function AdminProducts() {
         tags: [],
         story: '',
         culture: '',
-        use: '',
+        howToUse: '',
       });
     }
     setIsModalOpen(true);
@@ -118,7 +118,7 @@ export default function AdminProducts() {
       rating: parseFloat(formData.rating.toString()) || 0,
       story: formData.story,
       culture: formData.culture,
-      use: formData.use,
+      howToUse: formData.howToUse,
     };
 
     if (editingProduct) {
@@ -473,8 +473,8 @@ export default function AdminProducts() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">How to Use（使用方法）</label>
                 <textarea
-                  value={formData.use}
-                  onChange={(e) => setFormData({ ...formData, use: e.target.value })}
+                  value={formData.howToUse}
+                  onChange={(e) => setFormData({ ...formData, howToUse: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
                   rows={5}
                   placeholder="请输入使用方法，可以使用HTML标签"

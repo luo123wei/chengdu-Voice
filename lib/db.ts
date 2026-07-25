@@ -51,7 +51,7 @@ function mapProduct(row: any): Product {
     tags: row.tags || [],
     story: row.story,
     culture: row.culture,
-    use: row.use,
+    howToUse: row.how_to_use,
   };
 }
 
@@ -144,7 +144,7 @@ export const db = {
         tags: newProduct.tags,
         story: newProduct.story,
         culture: newProduct.culture,
-        use: newProduct.use,
+        how_to_use: newProduct.howToUse,
       }).select('*').single();
       if (error) {
         console.error('Failed to create product:', error);
@@ -169,7 +169,7 @@ export const db = {
       if (updates.tags !== undefined) updateData.tags = updates.tags;
       if (updates.story !== undefined) updateData.story = updates.story;
       if (updates.culture !== undefined) updateData.culture = updates.culture;
-      if (updates.use !== undefined) updateData.use = updates.use;
+      if (updates.howToUse !== undefined) updateData.how_to_use = updates.howToUse;
 
       const { data, error } = await supabase.from('products').update(updateData).eq('id', id).select('*').single();
       if (error || !data) return null;
