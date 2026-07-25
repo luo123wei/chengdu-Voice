@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Noto_Sans_SC } from 'next/font/google'
 import './globals.css'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 const inter = Inter({ 
   weight: ['400', '500', '600', '700'], 
@@ -36,7 +37,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <GoogleAnalytics />
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   )
