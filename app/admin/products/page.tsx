@@ -141,10 +141,13 @@ export default function AdminProducts() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
+      const { compressImageToFile } = await import('@/lib/imageUtils');
+      const compressedFile = await compressImageToFile(file, 1920);
+
+      const formData = new FormData();
+      formData.append('file', compressedFile);
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,

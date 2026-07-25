@@ -111,11 +111,14 @@ export default function AdminBlogs() {
       const remainingSlots = MAX_IMAGES - formData.images.length;
       const filesToUpload = Array.from(files).slice(0, remainingSlots);
       
+      const { compressImageToFile } = await import('@/lib/imageUtils');
+      
       for (const file of filesToUpload) {
-        const formDataToSend = new FormData();
-        formDataToSend.append('file', file);
-        
         try {
+          const compressedFile = await compressImageToFile(file, 1920);
+          const formDataToSend = new FormData();
+          formDataToSend.append('file', compressedFile);
+          
           const response = await fetch('/api/upload', {
             method: 'POST',
             body: formDataToSend,
