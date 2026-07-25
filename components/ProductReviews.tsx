@@ -32,6 +32,7 @@ export default function ProductReviews({ productId, productRating, productReview
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);

@@ -9,6 +9,7 @@ declare global {
 
 export default function GoogleAnalytics() {
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const savedSettings = localStorage.getItem('siteSettings');
     if (savedSettings) {
       try {

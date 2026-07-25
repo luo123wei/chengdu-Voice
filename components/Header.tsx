@@ -12,9 +12,11 @@ export default function Header() {
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
     }
     fetchCartCount();
   }, []);

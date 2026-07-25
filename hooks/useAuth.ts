@@ -13,6 +13,10 @@ export function useAuth() {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      setLoading(false);
+      return;
+    }
     const token = localStorage.getItem('adminToken');
     const storedUser = localStorage.getItem('adminUser');
 

@@ -17,6 +17,7 @@ export default function AccountPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
