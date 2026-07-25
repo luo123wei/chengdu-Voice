@@ -262,7 +262,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="mt-12 bg-cream/30 rounded-xl p-8">
+          <div className="mt-12 mb-12 bg-cream/30 rounded-xl p-8">
             <h2 className="text-2xl font-serif font-bold text-secondary mb-6 text-center">Discover the Story</h2>
             <div className="flex border-b border-gray-200 mb-6">
               <button
@@ -363,11 +363,13 @@ export default function ProductDetailPage() {
         </div>
       </section>
 
-      <ProductReviews
-        productId={product.id}
-        productRating={product.rating}
-        productReviewsCount={product.reviews}
-      />
+      <section className="mt-12">
+        <ProductReviews
+          productId={product.id}
+          productRating={product.rating}
+          productReviewsCount={product.reviews}
+        />
+      </section>
 
       <Footer />
     </div>
