@@ -104,10 +104,8 @@ export default function BlogDetailPage() {
           )}
 
           <div className="prose prose-lg max-w-none">
-            <h2 className="text-2xl font-bold text-secondary mb-4">English</h2>
-            <div className="text-gray-600 leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: post.contentEn || '<p>No content available</p>' }} />
+            <div className="text-gray-600 leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: post.contentEn || '<p>No content available</p>' }} />
             
-            <h2 className="text-2xl font-bold text-secondary mb-4">中文</h2>
             <div className="text-gray-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content || '<p>暂无内容</p>' }} />
           </div>
         </div>
