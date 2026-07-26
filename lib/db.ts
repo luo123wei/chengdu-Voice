@@ -3,8 +3,13 @@ import { products as defaultProducts, blogPosts as defaultBlogs, orders as defau
 import type { Product, BlogPost, Order, ShippingRate, Cart, User, VerificationCode } from '@/data/mockData';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
 
 const defaultSettings = {
   siteName: 'Chengdu Voice | 成都之音',
