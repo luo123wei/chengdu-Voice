@@ -44,7 +44,7 @@ export default function AdminProducts() {
     rating: 0,
     reviews: 0,
     tags: [] as string[],
-    unit: 0,
+    unit: 0 as number | undefined,
     unitType: '',
     story: '',
     culture: '',
@@ -98,7 +98,7 @@ export default function AdminProducts() {
         rating: 0,
         reviews: 0,
         tags: [],
-        unit: 0,
+        unit: undefined,
         unitType: '',
         story: '',
         culture: '',
@@ -123,7 +123,7 @@ export default function AdminProducts() {
       id: editingProduct?.id || `prod-${Date.now()}`,
       ...formData,
       rating: parseFloat(formData.rating.toString()) || 0,
-      unit: formData.unit || undefined,
+      unit: formData.unit === undefined || formData.unit === null ? undefined : formData.unit,
       unitType: formData.unitType || undefined,
       story: formData.story,
       culture: formData.culture,
@@ -391,8 +391,8 @@ export default function AdminProducts() {
                     <input
                       type="number"
                       min="0"
-                      value={formData.unit}
-                      onChange={(e) => setFormData({ ...formData, unit: parseFloat(e.target.value) || 0 })}
+                      value={formData.unit === undefined ? '' : formData.unit}
+                      onChange={(e) => setFormData({ ...formData, unit: e.target.value === '' ? undefined : (parseFloat(e.target.value) || 0) })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
                       placeholder="150"
                     />

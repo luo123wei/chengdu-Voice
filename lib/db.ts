@@ -54,7 +54,7 @@ function mapProduct(row: any): Product {
     rating: row.rating ? parseFloat(row.rating) : 0,
     reviews: row.reviews ? parseInt(row.reviews) : 0,
     tags: Array.isArray(row.tags) ? row.tags : [],
-    unit: row.unit ? parseFloat(row.unit) : undefined,
+    unit: row.unit === undefined || row.unit === null ? undefined : parseFloat(row.unit),
     unitType: row.unit_type || undefined,
     story: row.story || '',
     culture: row.culture || '',
