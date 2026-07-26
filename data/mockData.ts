@@ -28,6 +28,8 @@ export interface Product {
   rating: number;
   reviews: number;
   tags: string[];
+  unit?: number;
+  unitType?: string;
   story?: string;
   culture?: string;
   howToUse?: string;
@@ -215,6 +217,8 @@ export const products: Product[] = [
     stock: 150,
     rating: 4.9,
     reviews: 234,
+    unit: 100,
+    unitType: 'g',
     tags: ['organic', 'premium'],
   },
   {
@@ -232,6 +236,8 @@ export const products: Product[] = [
     stock: 300,
     rating: 4.8,
     reviews: 456,
+    unit: 500,
+    unitType: 'g',
     tags: ['authentic', 'traditional'],
   },
   {
@@ -250,6 +256,8 @@ export const products: Product[] = [
     stock: 25,
     rating: 5.0,
     reviews: 67,
+    unit: 1,
+    unitType: 'piece',
     tags: ['handmade', 'art'],
   },
   {
@@ -267,6 +275,8 @@ export const products: Product[] = [
     stock: 200,
     rating: 4.7,
     reviews: 312,
+    unit: 200,
+    unitType: 'g',
     tags: ['spicy', 'easy-cook'],
   },
   {
@@ -284,6 +294,8 @@ export const products: Product[] = [
     stock: 100,
     rating: 4.9,
     reviews: 189,
+    unit: 1,
+    unitType: 'piece',
     tags: ['gift', 'cute'],
   },
   {
@@ -301,6 +313,8 @@ export const products: Product[] = [
     stock: 80,
     rating: 4.8,
     reviews: 156,
+    unit: 200,
+    unitType: 'g',
     tags: ['snack', 'traditional'],
   },
 ];

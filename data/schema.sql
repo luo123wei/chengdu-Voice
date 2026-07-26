@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS products (
   rating DECIMAL(2,1) NOT NULL DEFAULT 0,
   reviews INT NOT NULL DEFAULT 0,
   tags TEXT[] NOT NULL DEFAULT '{}',
+  unit DECIMAL(10,2),
+  unit_type VARCHAR(50),
   story TEXT,
   culture TEXT,
   how_to_use TEXT

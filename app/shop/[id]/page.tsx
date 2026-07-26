@@ -166,6 +166,9 @@ export default function ProductDetailPage() {
 
               <div className="flex items-center space-x-3 mb-6">
                 <span className="text-3xl font-bold text-primary">${product.price}</span>
+                {product.unit && product.unitType && (
+                  <span className="text-lg text-gray-500">/ {product.unit}{product.unitType}</span>
+                )}
                 {product.originalPrice && (
                   <span className="text-lg text-gray-400 line-through">${product.originalPrice}</span>
                 )}

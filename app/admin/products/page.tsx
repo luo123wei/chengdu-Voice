@@ -44,6 +44,8 @@ export default function AdminProducts() {
     rating: 0,
     reviews: 0,
     tags: [] as string[],
+    unit: 0,
+    unitType: '',
     story: '',
     culture: '',
     howToUse: '',
@@ -74,6 +76,8 @@ export default function AdminProducts() {
         rating: product.rating,
         reviews: product.reviews,
         tags: [...product.tags],
+        unit: product.unit || 0,
+        unitType: product.unitType || '',
         story: product.story || '',
         culture: product.culture || '',
         howToUse: product.howToUse || '',
@@ -94,6 +98,8 @@ export default function AdminProducts() {
         rating: 0,
         reviews: 0,
         tags: [],
+        unit: 0,
+        unitType: '',
         story: '',
         culture: '',
         howToUse: '',
@@ -117,6 +123,8 @@ export default function AdminProducts() {
       id: editingProduct?.id || `prod-${Date.now()}`,
       ...formData,
       rating: parseFloat(formData.rating.toString()) || 0,
+      unit: formData.unit || undefined,
+      unitType: formData.unitType || undefined,
       story: formData.story,
       culture: formData.culture,
       howToUse: formData.howToUse,
@@ -376,6 +384,26 @@ export default function AdminProducts() {
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
                     placeholder="0"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">规格单位</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.unit}
+                      onChange={(e) => setFormData({ ...formData, unit: parseFloat(e.target.value) || 0 })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                      placeholder="150"
+                    />
+                    <input
+                      type="text"
+                      value={formData.unitType}
+                      onChange={(e) => setFormData({ ...formData, unitType: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                      placeholder="g / ml / 个"
+                    />
+                  </div>
                 </div>
               </div>
 

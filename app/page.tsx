@@ -212,6 +212,9 @@ export default async function HomePage() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-lg font-bold text-amber-600">${product.price}</span>
+                    {product.unit && product.unitType && (
+                      <span className="text-sm text-gray-500">/ {product.unit}{product.unitType}</span>
+                    )}
                     {product.originalPrice && (
                       <span className="text-sm text-gray-400 line-through">${product.originalPrice}</span>
                     )}

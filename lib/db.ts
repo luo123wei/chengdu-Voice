@@ -54,6 +54,8 @@ function mapProduct(row: any): Product {
     rating: row.rating ? parseFloat(row.rating) : 0,
     reviews: row.reviews ? parseInt(row.reviews) : 0,
     tags: Array.isArray(row.tags) ? row.tags : [],
+    unit: row.unit ? parseFloat(row.unit) : undefined,
+    unitType: row.unit_type || undefined,
     story: row.story || '',
     culture: row.culture || '',
     howToUse: row.how_to_use || '',
@@ -147,6 +149,8 @@ export const db = {
         rating: newProduct.rating,
         reviews: newProduct.reviews,
         tags: newProduct.tags,
+        unit: newProduct.unit,
+        unit_type: newProduct.unitType,
         story: newProduct.story,
         culture: newProduct.culture,
         how_to_use: newProduct.howToUse,
@@ -172,6 +176,8 @@ export const db = {
       if (updates.rating !== undefined) updateData.rating = updates.rating;
       if (updates.reviews !== undefined) updateData.reviews = updates.reviews;
       if (updates.tags !== undefined) updateData.tags = updates.tags;
+      if (updates.unit !== undefined) updateData.unit = updates.unit;
+      if (updates.unitType !== undefined) updateData.unit_type = updates.unitType;
       if (updates.story !== undefined) updateData.story = updates.story;
       if (updates.culture !== undefined) updateData.culture = updates.culture;
       if (updates.howToUse !== undefined) updateData.how_to_use = updates.howToUse;
