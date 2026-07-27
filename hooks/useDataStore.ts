@@ -32,7 +32,7 @@ export function useProducts() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product),
     });
-    refreshProducts();
+    await refreshProducts();
   }, [refreshProducts]);
 
   const addProduct = useCallback(async (product: Omit<Product, 'id'>) => {
@@ -41,14 +41,14 @@ export function useProducts() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product),
     });
-    refreshProducts();
+    await refreshProducts();
   }, [refreshProducts]);
 
   const deleteProduct = useCallback(async (id: string) => {
     await fetch(`/api/products?id=${id}`, {
       method: 'DELETE',
     });
-    refreshProducts();
+    await refreshProducts();
   }, [refreshProducts]);
 
   return { products, loading, saveProduct, updateProduct: saveProduct, addProduct, deleteProduct, refreshProducts };

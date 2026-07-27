@@ -163,14 +163,14 @@ export const db = {
     },
     update: async (id: string, updates: Partial<Product>): Promise<Product | null> => {
       const updateData: any = {};
-      if (updates.name) updateData.name = updates.name;
+      if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.nameEn !== undefined) updateData.name_en = updates.nameEn;
       if (updates.description !== undefined) updateData.description = updates.description;
       if (updates.descriptionEn !== undefined) updateData.description_en = updates.descriptionEn;
       if (updates.price !== undefined) updateData.price = updates.price;
       if (updates.originalPrice !== undefined) updateData.original_price = updates.originalPrice;
-      if (updates.category) updateData.category = updates.category;
-      if (updates.type) updateData.type = updates.type;
+      if (updates.category !== undefined) updateData.category = updates.category;
+      if (updates.type !== undefined) updateData.type = updates.type;
       if (updates.images !== undefined) updateData.images = updates.images;
       if (updates.stock !== undefined) updateData.stock = updates.stock;
       if (updates.rating !== undefined) updateData.rating = updates.rating;
@@ -182,8 +182,18 @@ export const db = {
       if (updates.culture !== undefined) updateData.culture = updates.culture;
       if (updates.howToUse !== undefined) updateData.how_to_use = updates.howToUse;
 
+      console.log('Update product:', id, 'with data:', updateData);
+
       const { data, error } = await supabase.from('products').update(updateData).eq('id', id).select('*').single();
-      if (error || !data) return null;
+      if (error) {
+        console.error('Update error:', error);
+        return null;
+      }
+      if (!data) {
+        console.log('No data returned after update');
+        return null;
+      }
+      console.log('Update result:', data);
       return mapProduct(data);
     },
     delete: async (id: string): Promise<boolean> => {

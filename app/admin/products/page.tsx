@@ -113,7 +113,7 @@ export default function AdminProducts() {
     setEditingProduct(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name || !formData.nameEn || !formData.price) {
       alert('请填写必填字段');
       return;
@@ -130,13 +130,17 @@ export default function AdminProducts() {
       howToUse: formData.howToUse,
     };
 
-    if (editingProduct) {
-      updateProduct(productData);
-    } else {
-      addProduct(productData);
+    try {
+      if (editingProduct) {
+        await updateProduct(productData);
+      } else {
+        await addProduct(productData);
+      }
+      handleCloseModal();
+    } catch (error) {
+      alert('保存失败，请重试');
+      console.error('Save failed:', error);
     }
-
-    handleCloseModal();
   };
 
   const handleDelete = (id: string) => {
