@@ -76,7 +76,7 @@ export default function AdminProducts() {
         rating: product.rating,
         reviews: product.reviews,
         tags: [...product.tags],
-        unit: product.unit || 0,
+        unit: product.unit,
         unitType: product.unitType || '',
         story: product.story || '',
         culture: product.culture || '',
@@ -123,7 +123,7 @@ export default function AdminProducts() {
       id: editingProduct?.id || `prod-${Date.now()}`,
       ...formData,
       rating: parseFloat(formData.rating.toString()) || 0,
-      unit: formData.unit === undefined || formData.unit === null ? undefined : formData.unit,
+      unit: formData.unit === undefined || formData.unit === null || isNaN(formData.unit) ? undefined : formData.unit,
       unitType: formData.unitType || undefined,
       story: formData.story,
       culture: formData.culture,
@@ -392,7 +392,15 @@ export default function AdminProducts() {
                       type="number"
                       min="0"
                       value={formData.unit === undefined ? '' : formData.unit}
-                      onChange={(e) => setFormData({ ...formData, unit: e.target.value === '' ? undefined : (parseFloat(e.target.value) || 0) })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          setFormData({ ...formData, unit: undefined });
+                        } else {
+                          const num = parseFloat(val);
+                          setFormData({ ...formData, unit: isNaN(num) ? formData.unit : num });
+                        }
+                      }}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
                       placeholder="150"
                     />
