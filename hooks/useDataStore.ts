@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { products as defaultProducts, blogPosts as defaultBlogs, orders as defaultOrders } from '@/data/mockData';
 import type { Product, BlogPost, Order, ShippingRate } from '@/data/mockData';
 
-export function useProducts() {
+export function useProducts(useMockFallback = true) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,36 +11,54 @@ export function useProducts() {
     fetch('/api/products')
       .then(res => res.json())
       .then(data => {
-        setProducts(data.length > 0 ? data : defaultProducts);
+        if (Array.isArray(data) && data.length > 0) {
+          setProducts(data);
+        } else if (useMockFallback) {
+          setProducts(defaultProducts);
+        }
         setLoading(false);
       })
       .catch(() => {
-        setProducts(defaultProducts);
+        if (useMockFallback) {
+          setProducts(defaultProducts);
+        }
         setLoading(false);
       });
-  }, []);
+  }, [useMockFallback]);
 
   const refreshProducts = useCallback(() => {
     fetch('/api/products')
       .then(res => res.json())
-      .then(data => setProducts(data));
+      .then(data => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        }
+      });
   }, []);
 
   const saveProduct = useCallback(async (product: Product) => {
-    await fetch('/api/products', {
+    const res = await fetch('/api/products', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || '保存失败');
+    }
     await refreshProducts();
   }, [refreshProducts]);
 
   const addProduct = useCallback(async (product: Omit<Product, 'id'>) => {
-    await fetch('/api/products', {
+    const res = await fetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || '添加失败');
+    }
     await refreshProducts();
   }, [refreshProducts]);
 

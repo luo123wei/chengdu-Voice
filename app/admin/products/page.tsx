@@ -51,7 +51,7 @@ export default function AdminProducts() {
     howToUse: '',
   });
 
-  const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts(false);
 
   const filteredProducts = productList.filter(
     (p) =>
