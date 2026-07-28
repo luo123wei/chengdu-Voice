@@ -3,8 +3,9 @@ import { db } from '@/lib/db'
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const blog = await db.blogs.getById(params.id)
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const blog = await db.blogs.getById(id)
   
   if (!blog) {
     return {
@@ -17,12 +18,12 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     description: blog.contentEn?.slice(0, 160) || blog.titleEn,
     keywords: [blog.category, 'Chengdu', '成都', 'culture', 'story'],
     alternates: {
-      canonical: `/blog/${params.id}`,
+      canonical: `/blog/${id}`,
     },
     openGraph: {
       title: blog.titleEn,
       description: blog.contentEn?.slice(0, 160) || blog.titleEn,
-      url: `${siteUrl}/blog/${params.id}`,
+      url: `${siteUrl}/blog/${id}`,
       type: 'article',
       publishedTime: blog.publishDate,
       images: blog.images?.[0] ? [{ url: blog.images[0] }] : [{ url: '/og-image.jpg' }],

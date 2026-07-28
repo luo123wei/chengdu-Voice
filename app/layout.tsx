@@ -39,8 +39,6 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'en_US',
-    localeAlternates: ['zh_CN'],
     url: siteUrl,
     siteName: 'Chengdu Voice | 成都之音',
     title: 'Chengdu Voice | Authentic Chengdu Culture & Products',
