@@ -1,13 +1,33 @@
 import type { MetadataRoute } from 'next'
 import { db } from '@/lib/db'
+import { products as defaultProducts, blogPosts as defaultBlogs } from '@/data/mockData'
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [blogs, products] = await Promise.all([
-    db.blogs.getAll(),
-    db.products.getAll(),
-  ])
+  let blogs: typeof defaultBlogs = []
+  let products: typeof defaultProducts = []
+
+  try {
+    [blogs, products] = await Promise.all([
+      db.blogs.getAll(),
+      db.products.getAll(),
+    ])
+    console.log(`[Sitemap] Fetched ${blogs.length} blogs and ${products.length} products from DB`)
+  } catch (error) {
+    console.error('[Sitemap] Error fetching data, using fallback:', error)
+    blogs = defaultBlogs
+    products = defaultProducts
+  }
+
+  if (!blogs || blogs.length === 0) {
+    console.log('[Sitemap] Using fallback blog data')
+    blogs = defaultBlogs
+  }
+  if (!products || products.length === 0) {
+    console.log('[Sitemap] Using fallback product data')
+    products = defaultProducts
+  }
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -74,5 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticRoutes, ...blogRoutes, ...productRoutes]
+  const result = [...staticRoutes, ...blogRoutes, ...productRoutes]
+  console.log(`[Sitemap] Generated ${result.length} total URLs (${blogRoutes.length} blogs, ${productRoutes.length} products)`)
+  return result
 }
