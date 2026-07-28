@@ -15,18 +15,18 @@ export async function POST(request: NextRequest) {
     }
 
     const code = generateCode();
+    console.log(`[Auth] Generating code for: ${email}`);
     
     try {
       await db.verificationCodes.create(email, code);
       console.log('[Auth] Verification code saved to database');
     } catch (dbError) {
       console.error('[Auth] Failed to save verification code to database:', dbError);
-      console.log('[Auth] Proceeding with email send despite database error');
     }
 
-    const settings = await db.settings.get();
-    const appUrl = settings?.appUrl || process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com';
 
+    console.log(`[Auth] Sending email to: ${email}`);
     await sendEmail({
       to: email,
       subject: 'Your Login Verification Code for Chengdu Voice',
@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
       `,
     });
 
+    console.log(`[Auth] Email sent successfully to: ${email}`);
     return NextResponse.json({ success: true, message: 'Verification code sent' });
   } catch (error: any) {
     console.error('Failed to send verification code:', error);

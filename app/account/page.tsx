@@ -45,21 +45,38 @@ export default function AccountPage() {
 
     setError('');
     setIsSending(true);
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    
     try {
       const res = await fetch('/api/auth/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
+        signal: controller.signal,
       });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server error: ${res.status}`);
+      }
+      
       const data = await res.json();
       if (data.success) {
         setSentCode(true);
+        setError('');
       } else {
         setError(data.error || 'Failed to send verification code');
       }
-    } catch (error) {
-      setError('Failed to send verification code. Please try again.');
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        setError('请求超时，请检查网络连接后重试');
+      } else {
+        setError(error.message || '发送验证码失败，请重试');
+      }
     } finally {
+      clearTimeout(timeoutId);
       setIsSending(false);
     }
   };
@@ -204,6 +221,12 @@ export default function AccountPage() {
                 {error && (
                   <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm">
                     {error}
+                  </div>
+                )}
+
+                {sentCode && !error && (
+                  <div className="p-3 bg-green-50 text-green-600 rounded-xl text-sm">
+                    ✓ 验证码已发送到你的邮箱，请查收
                   </div>
                 )}
 
