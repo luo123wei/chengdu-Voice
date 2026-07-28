@@ -137,8 +137,8 @@ export default function AdminProducts() {
         await addProduct(productData);
       }
       handleCloseModal();
-    } catch (error) {
-      alert('保存失败，请重试');
+    } catch (error: any) {
+      alert(`保存失败：${error?.message || error}`);
       console.error('Save failed:', error);
     }
   };

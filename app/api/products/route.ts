@@ -22,13 +22,15 @@ export async function PUT(request: Request) {
     if (!body.id) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
     }
+    console.log('PUT /api/products - body id:', body.id);
     const product = await db.products.update(body.id, body);
     if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      return NextResponse.json({ error: `Product not found with id: ${body.id}` }, { status: 404 });
     }
     return NextResponse.json(product);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
+  } catch (error: any) {
+    console.error('PUT /api/products error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to update product' }, { status: 500 });
   }
 }
 

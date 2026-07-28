@@ -186,11 +186,11 @@ export const db = {
 
       const { data, error } = await supabase.from('products').update(updateData).eq('id', id).select('*').single();
       if (error) {
-        console.error('Update error:', error);
-        return null;
+        console.error('Update Supabase error:', JSON.stringify(error));
+        throw new Error(`Supabase update error: ${error.message || error}`);
       }
       if (!data) {
-        console.log('No data returned after update');
+        console.log('No data returned after update for id:', id);
         return null;
       }
       console.log('Update result:', data);

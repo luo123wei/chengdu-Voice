@@ -37,15 +37,20 @@ export function useProducts(useMockFallback = true) {
   }, []);
 
   const saveProduct = useCallback(async (product: Product) => {
+    console.log('PUT /api/products - sending:', JSON.stringify(product));
     const res = await fetch('/api/products', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product),
     });
+    console.log('PUT response - status:', res.status);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || '保存失败');
+      console.error('PUT error response:', err);
+      throw new Error(err.error || `保存失败 (HTTP ${res.status})`);
     }
+    const result = await res.json();
+    console.log('PUT success:', result);
     await refreshProducts();
   }, [refreshProducts]);
 
