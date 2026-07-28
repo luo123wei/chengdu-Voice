@@ -1,5 +1,12 @@
 import nodemailer from 'nodemailer';
 
+console.log('[Email] Config:', {
+  host: process.env.MAIL_HOST || 'smtp.example.com',
+  port: process.env.MAIL_PORT || '587',
+  secure: process.env.MAIL_SECURE === 'true',
+  user: process.env.MAIL_USER || '',
+});
+
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST || 'smtp.example.com',
   port: parseInt(process.env.MAIL_PORT || '587'),
@@ -21,7 +28,9 @@ export async function sendEmail(options: {
     ...options,
   };
 
+  console.log(`[Email] Sending email to: ${options.to}`);
   await transporter.sendMail(mailOptions);
+  console.log(`[Email] Email sent successfully to: ${options.to}`);
 }
 
 export async function sendReviewVerificationEmail(

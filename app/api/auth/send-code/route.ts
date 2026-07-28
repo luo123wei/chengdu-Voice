@@ -40,8 +40,9 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, message: 'Verification code sent' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to send verification code:', error);
-    return NextResponse.json({ error: 'Failed to send verification code' }, { status: 500 });
+    const errorMessage = error?.message || 'Unknown error';
+    return NextResponse.json({ error: `Failed to send verification code: ${errorMessage}` }, { status: 500 });
   }
 }
