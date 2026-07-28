@@ -15,10 +15,17 @@ export async function POST(request: NextRequest) {
     }
 
     const code = generateCode();
-    await db.verificationCodes.create(email, code);
+    
+    try {
+      await db.verificationCodes.create(email, code);
+      console.log('[Auth] Verification code saved to database');
+    } catch (dbError) {
+      console.error('[Auth] Failed to save verification code to database:', dbError);
+      console.log('[Auth] Proceeding with email send despite database error');
+    }
 
     const settings = await db.settings.get();
-    const appUrl = settings.appUrl || 'http://localhost:3000';
+    const appUrl = settings?.appUrl || process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com';
 
     await sendEmail({
       to: email,
