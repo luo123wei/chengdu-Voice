@@ -1,6 +1,32 @@
 import { MapPin, Mail, Award, Globe, Heart, Users } from 'lucide-react';
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
+
+export const metadata: Metadata = {
+  title: 'About | Chengdu Voice - Our Story & Mission',
+  description: 'Learn about Chengdu Voice\'s mission to share authentic Chengdu culture with the world. From sound to taste, from Chengdu to your home.',
+  keywords: ['about Chengdu Voice', 'Chengdu culture mission', 'founder story', 'Chengdu to the world'],
+  alternates: {
+    canonical: '/about',
+  },
+  openGraph: {
+    title: 'About | Chengdu Voice',
+    description: 'Our mission to share authentic Chengdu culture with the world.',
+    url: `${siteUrl}/about`,
+    siteName: 'Chengdu Voice',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About | Chengdu Voice',
+    description: 'Our mission to share authentic Chengdu culture.',
+    images: ['/og-image.jpg'],
+  },
+};
 
 export default function AboutPage() {
   const stats = [

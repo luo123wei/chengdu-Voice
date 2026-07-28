@@ -1,0 +1,34 @@
+import type { Metadata } from 'next'
+
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
+
+export const metadata: Metadata = {
+  title: 'Free Sounds | Chengdu Voice - Listen to Authentic Chengdu',
+  description: 'Free authentic Chengdu sounds - teahouses, rain streets, local markets. Experience the rhythm of Chengdu through immersive audio.',
+  keywords: ['Chengdu sounds', '成都声音', 'free audio', 'teahouse sounds', 'Chinese soundscape', 'ASMR Chengdu'],
+  alternates: {
+    canonical: '/free-sounds',
+  },
+  openGraph: {
+    title: 'Free Sounds | Chengdu Voice',
+    description: 'Listen to authentic Chengdu sounds - teahouses, rain streets, local markets.',
+    url: `${siteUrl}/free-sounds`,
+    siteName: 'Chengdu Voice',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Free Sounds | Chengdu Voice',
+    description: 'Listen to authentic Chengdu sounds.',
+    images: ['/og-image.jpg'],
+  },
+}
+
+export default function FreeSoundsLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return children
+}

@@ -1,9 +1,35 @@
 import { ArrowRight, Star, Volume2, BookOpen, Utensils } from 'lucide-react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SubscribeForm from '@/components/SubscribeForm';
 import { db } from '@/lib/db';
+
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
+
+export const metadata: Metadata = {
+  title: 'Chengdu Voice | 成都之音 - Authentic Chengdu Culture & Products',
+  description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
+  keywords: ['Chengdu', '成都', 'Sichuan pepper', 'tea', 'culture', 'cross-border e-commerce'],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Chengdu Voice | 成都之音',
+    description: 'Experience authentic Chengdu through sound, taste, and stories.',
+    url: siteUrl,
+    siteName: 'Chengdu Voice',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Chengdu Voice | 成都之音',
+    description: 'Experience authentic Chengdu through sound, taste, and stories.',
+    images: ['/og-image.jpg'],
+  },
+};
 
 export default async function HomePage() {
   const [blogs, products, settings] = await Promise.all([

@@ -15,11 +15,68 @@ const notoSansSC = Noto_Sans_SC({
   display: 'swap',
 })
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
+
 export const metadata: Metadata = {
-  title: 'Chengdu Voice - Cross-border E-commerce',
-  description: 'Experience the authentic voice of Chengdu - Traditional Chinese culture meets Western aesthetics',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'Chengdu Voice | 成都之音 - Authentic Chengdu Culture & Products',
+    template: '%s | Chengdu Voice',
+  },
+  description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
+  keywords: [
+    'Chengdu', '成都', 'Sichuan pepper', '四川花椒', 'tea', '茶叶',
+    'Chengdu culture', '成都文化', 'cross-border e-commerce', '跨境电商',
+    'Chinese culture', '中国文化', 'sound map', '声音地图',
+    'Hanyuan pepper', '汉源花椒', 'Mongding tea', '蒙顶茶',
+    'authentic Chinese products', '正宗中国产品', 'traditional Sichuan', '传统四川'
+  ],
+  authors: [{ name: 'Chengdu Voice', url: siteUrl }],
+  creator: 'Chengdu Voice',
+  publisher: 'Chengdu Voice',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    localeAlternates: ['zh_CN'],
+    url: siteUrl,
+    siteName: 'Chengdu Voice | 成都之音',
+    title: 'Chengdu Voice | Authentic Chengdu Culture & Products',
+    description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Chengdu Voice - Authentic Chengdu Culture & Products',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Chengdu Voice | Authentic Chengdu Culture & Products',
+    description: 'Experience authentic Chengdu through sound, taste, and stories.',
+    images: ['/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'googlef4d70c08c36bec06',
+  },
   other: {
     'charset': 'UTF-8',
+    'baidu-site-verification': 'your-baidu-verification-code',
   },
 }
 
