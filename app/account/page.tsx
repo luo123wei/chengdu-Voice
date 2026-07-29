@@ -46,10 +46,17 @@ export default function AccountPage() {
     setError('');
     setIsSending(true);
     
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-    
     try {
+      // First, wake up the server (it might be sleeping on Render free tier)
+      try {
+        await fetch('/api/products', { method: 'GET', cache: 'no-store' });
+      } catch (e) {
+        // Ignore, just a warmup attempt
+      }
+      
+      const controller = new abortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+      
       const res = await fetch('/api/auth/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,9 +64,11 @@ export default function AccountPage() {
         signal: controller.signal,
       });
       
+      clearTimeout(timeoutId);
+      
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error: ${res.status}`);
+        throw new Error(errorData.error || `服务器错误: ${res.status}`);
       }
       
       const data = await res.json();
@@ -67,16 +76,15 @@ export default function AccountPage() {
         setSentCode(true);
         setError('');
       } else {
-        setError(data.error || 'Failed to send verification code');
+        setError(data.error || '发送验证码失败');
       }
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        setError('请求超时，请检查网络连接后重试');
+        setError('请求超时，服务器可能正在重启。请等待1分钟后重试');
       } else {
         setError(error.message || '发送验证码失败，请重试');
       }
     } finally {
-      clearTimeout(timeoutId);
       setIsSending(false);
     }
   };
