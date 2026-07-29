@@ -54,7 +54,7 @@ export default function AccountPage() {
         // Ignore, just a warmup attempt
       }
       
-      const controller = new abortController();
+      const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000);
       
       const res = await fetch('/api/auth/send-code', {
