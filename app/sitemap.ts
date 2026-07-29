@@ -1,34 +1,8 @@
 import type { MetadataRoute } from 'next'
-import { db } from '@/lib/db'
-import { products as defaultProducts, blogPosts as defaultBlogs } from '@/data/mockData'
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let blogs: typeof defaultBlogs = []
-  let products: typeof defaultProducts = []
-
-  try {
-    [blogs, products] = await Promise.all([
-      db.blogs.getAll(),
-      db.products.getAll(),
-    ])
-    console.log(`[Sitemap] Fetched ${blogs.length} blogs and ${products.length} products from DB`)
-  } catch (error) {
-    console.error('[Sitemap] Error fetching data, using fallback:', error)
-    blogs = defaultBlogs
-    products = defaultProducts
-  }
-
-  if (!blogs || blogs.length === 0) {
-    console.log('[Sitemap] Using fallback blog data')
-    blogs = defaultBlogs
-  }
-  if (!products || products.length === 0) {
-    console.log('[Sitemap] Using fallback product data')
-    products = defaultProducts
-  }
-
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: `${siteUrl}/`,
@@ -80,21 +54,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  const blogRoutes: MetadataRoute.Sitemap = blogs.map((blog) => ({
-    url: `${siteUrl}/blog/${blog.id}`,
-    lastModified: new Date(blog.publishDate || new Date()),
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  }))
+  let blogRoutes: MetadataRoute.Sitemap = []
+  let productRoutes: MetadataRoute.Sitemap = []
 
-  const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${siteUrl}/shop/${product.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }))
+  try {
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Fetch blogs
+    const { data: blogs, error: blogError } = await supabase.from('blogs').select('id, publish_date')
+    if (!blogError && blogs) {
+      blogRoutes = blogs.map((blog: any) => ({
+        url: `${siteUrl}/blog/${blog.id}`,
+        lastModified: new Date(blog.publish_date || new Date()),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      }))
+    }
+
+    // Fetch products
+    const { data: products, error: productError } = await supabase.from('products').select('id')
+    if (!productError && products) {
+      productRoutes = products.map((product: any) => ({
+        url: `${siteUrl}/shop/${product.id}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.8,
+      }))
+    }
+
+    console.log(`[Sitemap] Generated ${blogRoutes.length} blog URLs and ${productRoutes.length} product URLs`)
+  } catch (error) {
+    console.error('[Sitemap] Error fetching dynamic data:', error)
+  }
 
   const result = [...staticRoutes, ...blogRoutes, ...productRoutes]
-  console.log(`[Sitemap] Generated ${result.length} total URLs (${blogRoutes.length} blogs, ${productRoutes.length} products)`)
+  console.log(`[Sitemap] Total URLs: ${result.length}`)
   return result
 }
