@@ -98,21 +98,31 @@ export default function AccountPage() {
     setError('');
     setIsVerifying(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       const res = await fetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (data.success) {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
         fetchOrders(data.user.email);
       } else {
-        setError(data.error || 'Invalid verification code');
+        setError(data.error || '验证码无效，请重试');
       }
-    } catch (error) {
-      setError('Failed to verify code. Please try again.');
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        setError('验证超时，服务器可能正在重启，请重试');
+      } else {
+        setError('验证失败，请重试');
+      }
     } finally {
       setIsVerifying(false);
     }

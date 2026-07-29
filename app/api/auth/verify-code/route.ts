@@ -6,28 +6,32 @@ async function verifyCodeInDatabase(email: string, code: string): Promise<boolea
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
+
+    // 获取最新的验证码记录（避免 .single() 在多条记录时报错）
     const { data, error } = await supabase
       .from('verification_codes')
       .select('*')
       .ilike('email', email.toLowerCase())
-      .single();
-    
-    if (error || !data) {
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (error || !data || data.length === 0) {
       console.error('[Auth] Code not found in database:', error?.message);
       return false;
     }
-    
-    if (data.code !== code) {
+
+    const record = data[0];
+
+    if (record.code !== code) {
       console.log('[Auth] Code mismatch');
       return false;
     }
-    
-    if (new Date(data.expires_at) < new Date()) {
+
+    if (new Date(record.expires_at) < new Date()) {
       console.log('[Auth] Code expired');
       return false;
     }
-    
+
     console.log('[Auth] Code verified successfully');
     return true;
   } catch (err: any) {
@@ -37,103 +41,100 @@ async function verifyCodeInDatabase(email: string, code: string): Promise<boolea
 }
 
 async function getOrCreateUser(email: string): Promise<any> {
+  const fallbackUser = {
+    id: `user-${Date.now()}`,
+    email,
+    name: email.split('@')[0],
+    createdAt: new Date().toISOString(),
+    lastLoginAt: new Date().toISOString(),
+    orderIds: [],
+  };
+
   try {
     const { createClient } = await import('@supabase/supabase-js');
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Try to get existing user
-    const { data: existingUser } = await supabase
+
+    // 尝试获取现有用户
+    const { data: existingUsers, error: queryError } = await supabase
       .from('users')
       .select('*')
       .ilike('email', email.toLowerCase())
-      .single();
-    
-    if (existingUser) {
-      // Update last login
+      .limit(1);
+
+    if (existingUsers && existingUsers.length > 0) {
+      const existingUser = existingUsers[0];
+      // 更新最后登录时间
       await supabase
         .from('users')
         .update({ last_login_at: new Date().toISOString() })
         .eq('id', existingUser.id);
-      
+
       return {
         id: existingUser.id,
         email: existingUser.email,
-        name: existingUser.name,
+        name: existingUser.name || email.split('@')[0],
         createdAt: existingUser.created_at,
-        lastLoginAt: existingUser.last_login_at,
+        lastLoginAt: new Date().toISOString(),
         orderIds: existingUser.order_ids || [],
       };
     }
-    
-    // Create new user
+
+    // 创建新用户
     const newUserId = `user-${Date.now()}`;
-    const { data: newUser, error } = await supabase
+    const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
         id: newUserId,
         email,
+        name: email.split('@')[0],
         created_at: new Date().toISOString(),
         last_login_at: new Date().toISOString(),
-        order_ids: [],
       })
       .select('*')
-      .single();
-    
-    if (error) {
-      console.error('[Auth] Failed to create user:', error.message);
-      // Return a basic user object even if database fails
-      return {
-        id: newUserId,
-        email,
-        name: email.split('@')[0],
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-        orderIds: [],
-      };
+      .limit(1);
+
+    if (insertError || !newUser || newUser.length === 0) {
+      console.error('[Auth] Failed to create user:', insertError?.message);
+      return fallbackUser;
     }
-    
+
+    const user = newUser[0];
     return {
-      id: newUser.id,
-      email: newUser.email,
-      name: newUser.name,
-      createdAt: newUser.created_at,
-      lastLoginAt: newUser.last_login_at,
-      orderIds: newUser.order_ids || [],
+      id: user.id,
+      email: user.email,
+      name: user.name || email.split('@')[0],
+      createdAt: user.created_at,
+      lastLoginAt: user.last_login_at,
+      orderIds: user.order_ids || [],
     };
   } catch (err: any) {
     console.error('[Auth] User operation error:', err.message);
-    // Return a basic user object
-    return {
-      id: `user-${Date.now()}`,
-      email,
-      name: email.split('@')[0],
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-      orderIds: [],
-    };
+    return fallbackUser;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const { email, code } = await request.json();
-    
+
     if (!email || !code) {
       return NextResponse.json({ error: 'Email and code are required' }, { status: 400 });
     }
 
-    // Verify code with timeout
+    console.log(`[Auth] Verifying code for: ${email}`);
+
+    // 验证验证码（3秒超时）
     const verifyPromise = verifyCodeInDatabase(email, code);
-    const verifyTimeout = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000));
+    const verifyTimeout = new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000));
     const isValid = await Promise.race([verifyPromise, verifyTimeout]);
-    
+
     if (!isValid) {
-      return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 401 });
+      return NextResponse.json({ error: '验证码无效或已过期，请重新发送验证码' }, { status: 401 });
     }
 
-    // Get or create user with timeout
+    // 获取或创建用户（3秒超时，超时返回临时用户）
     const userPromise = getOrCreateUser(email);
     const userTimeout = new Promise<any>((resolve) => setTimeout(() => resolve({
       id: `user-${Date.now()}`,
@@ -142,12 +143,13 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString(),
       orderIds: [],
-    }), 5000));
+    }), 3000));
     const user = await Promise.race([userPromise, userTimeout]);
 
+    console.log(`[Auth] Login successful for: ${email}`);
     return NextResponse.json({ success: true, user });
   } catch (error: any) {
     console.error('Failed to verify code:', error);
-    return NextResponse.json({ error: 'Failed to verify code' }, { status: 500 });
+    return NextResponse.json({ error: '验证失败，请重试' }, { status: 500 });
   }
 }
