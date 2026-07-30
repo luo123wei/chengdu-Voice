@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SubscribeForm from '@/components/SubscribeForm';
+import BlogCarousel from '@/components/BlogCarousel';
 import { db } from '@/lib/db';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
@@ -37,9 +38,8 @@ export default async function HomePage() {
     db.products.getAll(),
     db.settings.get(),
   ]);
-  const featuredPosts = blogs.slice(0, 3);
+  const featuredPosts = blogs.slice(0, 5);
   const featuredProducts = products.slice(0, 4);
-  const featuredStory = blogs[0];
 
   return (
     <div className="min-h-screen bg-white">
@@ -164,42 +164,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {featuredStory && (
+      {featuredPosts.length > 0 && (
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="relative">
-                <div className="rounded-2xl overflow-hidden shadow-xl">
-                  <img
-                    src={featuredStory.images[0]}
-                    alt={featuredStory.titleEn}
-                    className="w-full h-80 object-cover"
-                  />
-                </div>
-                <div className="absolute -bottom-6 -right-6 bg-primary text-white p-6 rounded-xl shadow-lg">
-                  <p className="text-sm opacity-80">Featured Story</p>
-                  <p className="text-xl font-bold">{featuredStory.category}</p>
-                </div>
-              </div>
-              <div>
-                <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm mb-6">
-                  {featuredStory.category}
-                </span>
-                <h2 className="text-3xl font-serif font-bold text-secondary mb-6">
-                  {featuredStory.titleEn}
-                </h2>
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  {featuredStory.contentEn.replace(/<[^>]*>/g, '').substring(0, 300)}...
-                </p>
-                <Link
-                  href={`/blog/${featuredStory.id}`}
-                  className="inline-flex items-center gap-2 text-primary font-medium hover:gap-4 transition-all"
-                >
-                  <span>Read Full Story</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-            </div>
+            <BlogCarousel posts={featuredPosts} />
           </div>
         </section>
       )}
