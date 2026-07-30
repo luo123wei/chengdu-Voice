@@ -15,6 +15,7 @@ export default function AccountPage() {
   const [sentCode, setSentCode] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [error, setError] = useState('');
+  const [debugCode, setDebugCode] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -75,8 +76,12 @@ export default function AccountPage() {
       if (data.success) {
         setSentCode(true);
         setError('');
+        setDebugCode(null);
       } else {
         setError(data.error || '发送验证码失败');
+        if (data.debug_code) {
+          setDebugCode(data.debug_code);
+        }
       }
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -239,6 +244,12 @@ export default function AccountPage() {
                 {error && (
                   <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm">
                     {error}
+                    {debugCode && (
+                      <div className="mt-2 p-2 bg-yellow-50 text-yellow-800 rounded-lg text-xs">
+                        <strong>调试用验证码：</strong> {debugCode}
+                        <span className="block text-gray-500 mt-1">（邮件发送失败，但验证码已生成，可使用此码登录）</span>
+                      </div>
+                    )}
                   </div>
                 )}
 

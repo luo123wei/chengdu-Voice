@@ -10,26 +10,37 @@ async function sendEmailWithTimeout(options: {
   subject: string;
   text?: string;
   html?: string;
-}): Promise<void> {
-  const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST || 'smtp.qq.com',
-    port: parseInt(process.env.MAIL_PORT || '465'),
-    secure: process.env.MAIL_SECURE === 'true',
-    auth: {
-      user: process.env.MAIL_USER || '',
-      pass: process.env.MAIL_PASS || '',
-    },
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 10000,
-  });
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST || 'smtp.qq.com',
+      port: parseInt(process.env.MAIL_PORT || '465'),
+      secure: process.env.MAIL_SECURE === 'true',
+      auth: {
+        user: process.env.MAIL_USER || '',
+        pass: process.env.MAIL_PASS || '',
+      },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 15000,
+    });
 
-  const mailOptions = {
-    from: `Chengdu Voice <${process.env.MAIL_USER || 'hello@chengduvoice.com'}>`,
-    ...options,
-  };
+    // Verify SMTP connection first
+    await transporter.verify();
+    console.log('[Email] SMTP connection verified');
 
-  await transporter.sendMail(mailOptions);
+    const mailOptions = {
+      from: `Chengdu Voice <${process.env.MAIL_USER || 'hello@chengduvoice.com'}>`,
+      ...options,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('[Email] Email sent successfully:', info.messageId);
+    return { success: true };
+  } catch (err: any) {
+    console.error('[Email] Send failed:', err?.message);
+    return { success: false, error: err?.message || 'Failed to send email' };
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -70,9 +81,9 @@ export async function POST(request: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com';
 
-    // Send email with timeout
+    // Send email with proper error handling
     console.log(`[Auth] Sending email to: ${email}`);
-    const emailPromise = sendEmailWithTimeout({
+    const emailResult = await sendEmailWithTimeout({
       to: email,
       subject: 'Your Login Verification Code for Chengdu Voice',
       text: `Your verification code is: ${code}\n\nThis code expires in 10 minutes.\n\nVisit ${appUrl} to complete your login.`,
@@ -90,21 +101,24 @@ export async function POST(request: NextRequest) {
         </div>
       `,
     });
-    
-    const emailTimeout = new Promise<void>((resolve) => setTimeout(resolve, 15000));
-    await Promise.race([emailPromise, emailTimeout]).catch(err => {
-      console.error('[Auth] Email error:', err?.message || 'timeout');
-    });
 
-    console.log(`[Auth] Process completed for: ${email}`);
+    console.log(`[Auth] Process completed for: ${email}, email success: ${emailResult.success}`);
+    
+    if (!emailResult.success) {
+      // Email failed but code is generated - return error with code for debugging
+      return NextResponse.json({ 
+        error: `邮件发送失败：${emailResult.error}。请稍后重试或联系客服。`,
+        debug_code: code  // Only for debugging, remove in production
+      }, { status: 500 });
+    }
+
     return NextResponse.json({ 
       success: true, 
-      message: 'Verification code sent',
-      code // Return code for testing
+      message: '验证码已发送到你的邮箱，请查收' 
     });
   } catch (error: any) {
     console.error('Failed to send verification code:', error);
     const errorMessage = error?.message || 'Unknown error';
-    return NextResponse.json({ error: `Failed to send verification code: ${errorMessage}` }, { status: 500 });
+    return NextResponse.json({ error: `系统错误：${errorMessage}` }, { status: 500 });
   }
 }
