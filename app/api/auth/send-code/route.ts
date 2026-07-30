@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import dns from 'dns';
+import { promisify } from 'util';
+
+const dnsLookup = promisify(dns.lookup);
 
 function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -12,17 +16,31 @@ async function sendEmailWithTimeout(options: {
   html?: string;
 }): Promise<{ success: boolean; error?: string }> {
   try {
+    const host = process.env.MAIL_HOST || 'smtp.qq.com';
+    const port = parseInt(process.env.MAIL_PORT || '465');
+    const secure = process.env.MAIL_SECURE === 'true';
+
+    // Resolve DNS to get IPv4 address (force IPv4 to avoid ENETUNREACH on Render)
+    let smtpHost = host;
+    try {
+      const { address } = await dnsLookup(host, { family: 4 });
+      smtpHost = address;
+      console.log(`[Email] Resolved ${host} to IPv4: ${address}`);
+    } catch (dnsErr) {
+      console.warn(`[Email] DNS resolution failed, using original host: ${dnsErr}`);
+    }
+
     const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST || 'smtp.qq.com',
-      port: parseInt(process.env.MAIL_PORT || '465'),
-      secure: process.env.MAIL_SECURE === 'true',
+      host: smtpHost,
+      port,
+      secure,
       auth: {
         user: process.env.MAIL_USER || '',
         pass: process.env.MAIL_PASS || '',
       },
-      connectionTimeout: 5000,
-      greetingTimeout: 5000,
-      socketTimeout: 15000,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000,
     });
 
     // Verify SMTP connection first
