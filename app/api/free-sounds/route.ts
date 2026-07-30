@@ -18,6 +18,8 @@ interface FreeSound {
   description: string;
   duration: string;
   audio: string;
+  location?: string;
+  created_at?: string;
 }
 
 const defaultSounds: FreeSound[] = [];
@@ -48,6 +50,8 @@ export async function GET(request: NextRequest) {
       description: row.description,
       duration: row.duration,
       audio: row.audio,
+      location: row.location,
+      created_at: row.created_at,
     }));
     return NextResponse.json({ 
       success: true, 
@@ -65,7 +69,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, titleEn, description, duration, audio } = body;
+    const { title, titleEn, description, duration, audio, location } = body;
 
     if (!title || !titleEn || !description || !duration || !audio) {
       return NextResponse.json({ success: false, message: '缺少必填字段' }, { status: 400 });
@@ -78,6 +82,7 @@ export async function POST(request: NextRequest) {
       description,
       duration,
       audio,
+      location,
     };
 
     const { data, error } = await supabase.from('free_sounds').insert({
@@ -87,6 +92,7 @@ export async function POST(request: NextRequest) {
       description: newSound.description,
       duration: newSound.duration,
       audio: newSound.audio,
+      location: newSound.location,
       created_at: new Date().toISOString(),
     }).select('*').single();
 
@@ -105,7 +111,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, title, titleEn, description, duration, audio } = body;
+    const { id, title, titleEn, description, duration, audio, location } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, message: '缺少ID' }, { status: 400 });
@@ -117,6 +123,7 @@ export async function PUT(request: NextRequest) {
     if (description) updateData.description = description;
     if (duration) updateData.duration = duration;
     if (audio) updateData.audio = audio;
+    if (location) updateData.location = location;
 
     const { data, error } = await supabase.from('free_sounds').update(updateData).eq('id', id).select('*').single();
 
@@ -132,6 +139,7 @@ export async function PUT(request: NextRequest) {
       description: data.description,
       duration: data.duration,
       audio: data.audio,
+      location: data.location,
     } });
   } catch (error) {
     console.error('Update free sound error:', error);
