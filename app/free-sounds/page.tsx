@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, Volume2, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { Play, Pause, Volume2, MapPin } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -30,7 +30,6 @@ export default function FreeSoundsPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          // Sort by created_at descending (newest first)
           const sortedSounds = [...data.data].sort((a, b) => {
             const dateA = new Date(a.created_at || 0).getTime();
             const dateB = new Date(b.created_at || 0).getTime();
@@ -73,7 +72,6 @@ export default function FreeSoundsPage() {
       audio.currentTime = 0;
       setPlayingId(null);
     } else {
-      // Pause all other audios
       Object.values(audioRefs.current).forEach((a) => {
         if (a) {
           a.pause();
@@ -94,7 +92,7 @@ export default function FreeSoundsPage() {
       <Header />
 
       <section className="pt-24 pb-16 bg-gradient-to-br from-primary to-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-serif font-bold text-white mb-4">
             Free Chengdu Sounds
             <br />
@@ -107,7 +105,7 @@ export default function FreeSoundsPage() {
       </section>
 
       <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="text-center py-12">
               <Volume2 className="w-12 h-12 text-gray-300 mx-auto mb-4 animate-pulse" />
@@ -115,46 +113,39 @@ export default function FreeSoundsPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-4">
                 {sounds.map((sound) => (
                   <div
                     key={sound.id}
-                    className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all"
+                    className="bg-secondary/5 rounded-xl p-5 flex items-center gap-5 hover:bg-secondary/10 transition-colors"
                   >
-                    <div className="flex items-start gap-4">
-                      <button
-                        onClick={() => togglePlay(sound.id)}
-                        className="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition-colors flex-shrink-0"
-                      >
-                        {playingId === sound.id ? (
-                          <Pause className="w-6 h-6" />
-                        ) : (
-                          <Play className="w-6 h-6 ml-1" />
-                        )}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-secondary text-lg">{sound.title}</h3>
-                        <p className="text-sm text-gray-500 mb-2">{sound.titleEn}</p>
-                        
+                    <button
+                      onClick={() => togglePlay(sound.id)}
+                      className={`w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                        playingId === sound.id
+                          ? 'bg-primary scale-105'
+                          : 'bg-primary/80 hover:bg-primary hover:scale-105'
+                      }`}
+                    >
+                      {playingId === sound.id ? (
+                        <Pause className="w-8 h-8 text-white" />
+                      ) : (
+                        <Play className="w-8 h-8 text-white ml-1" />
+                      )}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-secondary text-xl mb-1">{sound.title}</h3>
+                      <p className="text-sm text-gray-500 mb-2">{sound.titleEn}</p>
+                      
+                      <div className="flex items-center gap-4 text-sm text-gray-600">
                         {sound.location && (
-                          <div className="flex items-center gap-2 text-sm text-primary mb-3">
-                            <MapPin className="w-4 h-4" />
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4 text-primary" />
                             <span>{sound.location}</span>
                           </div>
                         )}
-                        
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-3" dangerouslySetInnerHTML={{ __html: sound.description }}></p>
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-500">{sound.duration}</span>
-                          <button
-                            onClick={() => togglePlay(sound.id)}
-                            className="flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all text-sm"
-                          >
-                            <Volume2 className="w-4 h-4" />
-                            {playingId === sound.id ? 'Pause' : 'Listen'}
-                          </button>
-                        </div>
+                        <span className="text-gray-400">·</span>
+                        <span>{sound.duration}</span>
                       </div>
                     </div>
                   </div>
@@ -170,36 +161,19 @@ export default function FreeSoundsPage() {
               
               {total > limit && (
                 <div className="flex items-center justify-center mt-12">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    
+                  <div className="flex items-center gap-3">
                     {Array.from({ length: totalPages }, (_, i) => (
                       <button
                         key={i + 1}
                         onClick={() => setCurrentPage(i + 1)}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        className={`transition-all duration-300 ${
                           currentPage === i + 1
-                            ? 'bg-primary text-white'
-                            : 'border border-gray-200 hover:bg-gray-50'
+                            ? 'w-10 h-2 bg-primary rounded-full'
+                            : 'w-6 h-2 bg-gray-300 hover:bg-gray-400 rounded-full'
                         }`}
-                      >
-                        {i + 1}
-                      </button>
+                        aria-label={`第${i + 1}页`}
+                      />
                     ))}
-                    
-                    <button
-                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
                   </div>
                 </div>
               )}
