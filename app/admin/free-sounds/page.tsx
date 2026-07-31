@@ -14,7 +14,6 @@ interface FreeSound {
   description: string;
   duration: string;
   audio: string;
-  location?: string;
   culturalStory?: string;
 }
 
@@ -30,7 +29,6 @@ export default function AdminFreeSounds() {
     title: '',
     duration: '',
     audio: '',
-    location: '',
   });
 
   const descriptionEditor = useEditor({
@@ -69,7 +67,6 @@ export default function AdminFreeSounds() {
         title: sound.titleEn,
         duration: sound.duration,
         audio: sound.audio,
-        location: sound.location || '',
       });
       setTimeout(() => {
         descriptionEditor?.commands.setContent(sound.description || '<p></p>');
@@ -82,7 +79,6 @@ export default function AdminFreeSounds() {
         title: '',
         duration: '',
         audio: '',
-        location: '',
       });
       setTimeout(() => {
         descriptionEditor?.commands.setContent('<p></p>');
@@ -154,7 +150,6 @@ export default function AdminFreeSounds() {
             titleEn: formData.title,
             duration: formData.duration,
             audio: formData.audio,
-            location: formData.location,
             description,
             culturalStory,
           }),
@@ -168,7 +163,6 @@ export default function AdminFreeSounds() {
             titleEn: formData.title,
             duration: formData.duration,
             audio: formData.audio,
-            location: formData.location,
             description,
             culturalStory,
           }),
@@ -234,9 +228,6 @@ export default function AdminFreeSounds() {
                 标题
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                位置
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 时长
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -249,9 +240,6 @@ export default function AdminFreeSounds() {
               <tr key={sound.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="font-medium text-gray-800">{sound.titleEn}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-gray-600">{sound.location || '-'}</span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="text-gray-500">{sound.duration}</span>
@@ -317,32 +305,18 @@ export default function AdminFreeSounds() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    时长 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
-                    placeholder="例如：03:45"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    位置
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
-                    placeholder="例如：Qingcheng Mountain"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  时长 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
+                  placeholder="例如：03:45"
+                  required
+                />
               </div>
 
               <div>
@@ -423,54 +397,24 @@ export default function AdminFreeSounds() {
                 </label>
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
                   <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
-                    <button
-                      type="button"
-                      onClick={() => descriptionEditor?.chain().focus().toggleBold().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="粗体"
-                    >
+                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleBold().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="粗体">
                       <Bold className="w-4 h-4" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => descriptionEditor?.chain().focus().toggleItalic().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="斜体"
-                    >
+                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleItalic().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="斜体">
                       <Italic className="w-4 h-4" />
                     </button>
                     <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => descriptionEditor?.chain().focus().toggleBulletList().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="无序列表"
-                    >
+                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleBulletList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="无序列表">
                       <List className="w-4 h-4" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => descriptionEditor?.chain().focus().toggleOrderedList().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="有序列表"
-                    >
+                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleOrderedList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="有序列表">
                       <ListOrdered className="w-4 h-4" />
                     </button>
                     <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => descriptionEditor?.chain().focus().undo().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="撤销"
-                    >
+                    <button type="button" onClick={() => descriptionEditor?.chain().focus().undo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="撤销">
                       <Undo className="w-4 h-4" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => descriptionEditor?.chain().focus().redo().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="重做"
-                    >
+                    <button type="button" onClick={() => descriptionEditor?.chain().focus().redo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="重做">
                       <Redo className="w-4 h-4" />
                     </button>
                   </div>
@@ -484,54 +428,24 @@ export default function AdminFreeSounds() {
                 </label>
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
                   <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
-                    <button
-                      type="button"
-                      onClick={() => culturalStoryEditor?.chain().focus().toggleBold().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="粗体"
-                    >
+                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleBold().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="粗体">
                       <Bold className="w-4 h-4" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => culturalStoryEditor?.chain().focus().toggleItalic().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="斜体"
-                    >
+                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleItalic().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="斜体">
                       <Italic className="w-4 h-4" />
                     </button>
                     <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => culturalStoryEditor?.chain().focus().toggleBulletList().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="无序列表"
-                    >
+                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleBulletList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="无序列表">
                       <List className="w-4 h-4" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => culturalStoryEditor?.chain().focus().toggleOrderedList().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="有序列表"
-                    >
+                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleOrderedList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="有序列表">
                       <ListOrdered className="w-4 h-4" />
                     </button>
                     <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => culturalStoryEditor?.chain().focus().undo().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="撤销"
-                    >
+                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().undo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="撤销">
                       <Undo className="w-4 h-4" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => culturalStoryEditor?.chain().focus().redo().run()}
-                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
-                      title="重做"
-                    >
+                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().redo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="重做">
                       <Redo className="w-4 h-4" />
                     </button>
                   </div>

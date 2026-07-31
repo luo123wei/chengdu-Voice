@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, Volume2, MapPin, X, ChevronRight, Music } from 'lucide-react';
+import { Play, Pause, Volume2, X, ChevronRight, Music } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -12,9 +12,19 @@ interface FreeSound {
   description: string;
   duration: string;
   audio: string;
-  location?: string;
   culturalStory?: string;
   created_at?: string;
+}
+
+function stripHtml(html: string): string {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
 }
 
 export default function FreeSoundsPage() {
@@ -24,8 +34,11 @@ export default function FreeSoundsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedSound, setSelectedSound] = useState<FreeSound | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
   const limit = 6;
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetch(`/api/free-sounds?page=${currentPage}&limit=${limit}`)
@@ -52,15 +65,24 @@ export default function FreeSoundsPage() {
     if (!audioRefs.current[id]) {
       const audio = new Audio(audioUrl);
       audio.preload = 'metadata';
-      audio.addEventListener('ended', () => {
-        if (playingId === id) {
-          setPlayingId(null);
+      audio.addEventListener('loadedmetadata', () => {
+        if (selectedSound?.id === id) {
+          setDuration(audio.duration);
         }
+      });
+      audio.addEventListener('timeupdate', () => {
+        if (selectedSound?.id === id) {
+          setProgress(audio.currentTime);
+        }
+      });
+      audio.addEventListener('ended', () => {
+        setPlayingId(null);
+        setProgress(0);
       });
       audioRefs.current[id] = audio;
     }
     return audioRefs.current[id];
-  }, [playingId]);
+  }, [selectedSound]);
 
   const togglePlay = useCallback((id: string) => {
     const sound = sounds.find((s) => s.id === id);
@@ -71,7 +93,6 @@ export default function FreeSoundsPage() {
 
     if (playingId === id) {
       audio.pause();
-      audio.currentTime = 0;
       setPlayingId(null);
     } else {
       Object.values(audioRefs.current).forEach((a) => {
@@ -86,6 +107,44 @@ export default function FreeSoundsPage() {
       setPlayingId(id);
     }
   }, [sounds, playingId, createAudio]);
+
+  const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!selectedSound) return;
+    const audio = audioRefs.current[selectedSound.id];
+    if (!audio || !duration) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    const newTime = percent * duration;
+    audio.currentTime = newTime;
+    setProgress(newTime);
+  }, [selectedSound, duration]);
+
+  const openDetail = (sound: FreeSound) => {
+    setSelectedSound(sound);
+    setProgress(0);
+    setDuration(0);
+    setTimeout(() => {
+      const audio = audioRefs.current[sound.id];
+      if (audio) {
+        setDuration(audio.duration);
+        setProgress(audio.currentTime);
+      }
+    }, 100);
+  };
+
+  const closeDetail = () => {
+    setSelectedSound(null);
+    setProgress(0);
+    setDuration(0);
+  };
+
+  const formatTime = (seconds: number): string => {
+    if (!seconds || isNaN(seconds)) return '00:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const totalPages = Math.ceil(total / limit);
 
@@ -116,48 +175,49 @@ export default function FreeSoundsPage() {
           ) : (
             <>
               <div className="space-y-4">
-                {sounds.map((sound) => (
-                  <div
-                    key={sound.id}
-                    className="bg-secondary/5 rounded-xl p-5 flex items-center gap-5 hover:bg-secondary/10 transition-colors"
-                  >
-                    <button
-                      onClick={() => togglePlay(sound.id)}
-                      className={`w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
-                        playingId === sound.id
-                          ? 'bg-primary scale-105'
-                          : 'bg-primary/80 hover:bg-primary hover:scale-105'
-                      }`}
+                {sounds.map((sound) => {
+                  const isPlaying = playingId === sound.id;
+                  const plainText = stripHtml(sound.description);
+                  const truncatedDesc = truncateText(plainText, 50);
+                  return (
+                    <div
+                      key={sound.id}
+                      className="bg-secondary/5 rounded-xl p-5 flex items-center gap-5 hover:bg-secondary/10 transition-colors"
                     >
-                      {playingId === sound.id ? (
-                        <Pause className="w-8 h-8 text-white" />
-                      ) : (
-                        <Play className="w-8 h-8 text-white ml-1" />
-                      )}
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-secondary text-xl mb-1">{sound.titleEn}</h3>
-                      
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        {sound.location && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4 text-primary" />
-                            <span>{sound.location}</span>
-                          </div>
+                      <button
+                        onClick={() => togglePlay(sound.id)}
+                        className={`w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                          isPlaying
+                            ? 'bg-primary scale-105'
+                            : 'bg-primary/80 hover:bg-primary hover:scale-105'
+                        }`}
+                      >
+                        {isPlaying ? (
+                          <Pause className="w-8 h-8 text-white" />
+                        ) : (
+                          <Play className="w-8 h-8 text-white ml-1" />
                         )}
-                        <span className="text-gray-400">·</span>
-                        <span>{sound.duration}</span>
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-secondary text-xl mb-1 truncate">{sound.titleEn}</h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {truncatedDesc}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                          <span>·</span>
+                          <span>{sound.duration}</span>
+                        </div>
                       </div>
+                      <button
+                        onClick={() => openDetail(sound)}
+                        className="flex items-center gap-1 px-4 py-2 text-primary font-medium hover:bg-primary/10 rounded-lg transition-colors flex-shrink-0"
+                      >
+                        <span>More</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
                     </div>
-                    <button
-                      onClick={() => setSelectedSound(sound)}
-                      className="flex items-center gap-1 px-4 py-2 text-primary font-medium hover:bg-primary/10 rounded-lg transition-colors"
-                    >
-                      <span>More</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {sounds.length === 0 && (
@@ -230,24 +290,19 @@ export default function FreeSoundsPage() {
 
       {/* Detail Modal */}
       {selectedSound && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedSound(null)}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={closeDetail}>
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div>
                 <h2 className="text-2xl font-bold text-secondary">{selectedSound.titleEn}</h2>
-                <div className="flex items-center gap-4 text-sm text-gray-600 mt-2">
-                  {selectedSound.location && (
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-primary" />
-                      <span>{selectedSound.location}</span>
-                    </div>
-                  )}
-                  <span className="text-gray-400">·</span>
+                <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                  <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
                   <span>{selectedSound.duration}</span>
                 </div>
               </div>
               <button
-                onClick={() => setSelectedSound(null)}
+                onClick={closeDetail}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X className="w-6 h-6 text-gray-500" />
@@ -255,11 +310,11 @@ export default function FreeSoundsPage() {
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-              {/* Player */}
-              <div className="flex items-center justify-center mb-8">
+              {/* Player with progress bar */}
+              <div className="flex flex-col items-center mb-8">
                 <button
                   onClick={() => togglePlay(selectedSound.id)}
-                  className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
+                  className={`w-24 h-24 rounded-full flex items-center justify-center transition-all mb-6 ${
                     playingId === selectedSound.id
                       ? 'bg-primary scale-105'
                       : 'bg-primary/80 hover:bg-primary hover:scale-105'
@@ -271,26 +326,50 @@ export default function FreeSoundsPage() {
                     <Play className="w-12 h-12 text-white ml-1" />
                   )}
                 </button>
+
+                {/* Progress Bar */}
+                <div className="w-full flex items-center gap-3">
+                  <span className="text-xs text-gray-500 font-mono w-12 text-right">
+                    {formatTime(progress)}
+                  </span>
+                  <div
+                    className="flex-1 h-2 bg-gray-200 rounded-full cursor-pointer group"
+                    onClick={handleSeek}
+                  >
+                    <div
+                      className="h-full bg-primary rounded-full relative"
+                      style={{ width: `${duration ? (progress / duration) * 100 : 0}%` }}
+                    >
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                  <span className="text-xs text-gray-500 font-mono w-12">
+                    {selectedSound.duration}
+                  </span>
+                </div>
               </div>
 
               {/* Description */}
-              <div className="mb-8">
-                <h3 className="text-lg font-bold text-secondary mb-3">Description / 描述</h3>
-                <div 
-                  className="prose prose-sm max-w-none text-gray-700"
+              <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+                <div
+                  className="about-content"
                   dangerouslySetInnerHTML={{ __html: selectedSound.description }}
                 />
               </div>
 
-              {/* Cultural Story */}
-              {selectedSound.culturalStory && selectedSound.culturalStory !== '<p></p>' && (
-                <div>
-                  <h3 className="text-lg font-bold text-secondary mb-3">Cultural Story / 文化故事</h3>
-                  <div 
-                    className="prose prose-sm max-w-none text-gray-700"
-                    dangerouslySetInnerHTML={{ __html: selectedSound.culturalStory }}
-                  />
-                </div>
+              {/* Dashed Divider */}
+              {selectedSound.culturalStory && selectedSound.culturalStory !== '<p></p>' && selectedSound.culturalStory !== '' && (
+                <>
+                  <div className="border-t border-dashed border-gray-300 my-8"></div>
+                  
+                  {/* Cultural Story */}
+                  <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+                    <div
+                      className="about-content"
+                      dangerouslySetInnerHTML={{ __html: selectedSound.culturalStory }}
+                    />
+                  </div>
+                </>
               )}
             </div>
           </div>
