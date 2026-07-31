@@ -14,6 +14,8 @@ interface FreeSound {
   description: string;
   duration: string;
   audio: string;
+  location?: string;
+  culturalStory?: string;
 }
 
 export default function AdminFreeSounds() {
@@ -26,17 +28,19 @@ export default function AdminFreeSounds() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [formData, setFormData] = useState({
     title: '',
-    titleEn: '',
     duration: '',
     audio: '',
+    location: '',
   });
 
-  const editor = useEditor({
+  const descriptionEditor = useEditor({
     extensions: [StarterKit, TextStyle, Color],
     content: '',
-    onUpdate: ({ editor }) => {
-      console.log('Editor updated');
-    },
+  });
+
+  const culturalStoryEditor = useEditor({
+    extensions: [StarterKit, TextStyle, Color],
+    content: '',
   });
 
   const fetchSounds = async () => {
@@ -62,25 +66,27 @@ export default function AdminFreeSounds() {
       setEditingSound(sound);
       setUploadMode(sound.audio.startsWith('/') ? 'file' : 'url');
       setFormData({
-        title: sound.title,
-        titleEn: sound.titleEn,
+        title: sound.titleEn,
         duration: sound.duration,
         audio: sound.audio,
+        location: sound.location || '',
       });
       setTimeout(() => {
-        editor?.commands.setContent(sound.description || '<p></p>');
+        descriptionEditor?.commands.setContent(sound.description || '<p></p>');
+        culturalStoryEditor?.commands.setContent(sound.culturalStory || '<p></p>');
       }, 100);
     } else {
       setEditingSound(null);
       setUploadMode('file');
       setFormData({
         title: '',
-        titleEn: '',
         duration: '',
         audio: '',
+        location: '',
       });
       setTimeout(() => {
-        editor?.commands.setContent('<p></p>');
+        descriptionEditor?.commands.setContent('<p></p>');
+        culturalStoryEditor?.commands.setContent('<p></p>');
       }, 100);
     }
     setUploading(false);
@@ -134,7 +140,8 @@ export default function AdminFreeSounds() {
       return;
     }
 
-    const description = editor?.getHTML() || '';
+    const description = descriptionEditor?.getHTML() || '';
+    const culturalStory = culturalStoryEditor?.getHTML() || '';
 
     try {
       if (editingSound) {
@@ -143,8 +150,13 @@ export default function AdminFreeSounds() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id: editingSound.id,
-            ...formData,
+            title: formData.title,
+            titleEn: formData.title,
+            duration: formData.duration,
+            audio: formData.audio,
+            location: formData.location,
             description,
+            culturalStory,
           }),
         });
       } else {
@@ -152,8 +164,13 @@ export default function AdminFreeSounds() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...formData,
+            title: formData.title,
+            titleEn: formData.title,
+            duration: formData.duration,
+            audio: formData.audio,
+            location: formData.location,
             description,
+            culturalStory,
           }),
         });
       }
@@ -214,13 +231,10 @@ export default function AdminFreeSounds() {
           <thead>
             <tr className="bg-gray-50">
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                中文标题
+                标题
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                英文标题
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                描述
+                位置
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 时长
@@ -234,13 +248,10 @@ export default function AdminFreeSounds() {
             {filteredSounds.map((sound) => (
               <tr key={sound.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="font-medium text-gray-800">{sound.title}</span>
+                  <span className="font-medium text-gray-800">{sound.titleEn}</span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-gray-600">{sound.titleEn}</span>
-                </td>
-                <td className="px-6 py-4 max-w-xs truncate">
-                  <span className="text-gray-600">{sound.description}</span>
+                  <span className="text-gray-600">{sound.location || '-'}</span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="text-gray-500">{sound.duration}</span>
@@ -278,7 +289,7 @@ export default function AdminFreeSounds() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-800">
                 {editingSound ? '编辑声音' : '添加声音'}
@@ -294,105 +305,44 @@ export default function AdminFreeSounds() {
             <form id="sound-form" onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  中文标题 <span className="text-red-500">*</span>
+                  English Title <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
-                  placeholder="例如：茶馆盖碗茶"
+                  placeholder="例如：Birdsong at Qingcheng Mountain"
                   required
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  英文标题 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.titleEn}
-                  onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
-                  placeholder="例如：Teahouse Gaiwan Tea"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  描述 <span className="text-red-500">*</span>
-                </label>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
-                    <button
-                      type="button"
-                      onClick={() => editor?.chain().focus().toggleBold().run()}
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
-                      title="粗体"
-                    >
-                      <Bold className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => editor?.chain().focus().toggleItalic().run()}
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
-                      title="斜体"
-                    >
-                      <Italic className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-6 bg-gray-300 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => editor?.chain().focus().toggleBulletList().run()}
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
-                      title="无序列表"
-                    >
-                      <List className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
-                      title="有序列表"
-                    >
-                      <ListOrdered className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-6 bg-gray-300 mx-1" />
-                    <button
-                      type="button"
-                      onClick={() => editor?.chain().focus().undo().run()}
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
-                      title="撤销"
-                    >
-                      <Undo className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => editor?.chain().focus().redo().run()}
-                      className="p-2 hover:bg-gray-200 rounded transition-colors"
-                      title="重做"
-                    >
-                      <Redo className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <EditorContent editor={editor} className="p-4 min-h-[120px] focus:outline-none" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    时长 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
+                    placeholder="例如：03:45"
+                    required
+                  />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  时长 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
-                  placeholder="例如：03:45"
-                  required
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    位置
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
+                    placeholder="例如：Qingcheng Mountain"
+                  />
+                </div>
               </div>
 
               <div>
@@ -428,7 +378,7 @@ export default function AdminFreeSounds() {
 
                 {uploadMode === 'file' ? (
                   <div>
-                    <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-amber-500 transition-colors cursor-pointer">
+                    <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-amber-500 transition-colors cursor-pointer">
                       <input
                         type="file"
                         accept="audio/*"
@@ -438,33 +388,20 @@ export default function AdminFreeSounds() {
                       />
                       {uploading ? (
                         <div>
-                          <div className="w-12 h-12 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-4" />
+                          <div className="w-10 h-10 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-3" />
                           <p className="text-gray-600">上传中...</p>
-                          {uploadProgress > 0 && (
-                            <div className="mt-4">
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="bg-amber-600 h-2 rounded-full transition-all"
-                                  style={{ width: `${uploadProgress}%` }}
-                                />
-                              </div>
-                              <p className="text-sm text-gray-500 mt-1">{uploadProgress}%</p>
-                            </div>
-                          )}
                         </div>
                       ) : formData.audio.startsWith('/') ? (
                         <div>
-                          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                          <p className="text-gray-600">
-                            已上传: {formData.audio.split('/').pop()}
-                          </p>
-                          <p className="text-sm text-gray-400 mt-2">点击重新上传</p>
+                          <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-3" />
+                          <p className="text-gray-600">{formData.audio.split('/').pop()}</p>
+                          <p className="text-sm text-gray-400 mt-1">点击重新上传</p>
                         </div>
                       ) : (
                         <div>
-                          <Music className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-gray-600">点击或拖拽上传音频文件</p>
-                          <p className="text-sm text-gray-400 mt-2">支持 MP3、WAV、OGG、FLAC、M4A（最大50MB）</p>
+                          <Music className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                          <p className="text-gray-600">点击上传音频文件</p>
+                          <p className="text-xs text-gray-400 mt-1">支持 MP3、WAV、OGG（最大50MB）</p>
                         </div>
                       )}
                     </div>
@@ -480,7 +417,129 @@ export default function AdminFreeSounds() {
                 )}
               </div>
 
-              </form>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  描述 <span className="text-red-500">*</span>
+                </label>
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
+                    <button
+                      type="button"
+                      onClick={() => descriptionEditor?.chain().focus().toggleBold().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="粗体"
+                    >
+                      <Bold className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => descriptionEditor?.chain().focus().toggleItalic().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="斜体"
+                    >
+                      <Italic className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-5 bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => descriptionEditor?.chain().focus().toggleBulletList().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="无序列表"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => descriptionEditor?.chain().focus().toggleOrderedList().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="有序列表"
+                    >
+                      <ListOrdered className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-5 bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => descriptionEditor?.chain().focus().undo().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="撤销"
+                    >
+                      <Undo className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => descriptionEditor?.chain().focus().redo().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="重做"
+                    >
+                      <Redo className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <EditorContent editor={descriptionEditor} className="p-3 min-h-[100px] focus:outline-none prose prose-sm max-w-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Cultural Story / 文化故事 <span className="text-gray-400 text-xs">(可选)</span>
+                </label>
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
+                    <button
+                      type="button"
+                      onClick={() => culturalStoryEditor?.chain().focus().toggleBold().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="粗体"
+                    >
+                      <Bold className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => culturalStoryEditor?.chain().focus().toggleItalic().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="斜体"
+                    >
+                      <Italic className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-5 bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => culturalStoryEditor?.chain().focus().toggleBulletList().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="无序列表"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => culturalStoryEditor?.chain().focus().toggleOrderedList().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="有序列表"
+                    >
+                      <ListOrdered className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-5 bg-gray-300 mx-1" />
+                    <button
+                      type="button"
+                      onClick={() => culturalStoryEditor?.chain().focus().undo().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="撤销"
+                    >
+                      <Undo className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => culturalStoryEditor?.chain().focus().redo().run()}
+                      className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                      title="重做"
+                    >
+                      <Redo className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <EditorContent editor={culturalStoryEditor} className="p-3 min-h-[100px] focus:outline-none prose prose-sm max-w-none" />
+                </div>
+                <p className="text-xs text-gray-400 mt-1">详细介绍这个声音背后的文化故事</p>
+              </div>
+            </form>
 
             <div className="flex space-x-3 p-6 border-t border-gray-200 bg-white">
               <button

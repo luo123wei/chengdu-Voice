@@ -19,6 +19,7 @@ interface FreeSound {
   duration: string;
   audio: string;
   location?: string;
+  culturalStory?: string;
   created_at?: string;
 }
 
@@ -51,6 +52,7 @@ export async function GET(request: NextRequest) {
       duration: row.duration,
       audio: row.audio,
       location: row.location,
+      culturalStory: row.cultural_story,
       created_at: row.created_at,
     }));
     return NextResponse.json({ 
@@ -69,7 +71,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, titleEn, description, duration, audio, location } = body;
+    const { title, titleEn, description, duration, audio, location, culturalStory } = body;
 
     if (!title || !titleEn || !description || !duration || !audio) {
       return NextResponse.json({ success: false, message: '缺少必填字段' }, { status: 400 });
@@ -83,6 +85,7 @@ export async function POST(request: NextRequest) {
       duration,
       audio,
       location,
+      culturalStory,
     };
 
     const { data, error } = await supabase.from('free_sounds').insert({
@@ -93,6 +96,7 @@ export async function POST(request: NextRequest) {
       duration: newSound.duration,
       audio: newSound.audio,
       location: newSound.location,
+      cultural_story: newSound.culturalStory,
       created_at: new Date().toISOString(),
     }).select('*').single();
 
@@ -111,7 +115,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, title, titleEn, description, duration, audio, location } = body;
+    const { id, title, titleEn, description, duration, audio, location, culturalStory } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, message: '缺少ID' }, { status: 400 });
@@ -123,7 +127,8 @@ export async function PUT(request: NextRequest) {
     if (description) updateData.description = description;
     if (duration) updateData.duration = duration;
     if (audio) updateData.audio = audio;
-    if (location) updateData.location = location;
+    if (location !== undefined) updateData.location = location;
+    if (culturalStory !== undefined) updateData.cultural_story = culturalStory;
 
     const { data, error } = await supabase.from('free_sounds').update(updateData).eq('id', id).select('*').single();
 
@@ -140,6 +145,7 @@ export async function PUT(request: NextRequest) {
       duration: data.duration,
       audio: data.audio,
       location: data.location,
+      culturalStory: data.cultural_story,
     } });
   } catch (error) {
     console.error('Update free sound error:', error);

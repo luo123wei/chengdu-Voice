@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, Volume2, MapPin } from 'lucide-react';
+import { Play, Pause, Volume2, MapPin, X, ChevronRight, Music } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -13,6 +13,7 @@ interface FreeSound {
   duration: string;
   audio: string;
   location?: string;
+  culturalStory?: string;
   created_at?: string;
 }
 
@@ -22,6 +23,7 @@ export default function FreeSoundsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedSound, setSelectedSound] = useState<FreeSound | null>(null);
   const limit = 6;
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 
@@ -134,8 +136,7 @@ export default function FreeSoundsPage() {
                       )}
                     </button>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-secondary text-xl mb-1">{sound.title}</h3>
-                      <p className="text-sm text-gray-500 mb-2">{sound.titleEn}</p>
+                      <h3 className="font-bold text-secondary text-xl mb-1">{sound.titleEn}</h3>
                       
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         {sound.location && (
@@ -148,6 +149,13 @@ export default function FreeSoundsPage() {
                         <span>{sound.duration}</span>
                       </div>
                     </div>
+                    <button
+                      onClick={() => setSelectedSound(sound)}
+                      className="flex items-center gap-1 px-4 py-2 text-primary font-medium hover:bg-primary/10 rounded-lg transition-colors"
+                    >
+                      <span>More</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -181,6 +189,113 @@ export default function FreeSoundsPage() {
           )}
         </div>
       </section>
+
+      {/* Explore Links */}
+      <section className="py-12 bg-cream">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <a
+              href="/blog"
+              className="group flex items-center gap-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <Music className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-secondary text-lg">Explore More Chengdu Culture</h3>
+                <p className="text-sm text-primary flex items-center gap-1 mt-1">
+                  Discover
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </p>
+              </div>
+            </a>
+            <a
+              href="/shop"
+              className="group flex items-center gap-4 p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">🌶️</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-secondary text-lg">Taste Chengdu</h3>
+                <p className="text-sm text-primary flex items-center gap-1 mt-1">
+                  Hanyuan Sichuan Pepper
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Detail Modal */}
+      {selectedSound && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedSound(null)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-2xl font-bold text-secondary">{selectedSound.titleEn}</h2>
+                <div className="flex items-center gap-4 text-sm text-gray-600 mt-2">
+                  {selectedSound.location && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      <span>{selectedSound.location}</span>
+                    </div>
+                  )}
+                  <span className="text-gray-400">·</span>
+                  <span>{selectedSound.duration}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedSound(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              {/* Player */}
+              <div className="flex items-center justify-center mb-8">
+                <button
+                  onClick={() => togglePlay(selectedSound.id)}
+                  className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
+                    playingId === selectedSound.id
+                      ? 'bg-primary scale-105'
+                      : 'bg-primary/80 hover:bg-primary hover:scale-105'
+                  }`}
+                >
+                  {playingId === selectedSound.id ? (
+                    <Pause className="w-12 h-12 text-white" />
+                  ) : (
+                    <Play className="w-12 h-12 text-white ml-1" />
+                  )}
+                </button>
+              </div>
+
+              {/* Description */}
+              <div className="mb-8">
+                <h3 className="text-lg font-bold text-secondary mb-3">Description / 描述</h3>
+                <div 
+                  className="prose prose-sm max-w-none text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: selectedSound.description }}
+                />
+              </div>
+
+              {/* Cultural Story */}
+              {selectedSound.culturalStory && selectedSound.culturalStory !== '<p></p>' && (
+                <div>
+                  <h3 className="text-lg font-bold text-secondary mb-3">Cultural Story / 文化故事</h3>
+                  <div 
+                    className="prose prose-sm max-w-none text-gray-700"
+                    dangerouslySetInnerHTML={{ __html: selectedSound.culturalStory }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
