@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Settings, Save, Download, Mail, Globe, FileText, Check, MessageSquare, Truck, Plus, Trash2, Lock, Eye, EyeOff, Image, Upload, X } from 'lucide-react';
+import { Settings, Save, Download, Mail, Globe, FileText, Check, MessageSquare, Truck, Plus, Trash2, Lock, Eye, EyeOff, Image, Upload, X, Info } from 'lucide-react';
 import { useSettings, useShippingRates } from '@/hooks/useDataStore';
+import RichTextEditor from '@/components/RichTextEditor';
 
 export interface CustomShippingRate {
   country: string;
@@ -464,6 +465,27 @@ export default function AdminSettings() {
                 国外用户访问网站时，通过 CDN 加速或直接访问国内链接均可正常播放。
               </p>
             </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+          <div className="flex items-center space-x-3 mb-6">
+            <Info className="w-6 h-6 text-amber-600" />
+            <h2 className="text-xl font-bold text-gray-800">About 页面内容</h2>
+          </div>
+
+          <div className="space-y-6">
+            <div className="p-4 bg-blue-50 rounded-lg mb-4">
+              <p className="text-sm text-blue-800">
+                <strong>编辑说明：</strong>在此处编辑 About 页面的富文本内容，支持标题、粗体、斜体、列表、引用、链接等格式。修改后点击"保存设置"按钮即可生效。
+              </p>
+            </div>
+            
+            <RichTextEditor
+              value={localSettings.aboutContent || ''}
+              onChange={(value) => setLocalSettings({ ...localSettings, aboutContent: value })}
+              placeholder="输入 About 页面内容..."
+            />
           </div>
         </div>
 

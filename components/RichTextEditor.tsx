@@ -2,225 +2,171 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
-import BulletList from '@tiptap/extension-bullet-list';
-import OrderedList from '@tiptap/extension-ordered-list';
-import ListItem from '@tiptap/extension-list-item';
-import Placeholder from '@tiptap/extension-placeholder';
-import { Bold, Italic, Underline, List, ListOrdered, Link2, Undo, Redo, Heading1, Heading2, Heading3, ImagePlus, Loader2 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
+import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Undo, Redo, Minus, Quote, Link } from 'lucide-react';
 
 interface RichTextEditorProps {
   value: string;
-  onChange: (content: string) => void;
+  onChange: (value: string) => void;
   placeholder?: string;
-  label?: string;
-  maxLength?: number;
 }
 
-export default function RichTextEditor({ value, onChange, placeholder, label, maxLength }: RichTextEditorProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-
+export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Link.configure({
-        openOnClick: false,
-      }),
-      Image.configure({
-        inline: false,
-        allowBase64: false,
-        HTMLAttributes: {
-          class: 'rounded-lg max-w-full h-auto my-4',
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
         },
       }),
-      BulletList,
-      OrderedList,
-      ListItem,
-      Placeholder.configure({
-        placeholder: placeholder || 'Start typing...',
-      }),
+      TextStyle,
+      Color,
     ],
-    content: value || '<p></p>',
+    content: value || '',
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    editorProps: {
-      attributes: {
-        class: 'w-full min-h-[160px] p-4 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors prose prose-lg max-w-none',
-      },
-    },
+    placeholder: placeholder || '在此输入内容...',
   });
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editor) return;
-
-    setUploading(true);
-    try {
-      // 压缩图片
-      const { compressImageToFile } = await import('@/lib/imageUtils');
-      const compressedFile = await compressImageToFile(file, 1920);
-
-      // 上传到服务器
-      const formData = new FormData();
-      formData.append('file', compressedFile);
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-
-      if (result.success && result.url) {
-        // 在光标位置插入图片
-        editor.chain().focus().setImage({ src: result.url }).run();
-      } else {
-        alert('图片上传失败：' + (result.error || '未知错误'));
-      }
-    } catch (error: any) {
-      alert('图片上传失败：' + (error.message || '请重试'));
-    } finally {
-      setUploading(false);
-      // 重置 input 以便可以重复选择同一文件
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
   if (!editor) {
-    return null;
+    return (
+      <div className="border border-gray-200 rounded-lg p-4 min-h-[200px] bg-gray-50 flex items-center justify-center text-gray-400">
+        加载编辑器中...
+      </div>
+    );
   }
 
+  const toolbarButtons = [
+    {
+      icon: <Heading1 className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+      isActive: editor.isActive('heading', { level: 1 }),
+      title: '标题 1',
+    },
+    {
+      icon: <Heading2 className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+      isActive: editor.isActive('heading', { level: 2 }),
+      title: '标题 2',
+    },
+    {
+      icon: <Heading3 className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+      isActive: editor.isActive('heading', { level: 3 }),
+      title: '标题 3',
+    },
+    { type: 'divider' },
+    {
+      icon: <Bold className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleBold().run(),
+      isActive: editor.isActive('bold'),
+      title: '粗体',
+    },
+    {
+      icon: <Italic className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleItalic().run(),
+      isActive: editor.isActive('italic'),
+      title: '斜体',
+    },
+    { type: 'divider' },
+    {
+      icon: <List className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleBulletList().run(),
+      isActive: editor.isActive('bulletList'),
+      title: '无序列表',
+    },
+    {
+      icon: <ListOrdered className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleOrderedList().run(),
+      isActive: editor.isActive('orderedList'),
+      title: '有序列表',
+    },
+    {
+      icon: <Quote className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().toggleBlockquote().run(),
+      isActive: editor.isActive('blockquote'),
+      title: '引用',
+    },
+    { type: 'divider' },
+    {
+      icon: <Minus className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().setHorizontalRule().run(),
+      isActive: false,
+      title: '分割线',
+    },
+    { type: 'divider' },
+    {
+      icon: <Link className="w-4 h-4" />,
+      onClick: () => {
+        const url = prompt('输入链接地址：');
+        if (url) {
+          editor.chain().focus().setLink({ href: url }).run();
+        }
+      },
+      isActive: editor.isActive('link'),
+      title: '链接',
+    },
+    { type: 'divider' },
+    {
+      icon: <Undo className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().undo().run(),
+      isActive: false,
+      title: '撤销',
+    },
+    {
+      icon: <Redo className="w-4 h-4" />,
+      onClick: () => editor.chain().focus().redo().run(),
+      isActive: false,
+      title: '重做',
+    },
+  ];
+
+  const colors = ['#000000', '#8B4513', '#D4A574', '#2563EB', '#DC2626', '#16A34A', '#9333EA'];
+
   return (
-    <div className="w-full">
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-      )}
-      <div className="flex flex-wrap gap-1 p-2 bg-gray-50 border border-gray-200 rounded-lg mb-2">
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('bold') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Bold"
-        >
-          <Bold className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('italic') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Italic"
-        >
-          <Italic className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('underline') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Underline"
-        >
-          <Underline className="w-4 h-4" />
-        </button>
-
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('heading', { level: 1 }) ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Heading 1"
-        >
-          <Heading1 className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('heading', { level: 2 }) ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Heading 2"
-        >
-          <Heading2 className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('heading', { level: 3 }) ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Heading 3"
-        >
-          <Heading3 className="w-4 h-4" />
-        </button>
-
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-
-        <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('bulletList') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Bullet List"
-        >
-          <List className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-2 rounded transition-colors ${editor.isActive('orderedList') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Ordered List"
-        >
-          <ListOrdered className="w-4 h-4" />
-        </button>
-
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-
-        <button
-          onClick={() => {
-            const url = window.prompt('Enter URL:');
-            if (url) {
-              editor.chain().focus().toggleLink({ href: url }).run();
-            }
-          }}
-          className={`p-2 rounded transition-colors ${editor.isActive('link') ? 'bg-amber-100 text-amber-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          title="Link"
-        >
-          <Link2 className="w-4 h-4" />
-        </button>
-
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          className="p-2 rounded text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          title="插入图片"
-        >
-          {uploading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <ImagePlus className="w-4 h-4" />
-          )}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="hidden"
-        />
-
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-
-        <button
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
-          className="p-2 rounded text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Undo"
-        >
-          <Undo className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
-          className="p-2 rounded text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Redo"
-        >
-          <Redo className="w-4 h-4" />
-        </button>
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
+      {/* 工具栏 */}
+      <div className="flex flex-wrap items-center gap-1 p-2 bg-gray-50 border-b border-gray-200">
+        {toolbarButtons.map((btn, index) => {
+          if (btn.type === 'divider') {
+            return <div key={index} className="w-px h-5 bg-gray-300 mx-1" />;
+          }
+          return (
+            <button
+              key={index}
+              onClick={btn.onClick}
+              title={btn.title}
+              className={`p-2 rounded hover:bg-gray-200 transition-colors ${
+                btn.isActive ? 'bg-amber-100 text-amber-700' : 'text-gray-600'
+              }`}
+            >
+              {btn.icon}
+            </button>
+          );
+        })}
+        
+        {/* 颜色选择器 */}
+        <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300">
+          <span className="text-xs text-gray-500">颜色:</span>
+          {colors.map((color) => (
+            <button
+              key={color}
+              onClick={() => editor.chain().focus().setColor(color).run()}
+              className="w-5 h-5 rounded border border-gray-300 hover:scale-110 transition-transform"
+              style={{ backgroundColor: color }}
+              title={color}
+            />
+          ))}
+        </div>
       </div>
-      <EditorContent editor={editor} />
+
+      {/* 编辑区域 */}
+      <EditorContent
+        editor={editor}
+        className="prose prose-sm max-w-none p-4 min-h-[300px] focus:outline-none"
+      />
     </div>
   );
 }

@@ -194,6 +194,7 @@ export function useSettings() {
     orderEmailBodyEn: 'Dear {customerName},\n\nThank you for your order! We have received your order #{orderNumber} and will begin processing it within 24 hours.\n\nYour package will be shipped via cross-border logistics and we will send you a tracking number once it is dispatched.\n\nThank you for choosing Chengdu Voice!',
     orderEmailSubjectZh: '您的订单已确认 - 成都之音',
     orderEmailBodyZh: '尊敬的 {customerName}，\n\n感谢您的订单！我们已收到您的订单 #{orderNumber}，将在24小时内开始处理。\n\n您的包裹将通过跨境物流发出，发货后我们会发送物流追踪号码给您。\n\n感谢您选择成都之音！',
+    aboutContent: '<h2>Experience Chengdu</h2><p>Through Sound &amp; Flavor</p>',
   });
   const [loading, setLoading] = useState(true);
 
