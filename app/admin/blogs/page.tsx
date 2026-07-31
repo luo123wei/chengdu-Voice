@@ -103,7 +103,6 @@ export default function AdminBlogs() {
   };
 
   const MAX_IMAGES = 6;
-  const MAX_CONTENT_LENGTH = 5000;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -468,19 +467,21 @@ export default function AdminBlogs() {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    内容 (中文) <span className="text-red-500">*</span>
+                  </label>
                   <RichTextEditor
-                    label="内容 (中文)"
                     value={formData.content}
                     onChange={(content) => setFormData({ ...formData, content })}
-                    maxLength={MAX_CONTENT_LENGTH}
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    内容 (英文) <span className="text-red-500">*</span>
+                  </label>
                   <RichTextEditor
-                    label="内容 (英文)"
                     value={formData.contentEn}
                     onChange={(content) => setFormData({ ...formData, contentEn: content })}
-                    maxLength={MAX_CONTENT_LENGTH}
                   />
                 </div>
               </div>

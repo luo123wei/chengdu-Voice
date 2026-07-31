@@ -4,6 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
+import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2, Heading3, Undo, Redo, Minus, Quote, Link } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -22,12 +23,14 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       }),
       TextStyle,
       Color,
+      Placeholder.configure({
+        placeholder: placeholder || '在此输入内容...',
+      }),
     ],
     content: value || '',
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
-    placeholder: placeholder || '在此输入内容...',
   });
 
   if (!editor) {
