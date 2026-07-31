@@ -209,11 +209,15 @@ export function useSettings() {
   }, []);
 
   const saveSettings = useCallback(async (newSettings: typeof settings) => {
-    await fetch('/api/settings', {
+    const res = await fetch('/api/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSettings),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || '保存失败');
+    }
     setSettings(newSettings);
   }, []);
 

@@ -42,11 +42,23 @@ export default function AdminSettings() {
     }
   }, [shippingRates]);
 
+  const [saveError, setSaveError] = useState('');
+  const [saving, setSaving] = useState(false);
+
   const handleSave = async () => {
-    await saveSettings(localSettings);
-    await saveRates(localRates);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setSaving(true);
+    setSaveError('');
+    try {
+      await saveSettings(localSettings);
+      await saveRates(localRates);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error: any) {
+      setSaveError(error.message || '保存失败，请重试');
+      console.error('Save settings failed:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleChangePassword = async () => {
@@ -670,10 +682,14 @@ export default function AdminSettings() {
         </div>
       </div>
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex justify-end items-center gap-4">
+        {saveError && (
+          <span className="text-red-600 text-sm font-medium">{saveError}</span>
+        )}
         <button
           onClick={handleSave}
-          className={`flex items-center px-8 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors ${
+          disabled={saving}
+          className={`flex items-center px-8 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
             saved ? 'bg-green-600 hover:bg-green-700' : ''
           }`}
         >
@@ -681,6 +697,11 @@ export default function AdminSettings() {
             <>
               <Check className="w-5 h-5 mr-2" />
               已保存
+            </>
+          ) : saving ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+              保存中...
             </>
           ) : (
             <>
