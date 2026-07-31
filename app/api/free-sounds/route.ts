@@ -48,19 +48,18 @@ export async function GET(request: NextRequest) {
       id: row.id,
       title: row.title,
       titleEn: row.title_en,
-      description: row.description,
+      description: row.description || '',
       duration: row.duration,
       audio: row.audio,
-      location: row.location,
-      culturalStory: row.cultural_story,
+      culturalStory: row.cultural_story || '',
       created_at: row.created_at,
     }));
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: sounds.length > 0 ? sounds : defaultSounds,
       total,
       page,
-      limit 
+      limit
     });
   } catch (error) {
     console.error('Get free sounds error:', error);
@@ -71,41 +70,51 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, titleEn, description, duration, audio, location, culturalStory } = body;
+    const { title, titleEn, description, duration, audio, culturalStory } = body;
 
     if (!title || !titleEn || !description || !duration || !audio) {
       return NextResponse.json({ success: false, message: '缺少必填字段' }, { status: 400 });
     }
 
-    const newSound: FreeSound = {
-      id: `sound-${Date.now()}`,
+    const newId = `sound-${Date.now()}`;
+
+    // 先尝试包含 cultural_story 的插入
+    let insertData: any = {
+      id: newId,
       title,
-      titleEn,
+      title_en: titleEn,
       description,
       duration,
       audio,
-      location,
-      culturalStory,
+      cultural_story: culturalStory || '',
+      created_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase.from('free_sounds').insert({
-      id: newSound.id,
-      title: newSound.title,
-      title_en: newSound.titleEn,
-      description: newSound.description,
-      duration: newSound.duration,
-      audio: newSound.audio,
-      location: newSound.location,
-      cultural_story: newSound.culturalStory,
-      created_at: new Date().toISOString(),
-    }).select('*').single();
+    let { data, error } = await supabase.from('free_sounds').insert(insertData).select('*').single();
 
+    // 如果失败（可能 cultural_story 列不存在），重试不含该字段
     if (error) {
-      console.error('Failed to create free sound:', error);
-      return NextResponse.json({ success: false, message: '创建失败' }, { status: 500 });
+      console.error('Insert with cultural_story failed, retrying without:', error);
+      const fallbackData: any = {
+        id: newId,
+        title,
+        title_en: titleEn,
+        description,
+        duration,
+        audio,
+        created_at: new Date().toISOString(),
+      };
+      const retry = await supabase.from('free_sounds').insert(fallbackData).select('*').single();
+      data = retry.data;
+      error = retry.error;
     }
 
-    return NextResponse.json({ success: true, data: newSound }, { status: 201 });
+    if (error || !data) {
+      console.error('Failed to create free sound:', error);
+      return NextResponse.json({ success: false, message: '创建失败: ' + (error?.message || '未知错误') }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, data: { id: data.id } }, { status: 201 });
   } catch (error) {
     console.error('Create free sound error:', error);
     return NextResponse.json({ success: false, message: '创建失败' }, { status: 500 });
@@ -115,26 +124,37 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, title, titleEn, description, duration, audio, location, culturalStory } = body;
+    const { id, title, titleEn, description, duration, audio, culturalStory } = body;
 
     if (!id) {
       return NextResponse.json({ success: false, message: '缺少ID' }, { status: 400 });
     }
 
-    const updateData: any = {};
-    if (title) updateData.title = title;
-    if (titleEn) updateData.title_en = titleEn;
-    if (description) updateData.description = description;
-    if (duration) updateData.duration = duration;
-    if (audio) updateData.audio = audio;
-    if (location !== undefined) updateData.location = location;
-    if (culturalStory !== undefined) updateData.cultural_story = culturalStory;
+    // 基础更新数据（不含 cultural_story）
+    const baseUpdate: any = {};
+    if (title !== undefined) baseUpdate.title = title;
+    if (titleEn !== undefined) baseUpdate.title_en = titleEn;
+    if (description !== undefined) baseUpdate.description = description;
+    if (duration !== undefined) baseUpdate.duration = duration;
+    if (audio !== undefined) baseUpdate.audio = audio;
 
-    const { data, error } = await supabase.from('free_sounds').update(updateData).eq('id', id).select('*').single();
+    // 先尝试包含 cultural_story 的更新
+    const fullUpdate = { ...baseUpdate };
+    if (culturalStory !== undefined) fullUpdate.cultural_story = culturalStory;
+
+    let { data, error } = await supabase.from('free_sounds').update(fullUpdate).eq('id', id).select('*').single();
+
+    // 如果失败（可能 cultural_story 列不存在），用基础数据重试
+    if (error && culturalStory !== undefined && Object.keys(baseUpdate).length > 0) {
+      console.error('Update with cultural_story failed, retrying with base only:', error);
+      const retry = await supabase.from('free_sounds').update(baseUpdate).eq('id', id).select('*').single();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error || !data) {
       console.error('Failed to update free sound:', error);
-      return NextResponse.json({ success: false, message: '声音不存在' }, { status: 404 });
+      return NextResponse.json({ success: false, message: '更新失败: ' + (error?.message || '声音不存在') }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, data: {
@@ -144,8 +164,7 @@ export async function PUT(request: NextRequest) {
       description: data.description,
       duration: data.duration,
       audio: data.audio,
-      location: data.location,
-      culturalStory: data.cultural_story,
+      culturalStory: data.cultural_story || '',
     } });
   } catch (error) {
     console.error('Update free sound error:', error);

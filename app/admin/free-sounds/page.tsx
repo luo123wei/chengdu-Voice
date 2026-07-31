@@ -140,8 +140,9 @@ export default function AdminFreeSounds() {
     const culturalStory = culturalStoryEditor?.getHTML() || '';
 
     try {
+      let res;
       if (editingSound) {
-        await fetch('/api/free-sounds', {
+        res = await fetch('/api/free-sounds', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -155,7 +156,7 @@ export default function AdminFreeSounds() {
           }),
         });
       } else {
-        await fetch('/api/free-sounds', {
+        res = await fetch('/api/free-sounds', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -169,11 +170,16 @@ export default function AdminFreeSounds() {
         });
       }
 
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || '保存失败');
+      }
+
       fetchSounds();
       handleCloseModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error('保存失败:', error);
-      alert('保存失败，请重试');
+      alert('保存失败: ' + (error.message || '请重试'));
     }
   };
 
