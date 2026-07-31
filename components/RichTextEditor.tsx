@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { TextStyle } from '@tiptap/extension-text-style';
@@ -14,6 +15,8 @@ interface RichTextEditorProps {
 }
 
 export default function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+  const isInternalChange = useRef(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -29,9 +32,21 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     ],
     content: value || '',
     onUpdate: ({ editor }) => {
+      isInternalChange.current = true;
       onChange(editor.getHTML());
     },
   });
+
+  // 同步外部 value 变化到编辑器（例如打开弹窗加载已有数据）
+  useEffect(() => {
+    if (editor && !isInternalChange.current) {
+      const currentHTML = editor.getHTML();
+      if (value !== currentHTML) {
+        editor.commands.setContent(value || '<p></p>', { emitUpdate: false });
+      }
+    }
+    isInternalChange.current = false;
+  }, [value, editor]);
 
   if (!editor) {
     return (

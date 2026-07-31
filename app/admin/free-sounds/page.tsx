@@ -1,11 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Music, Plus, Edit, Trash2, Search, X, Save, Upload, Link, CheckCircle, Bold, Italic, List, ListOrdered, Undo, Redo } from 'lucide-react';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import { TextStyle } from '@tiptap/extension-text-style';
-import { Color } from '@tiptap/extension-color';
+import { Music, Plus, Edit, Trash2, Search, X, Save, Upload, Link, CheckCircle } from 'lucide-react';
+import RichTextEditor from '@/components/RichTextEditor';
 
 interface FreeSound {
   id: string;
@@ -24,21 +21,13 @@ export default function AdminFreeSounds() {
   const [editingSound, setEditingSound] = useState<FreeSound | null>(null);
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     duration: '',
     audio: '',
-  });
-
-  const descriptionEditor = useEditor({
-    extensions: [StarterKit, TextStyle, Color],
-    content: '',
-  });
-
-  const culturalStoryEditor = useEditor({
-    extensions: [StarterKit, TextStyle, Color],
-    content: '',
+    description: '',
+    culturalStory: '',
   });
 
   const fetchSounds = async () => {
@@ -67,11 +56,9 @@ export default function AdminFreeSounds() {
         title: sound.titleEn,
         duration: sound.duration,
         audio: sound.audio,
+        description: sound.description || '',
+        culturalStory: sound.culturalStory || '',
       });
-      setTimeout(() => {
-        descriptionEditor?.commands.setContent(sound.description || '<p></p>');
-        culturalStoryEditor?.commands.setContent(sound.culturalStory || '<p></p>');
-      }, 100);
     } else {
       setEditingSound(null);
       setUploadMode('file');
@@ -79,14 +66,11 @@ export default function AdminFreeSounds() {
         title: '',
         duration: '',
         audio: '',
+        description: '',
+        culturalStory: '',
       });
-      setTimeout(() => {
-        descriptionEditor?.commands.setContent('<p></p>');
-        culturalStoryEditor?.commands.setContent('<p></p>');
-      }, 100);
     }
     setUploading(false);
-    setUploadProgress(0);
     setIsModalOpen(true);
   };
 
@@ -94,7 +78,6 @@ export default function AdminFreeSounds() {
     setIsModalOpen(false);
     setEditingSound(null);
     setUploading(false);
-    setUploadProgress(0);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +85,6 @@ export default function AdminFreeSounds() {
     if (!file) return;
 
     setUploading(true);
-    setUploadProgress(0);
 
     try {
       const uploadFormData = new FormData();
@@ -116,7 +98,6 @@ export default function AdminFreeSounds() {
       const result = await res.json();
       if (result.success) {
         setFormData({ ...formData, audio: result.data.url });
-        setUploadProgress(100);
       } else {
         alert(result.message || '上传失败');
       }
@@ -136,37 +117,30 @@ export default function AdminFreeSounds() {
       return;
     }
 
-    const description = descriptionEditor?.getHTML() || '';
-    const culturalStory = culturalStoryEditor?.getHTML() || '';
+    setSaving(true);
 
     try {
       let res;
+      const payload = {
+        title: formData.title,
+        titleEn: formData.title,
+        duration: formData.duration,
+        audio: formData.audio,
+        description: formData.description,
+        culturalStory: formData.culturalStory,
+      };
+
       if (editingSound) {
         res = await fetch('/api/free-sounds', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: editingSound.id,
-            title: formData.title,
-            titleEn: formData.title,
-            duration: formData.duration,
-            audio: formData.audio,
-            description,
-            culturalStory,
-          }),
+          body: JSON.stringify({ id: editingSound.id, ...payload }),
         });
       } else {
         res = await fetch('/api/free-sounds', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: formData.title,
-            titleEn: formData.title,
-            duration: formData.duration,
-            audio: formData.audio,
-            description,
-            culturalStory,
-          }),
+          body: JSON.stringify(payload),
         });
       }
 
@@ -180,14 +154,14 @@ export default function AdminFreeSounds() {
     } catch (error: any) {
       console.error('保存失败:', error);
       alert('保存失败: ' + (error.message || '请重试'));
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('确定要删除这个声音吗？')) {
-      await fetch(`/api/free-sounds?id=${id}`, {
-        method: 'DELETE',
-      });
+      await fetch(`/api/free-sounds?id=${id}`, { method: 'DELETE' });
       fetchSounds();
     }
   };
@@ -230,15 +204,9 @@ export default function AdminFreeSounds() {
         <table className="w-full">
           <thead>
             <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                标题
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                时长
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                操作
-              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标题</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时长</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -334,9 +302,7 @@ export default function AdminFreeSounds() {
                     type="button"
                     onClick={() => setUploadMode('file')}
                     className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                      uploadMode === 'file'
-                        ? 'bg-white shadow text-amber-600'
-                        : 'text-gray-600 hover:text-gray-800'
+                      uploadMode === 'file' ? 'bg-white shadow text-amber-600' : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     <Upload className="w-4 h-4" />
@@ -346,9 +312,7 @@ export default function AdminFreeSounds() {
                     type="button"
                     onClick={() => setUploadMode('url')}
                     className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                      uploadMode === 'url'
-                        ? 'bg-white shadow text-amber-600'
-                        : 'text-gray-600 hover:text-gray-800'
+                      uploadMode === 'url' ? 'bg-white shadow text-amber-600' : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     <Link className="w-4 h-4" />
@@ -357,34 +321,32 @@ export default function AdminFreeSounds() {
                 </div>
 
                 {uploadMode === 'file' ? (
-                  <div>
-                    <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-amber-500 transition-colors cursor-pointer">
-                      <input
-                        type="file"
-                        accept="audio/*"
-                        onChange={handleFileUpload}
-                        disabled={uploading}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      />
-                      {uploading ? (
-                        <div>
-                          <div className="w-10 h-10 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-3" />
-                          <p className="text-gray-600">上传中...</p>
-                        </div>
-                      ) : formData.audio.startsWith('/') ? (
-                        <div>
-                          <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-3" />
-                          <p className="text-gray-600">{formData.audio.split('/').pop()}</p>
-                          <p className="text-sm text-gray-400 mt-1">点击重新上传</p>
-                        </div>
-                      ) : (
-                        <div>
-                          <Music className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                          <p className="text-gray-600">点击上传音频文件</p>
-                          <p className="text-xs text-gray-400 mt-1">支持 MP3、WAV、OGG（最大50MB）</p>
-                        </div>
-                      )}
-                    </div>
+                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-amber-500 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    {uploading ? (
+                      <div>
+                        <div className="w-10 h-10 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-3" />
+                        <p className="text-gray-600">上传中...</p>
+                      </div>
+                    ) : formData.audio.startsWith('/') ? (
+                      <div>
+                        <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-3" />
+                        <p className="text-gray-600">{formData.audio.split('/').pop()}</p>
+                        <p className="text-sm text-gray-400 mt-1">点击重新上传</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <Music className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-600">点击上传音频文件</p>
+                        <p className="text-xs text-gray-400 mt-1">支持 MP3、WAV、OGG（最大50MB）</p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <input
@@ -401,63 +363,22 @@ export default function AdminFreeSounds() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   描述 <span className="text-red-500">*</span>
                 </label>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
-                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleBold().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="粗体">
-                      <Bold className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleItalic().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="斜体">
-                      <Italic className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleBulletList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="无序列表">
-                      <List className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => descriptionEditor?.chain().focus().toggleOrderedList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="有序列表">
-                      <ListOrdered className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button type="button" onClick={() => descriptionEditor?.chain().focus().undo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="撤销">
-                      <Undo className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => descriptionEditor?.chain().focus().redo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="重做">
-                      <Redo className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <EditorContent editor={descriptionEditor} className="p-3 min-h-[100px] focus:outline-none prose prose-sm max-w-none" />
-                </div>
+                <RichTextEditor
+                  value={formData.description}
+                  onChange={(content) => setFormData({ ...formData, description: content })}
+                  placeholder="输入声音描述..."
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Cultural Story / 文化故事 <span className="text-gray-400 text-xs">(可选)</span>
                 </label>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50">
-                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleBold().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="粗体">
-                      <Bold className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleItalic().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="斜体">
-                      <Italic className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleBulletList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="无序列表">
-                      <List className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().toggleOrderedList().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="有序列表">
-                      <ListOrdered className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-5 bg-gray-300 mx-1" />
-                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().undo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="撤销">
-                      <Undo className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => culturalStoryEditor?.chain().focus().redo().run()} className="p-1.5 hover:bg-gray-200 rounded transition-colors" title="重做">
-                      <Redo className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <EditorContent editor={culturalStoryEditor} className="p-3 min-h-[100px] focus:outline-none prose prose-sm max-w-none" />
-                </div>
-                <p className="text-xs text-gray-400 mt-1">详细介绍这个声音背后的文化故事</p>
+                <RichTextEditor
+                  value={formData.culturalStory}
+                  onChange={(content) => setFormData({ ...formData, culturalStory: content })}
+                  placeholder="详细介绍这个声音背后的文化故事..."
+                />
               </div>
             </form>
 
@@ -472,11 +393,11 @@ export default function AdminFreeSounds() {
               <button
                 type="submit"
                 form="sound-form"
-                disabled={uploading}
+                disabled={uploading || saving}
                 className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
-                <span>{editingSound ? '保存修改' : '添加声音'}</span>
+                <span>{saving ? '保存中...' : editingSound ? '保存修改' : '添加声音'}</span>
               </button>
             </div>
           </div>
