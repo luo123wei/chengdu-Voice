@@ -97,9 +97,21 @@ export default function BlogDetailPage() {
                 <Video className="w-6 h-6 text-chinese-red" />
                 <h3 className="font-bold text-secondary">Video Content</h3>
               </div>
-              <video controls className="w-full rounded-lg">
-                <source src={post.video} type="video/mp4" />
-              </video>
+              <div
+                className="w-full rounded-lg overflow-hidden bg-black"
+                style={{
+                  aspectRatio: '16 / 9',
+                  maxHeight: '450px',
+                }}
+              >
+                <video
+                  controls
+                  className="w-full h-full object-contain"
+                  style={{ maxHeight: '450px' }}
+                >
+                  <source src={post.video} type="video/mp4" />
+                </video>
+              </div>
             </div>
           )}
 
