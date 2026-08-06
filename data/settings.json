@@ -3,7 +3,7 @@
   "siteDescription": "闭上眼，听成都",
   "downloadLink": "https://cdn.example.com/download.zip",
   "mailFrom": "Chengdu Voice <hello@chengduvoice.com>",
-  "appUrl": "https://your-domain.com",
+  "appUrl": "https://voiceculture.world",
   "gaMeasurementId": "",
   "orderEmailSubjectEn": "Your Order Has Been Confirmed - Chengdu Voice",
   "orderEmailBodyEn": "Dear {customerName},\n\nThank you for your order! We have received your order #{orderNumber} and will begin processing it within 24 hours.\n\nYour package will be shipped via cross-border logistics and we will send you a tracking number once it is dispatched.\n\nThank you for choosing Chengdu Voice!",

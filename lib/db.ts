@@ -66,6 +66,7 @@ function mapProduct(row: any): Product {
 function mapBlog(row: any): BlogPost {
   return {
     id: row.id,
+    slug: row.slug || '',
     title: row.title,
     titleEn: row.title_en,
     content: row.content,
@@ -217,10 +218,16 @@ export const db = {
       if (error || !data) return undefined;
       return mapBlog(data);
     },
+    getBySlug: async (slug: string): Promise<BlogPost | undefined> => {
+      const { data, error } = await supabase.from('blogs').select('*').eq('slug', slug).single();
+      if (error || !data) return undefined;
+      return mapBlog(data);
+    },
     create: async (blog: Omit<BlogPost, 'id'>): Promise<BlogPost> => {
       const newBlog: BlogPost = { ...blog, id: `blog-${Date.now()}` };
       const { data, error } = await supabase.from('blogs').insert({
         id: newBlog.id,
+        slug: newBlog.slug,
         title: newBlog.title,
         title_en: newBlog.titleEn,
         content: newBlog.content,
@@ -241,6 +248,7 @@ export const db = {
     },
     update: async (id: string, updates: Partial<BlogPost>): Promise<BlogPost | null> => {
       const updateData: any = {};
+      if (updates.slug !== undefined) updateData.slug = updates.slug;
       if (updates.title) updateData.title = updates.title;
       if (updates.titleEn !== undefined) updateData.title_en = updates.titleEn;
       if (updates.content !== undefined) updateData.content = updates.content;

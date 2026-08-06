@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       console.error('[Auth] Database error (non-fatal):', err.message);
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world';
 
     // Send email with proper error handling
     console.log(`[Auth] Sending email to: ${email}`);

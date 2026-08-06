@@ -186,7 +186,7 @@ export default function BlogPage() {
             {paginatedPosts.map((post) => (
               <Link
                 key={post.id}
-                href={`/blog/${post.id}`}
+                href={`/blog/${post.slug}`}
                 className="group bg-cream rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300"
               >
                 <div className="relative overflow-hidden h-48">

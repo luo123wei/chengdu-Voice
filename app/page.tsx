@@ -7,7 +7,7 @@ import SubscribeForm from '@/components/SubscribeForm';
 import BlogCarousel from '@/components/BlogCarousel';
 import { db } from '@/lib/db';
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
 
 export const metadata: Metadata = {
   title: 'Chengdu Voice | 成都之音 - Authentic Chengdu Culture & Products',

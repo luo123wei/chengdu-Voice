@@ -11,7 +11,7 @@ export default function BlogDetailPage() {
   const params = useParams();
   const { blogs } = useBlogs();
   const { products } = useProducts();
-  const post = blogs.find((p) => p.id === params.id);
+  const post = blogs.find((p) => p.slug === params.slug);
 
   if (!post) {
     return (

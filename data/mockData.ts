@@ -1,5 +1,6 @@
 export interface BlogPost {
   id: string;
+  slug: string;
   title: string;
   titleEn: string;
   content: string;
@@ -110,6 +111,7 @@ export interface VerificationCode {
 export const blogPosts: BlogPost[] = [
   {
     id: '5',
+    slug: 'chengdu-morning-sounds',
     title: '成都清晨的声音：盖碗茶、鸟鸣与晨雾',
     titleEn: 'Sounds of Chengdu Morning: Gaiwan Tea, Bird Songs and Morning Mist',
     content: '在成都，清晨是一首无声的诗。当第一缕阳光穿透薄雾，城市开始苏醒。茶馆里传来盖碗茶清脆的碰撞声，老茶客们用低沉的四川话聊着家常。窗外，鸟儿在竹林间欢快地歌唱，偶尔传来几声清脆的自行车铃声。这就是成都的早晨，一个用声音编织的梦境。在这里，时间仿佛放慢了脚步，每一个声音都在诉说着这座城市的故事。如果你也想体验这份宁静，可以聆听我们的《成都声音地图》白噪音专辑，让成都的声音陪伴你的每一天。',
@@ -125,6 +127,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     id: '1',
+    slug: 'chengdu-tea-culture',
     title: '成都茶文化：一杯清茶的千年传承',
     titleEn: 'Chengdu Tea Culture: A Thousand-Year Legacy in a Cup',
     content: '成都，这座有着三千多年历史的城市，茶文化早已深深融入人们的日常生活。从古老的盖碗茶到现代的茶馆文化，每一杯茶都承载着成都人的生活哲学。',
@@ -140,6 +143,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     id: '2',
+    slug: 'sichuan-cuisine-fiery-journey',
     title: '川菜的麻辣艺术：味蕾上的火焰之旅',
     titleEn: 'Sichuan Cuisine: A Fiery Journey on the Taste Buds',
     content: '川菜，中国四大菜系之一，以其独特的麻辣风味闻名于世。从麻婆豆腐到水煮鱼，每一道菜都是一场味觉的盛宴。',
@@ -155,6 +159,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     id: '3',
+    slug: 'wide-narrow-alleys-chengdu',
     title: '宽窄巷子：穿越时光的成都记忆',
     titleEn: 'Wide and Narrow Alleys: Chengdu Memories Through Time',
     content: '宽窄巷子，成都最具代表性的历史文化街区。在这里，传统与现代交融，每一条巷子都诉说着老成都的故事。',
@@ -169,6 +174,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     id: '4',
+    slug: 'shu-embroidery-splendid-china',
     title: '蜀绣：针尖上的锦绣中华',
     titleEn: 'Shu Embroidery: Splendid China on the Tip of a Needle',
     content: '蜀绣，中国四大名绣之一，以其精细的针法和丰富的色彩著称。每一件作品都是艺术与工艺的完美结合。',

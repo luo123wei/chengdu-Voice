@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
 
 export const metadata: Metadata = {
   title: 'Discover | Chengdu Voice - Chengdu Culture, Stories & Insights',

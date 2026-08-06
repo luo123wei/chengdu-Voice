@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chengdu-voice.onrender.com'
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -64,10 +64,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Fetch blogs
-    const { data: blogs, error: blogError } = await supabase.from('blogs').select('id, publish_date')
+    const { data: blogs, error: blogError } = await supabase.from('blogs').select('id, slug, publish_date')
     if (!blogError && blogs) {
       blogRoutes = blogs.map((blog: any) => ({
-        url: `${siteUrl}/blog/${blog.id}`,
+        url: `${siteUrl}/blog/${blog.slug || blog.id}`,
         lastModified: new Date(blog.publish_date || new Date()),
         changeFrequency: 'monthly' as const,
         priority: 0.7,

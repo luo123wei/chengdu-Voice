@@ -1,11 +1,12 @@
 'use client';
-import { useState } from 'react';
-import { Plus, Edit, Trash2, Eye, Search, Filter, Image, Music, Video, Save, X, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Edit, Trash2, Eye, Search, Filter, Image, Music, Video, Save, X, FileText, Link as LinkIcon, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { categoryLabels } from '@/data/mockData';
 import type { BlogPost } from '@/data/mockData';
 import { useBlogs } from '@/hooks/useDataStore';
 import RichTextEditor from '@/components/RichTextEditor';
+import { generateSlug, ensureUniqueSlug } from '@/lib/slug';
 
 export default function AdminBlogs() {
   const { blogs: posts, saveBlog, addBlog, deleteBlog } = useBlogs();
@@ -16,6 +17,7 @@ export default function AdminBlogs() {
   const [formData, setFormData] = useState({
     title: '',
     titleEn: '',
+    slug: '',
     content: '',
     contentEn: '',
     category: 'culture' as 'culture' | 'food' | 'travel' | 'art',
@@ -35,6 +37,25 @@ export default function AdminBlogs() {
     { value: 'art', label: { en: '艺术', zh: '艺术' } },
   ];
 
+  const [autoSlug, setAutoSlug] = useState(true);
+
+  useEffect(() => {
+    if (autoSlug && formData.titleEn && !editingPost) {
+      const generated = generateSlug(formData.titleEn);
+      if (generated) {
+        setFormData(prev => ({ ...prev, slug: generated }));
+      }
+    }
+  }, [formData.titleEn, autoSlug, editingPost]);
+
+  const handleAutoSlug = () => {
+    if (formData.titleEn) {
+      const existingSlugs = posts.filter(p => p.id !== editingPost?.id).map(p => p.slug);
+      const generated = ensureUniqueSlug(generateSlug(formData.titleEn), existingSlugs);
+      setFormData(prev => ({ ...prev, slug: generated }));
+    }
+  };
+
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -46,9 +67,11 @@ export default function AdminBlogs() {
   const handleOpenModal = (post?: BlogPost) => {
     if (post) {
       setEditingPost(post);
+      setAutoSlug(false);
       setFormData({
         title: post.title,
         titleEn: post.titleEn,
+        slug: post.slug,
         content: post.content || '<p></p>',
         contentEn: post.contentEn || '<p></p>',
         category: post.category,
@@ -61,9 +84,11 @@ export default function AdminBlogs() {
       });
     } else {
       setEditingPost(null);
+      setAutoSlug(true);
       setFormData({
         title: '',
         titleEn: '',
+        slug: '',
         content: '<p></p>',
         contentEn: '<p></p>',
         category: 'culture',
@@ -84,11 +109,18 @@ export default function AdminBlogs() {
   };
 
   const handleSave = () => {
+    if (!formData.slug.trim()) {
+      alert('Please set a URL slug for this article');
+      return;
+    }
     if (editingPost) {
       saveBlog({ ...editingPost, ...formData });
     } else {
+      const existingSlugs = posts.map(p => p.slug);
+      const uniqueSlug = ensureUniqueSlug(formData.slug, existingSlugs);
       addBlog({
         ...formData,
+        slug: uniqueSlug,
         publishDate: new Date().toISOString().split('T')[0],
         views: 0,
       });
@@ -281,7 +313,7 @@ export default function AdminBlogs() {
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
                     <Link
-                      href={`/blog/${post.id}`}
+                      href={`/blog/${post.slug}`}
                       className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
                     >
                       <Eye className="w-5 h-5" />
@@ -350,6 +382,49 @@ export default function AdminBlogs() {
                     placeholder="Article Title"
                   />
                 </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">URL Slug</label>
+                  {autoSlug && !editingPost && (
+                    <span className="text-xs text-green-600">Auto-generated from title</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">/blog/</span>
+                    <input
+                      type="text"
+                      value={formData.slug}
+                      onChange={(e) => {
+                        setAutoSlug(false);
+                        setFormData({ ...formData, slug: e.target.value });
+                      }}
+                      className="w-full pl-16 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors font-mono text-sm"
+                      placeholder="article-url-slug"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAutoSlug}
+                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-amber-600"
+                    title="Regenerate from title"
+                  >
+                    <RefreshCw className="w-5 h-5" />
+                  </button>
+                </div>
+                {formData.slug && (
+                  <a
+                    href={`/blog/${formData.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 text-xs text-blue-600 hover:underline inline-flex items-center gap-1"
+                  >
+                    <LinkIcon className="w-3 h-3" />
+                    Preview: /blog/{formData.slug}
+                  </a>
+                )}
               </div>
 
               <div>

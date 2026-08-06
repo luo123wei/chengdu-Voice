@@ -25,7 +25,6 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
     setCurrentIndex(index);
   }, []);
 
-  // Auto play every 4 seconds
   useEffect(() => {
     if (isPaused || posts.length <= 1) return;
     const timer = setInterval(goToNext, 4000);
@@ -33,17 +32,24 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
   }, [isPaused, goToNext, posts.length]);
 
   if (posts.length === 0) return null;
+
   if (posts.length === 1) {
     const post = posts[0];
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="relative">
-          <div className="rounded-2xl overflow-hidden shadow-xl">
-            <img
-              src={post.images[0]}
-              alt={post.titleEn}
-              className="w-full h-80 object-cover"
-            />
+          <Link href={`/blog/${post.slug}`}>
+            <div className="rounded-2xl overflow-hidden shadow-xl cursor-pointer group">
+              <img
+                src={post.images[0]}
+                alt={post.titleEn}
+                className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          </Link>
+          <div className="absolute -bottom-6 -right-6 bg-primary text-white p-4 rounded-xl shadow-lg">
+            <p className="text-sm opacity-80">Featured Story</p>
+            <p className="text-xl font-bold capitalize">{post.category}</p>
           </div>
         </div>
         <div>
@@ -57,7 +63,7 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
             {post.contentEn.replace(/<[^>]*>/g, '').substring(0, 300)}...
           </p>
           <Link
-            href={`/blog/${post.id}`}
+            href={`/blog/${post.slug}`}
             className="inline-flex items-center gap-2 text-primary font-medium hover:gap-4 transition-all"
           >
             <span>Read Full Story</span>
@@ -76,20 +82,19 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Carousel content */}
       <div className="overflow-hidden">
         <div
           className="flex transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
-          {posts.map((post, index) => (
+          {posts.map((post) => (
             <div
               key={post.id}
               className="w-full flex-shrink-0"
             >
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="relative">
-                  <Link href={`/blog/${post.id}`}>
+                  <Link href={`/blog/${post.slug}`}>
                     <div className="rounded-2xl overflow-hidden shadow-xl cursor-pointer group">
                       <img
                         src={post.images[0]}
@@ -114,7 +119,7 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
                     {post.contentEn.replace(/<[^>]*>/g, '').substring(0, 300)}...
                   </p>
                   <Link
-                    href={`/blog/${post.id}`}
+                    href={`/blog/${post.slug}`}
                     className="inline-flex items-center gap-2 text-primary font-medium hover:gap-4 transition-all"
                   >
                     <span>Read Full Story</span>
@@ -127,7 +132,6 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
         </div>
       </div>
 
-      {/* Navigation arrows */}
       <button
         onClick={goToPrev}
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 z-10"
@@ -143,7 +147,6 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
         <ChevronRight className="w-6 h-6 text-gray-700" />
       </button>
 
-      {/* Dots indicator */}
       <div className="flex justify-center items-center gap-2 mt-8">
         {posts.map((_, index) => (
           <button
