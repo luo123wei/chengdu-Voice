@@ -20,13 +20,15 @@ export async function sendEmail(options: {
 
   console.log(`[Email] Sending email via Resend to: ${to}`);
 
-  const data = await resend.emails.send({
+  const payload: Record<string, unknown> = {
     from: from || fromEmail,
     to,
     subject,
-    ...(html ? { html } : {}),
-    ...(text ? { text } : {}),
-  });
+  };
+  if (html) payload.html = html;
+  if (text) payload.text = text;
+
+  const data = await resend.emails.send(payload as any);
 
   if (data.error) {
     throw new Error(`Resend error: ${data.error.message}`);
