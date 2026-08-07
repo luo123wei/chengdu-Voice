@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Search, Filter, Star, Camera, Music, Video, ChevronLeft, ChevronRight, Volume2, Utensils, Home, BookOpen, Plane, Palette } from 'lucide-react';
+import { Search, Music, Video, ChevronLeft, ChevronRight, Utensils, BookOpen, Plane, Palette } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -20,7 +20,6 @@ export default function BlogPage() {
   const { blogs } = useBlogs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedMediaType, setSelectedMediaType] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const filteredPosts = blogs.filter((post) => {
@@ -28,12 +27,7 @@ export default function BlogPage() {
       post.titleEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = !selectedCategory || post.category === selectedCategory;
-    const matchesMediaType =
-      !selectedMediaType ||
-      (selectedMediaType === 'image' && post.images.length > 0) ||
-      (selectedMediaType === 'audio' && post.audio) ||
-      (selectedMediaType === 'video' && post.video);
-    return matchesSearch && matchesCategory && matchesMediaType;
+    return matchesSearch && matchesCategory;
   });
 
   const totalPages = Math.ceil(filteredPosts.length / ITEMS_PER_PAGE);
@@ -119,68 +113,6 @@ export default function BlogPage() {
                 );
               })}
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3 mb-8">
-            <span className="text-gray-600 font-medium flex items-center">
-              <Filter className="w-4 h-4 mr-2" />
-              Media Type:
-            </span>
-            <button
-              onClick={() => {
-                setSelectedMediaType(null);
-                resetPagination();
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                !selectedMediaType
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => {
-                setSelectedMediaType('image');
-                resetPagination();
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                selectedMediaType === 'image'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Camera className="w-4 h-4" />
-              Images
-            </button>
-            <button
-              onClick={() => {
-                setSelectedMediaType('audio');
-                resetPagination();
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                selectedMediaType === 'audio'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Music className="w-4 h-4" />
-              Audio
-            </button>
-            <button
-              onClick={() => {
-                setSelectedMediaType('video');
-                resetPagination();
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                selectedMediaType === 'video'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Video className="w-4 h-4" />
-              Video
-            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
