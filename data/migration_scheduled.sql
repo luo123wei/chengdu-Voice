@@ -7,16 +7,10 @@ ALTER TABLE blogs ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
 -- 2. 添加索引便于按发布时间查询
 CREATE INDEX IF NOT EXISTS idx_blogs_scheduled_at ON blogs(scheduled_at);
 
--- 3. 更新 publish_date 字段格式（确保只包含日期部分，不包含时间）
--- 对于已有数据，如果 publish_date 包含时间部分，截取为日期
-UPDATE blogs
-SET publish_date = split_part(publish_date::text, 'T', 1)
-WHERE publish_date::text LIKE '%T%';
-
--- 4. 将已有博客的作者默认值设为 'Chengdu-Voice'（仅对空值）
+-- 3. 将已有博客的作者默认值设为 'Chengdu-Voice'（仅对空值）
 UPDATE blogs SET author = 'Chengdu-Voice' WHERE author IS NULL OR author = '';
 
--- 5. 验证字段已添加
+-- 4. 验证字段已添加
 SELECT
   column_name,
   data_type,
