@@ -207,28 +207,21 @@ export const db = {
   blogs: {
     getAll: async (): Promise<BlogPost[]> => {
       try {
-        const { data, error } = await supabase.from('blogs').select('*');
+        const { data, error } = await supabase.from('blogs').select('*').order('publish_date', { ascending: false });
         if (error) {
           console.error('Failed to get blogs from Supabase:', error);
-          console.log(`[Blogs] Falling back to defaultBlogs (${defaultBlogs.length} posts)`);
-          return defaultBlogs;
+          return [];
         }
         if (!data || data.length === 0) {
-          console.log(`[Blogs] No blogs in Supabase, using defaultBlogs (${defaultBlogs.length} posts)`);
-          return defaultBlogs;
+          console.log('[Blogs] No blogs found in Supabase');
+          return [];
         }
         const mapped = data.map(mapBlog);
-        console.log(`[Blogs] Supabase returned ${mapped.length} blogs`);
-        if (mapped.length < 5) {
-          console.log(`[Blogs] Only ${mapped.length} blogs from Supabase, supplementing with mockData to reach 5`);
-          const existingIds = new Set(mapped.map(b => b.id));
-          const supplements = defaultBlogs.filter(b => !existingIds.has(b.id)).slice(0, 5 - mapped.length);
-          return [...mapped, ...supplements];
-        }
+        console.log(`[Blogs] Loaded ${mapped.length} blogs from Supabase`);
         return mapped;
       } catch (err: any) {
         console.error('Exception in getAll blogs:', err.message);
-        return defaultBlogs;
+        return [];
       }
     },
     getById: async (id: string): Promise<BlogPost | undefined> => {
