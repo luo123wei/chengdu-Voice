@@ -288,7 +288,7 @@ export default function AdminSettings() {
                 value={localSettings.mailFrom}
                 onChange={(e) => setLocalSettings({ ...localSettings, mailFrom: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
-                placeholder="Chengdu Voice <kylw02@outlook.com>"
+                placeholder="Chengdu Voice <hello@chengduvoice.com>"
               />
             </div>
 

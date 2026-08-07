@@ -102,7 +102,7 @@ ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item
 
 Your package will be shipped via cross-border logistics and we will send you a tracking number once it's dispatched.
 
-Thank you for choosing Chengdu Voice! If you have any questions, please contact us at kylw02@outlook.com.
+Thank you for choosing Chengdu Voice! If you have any questions, please contact us at hello@chengduvoice.com.
 
 Best regards,
 The Chengdu Voice Team`;
@@ -120,7 +120,7 @@ ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.q
 
 您的包裹将通过跨境物流发出，发货后我们会发送物流追踪号码给您。
 
-感谢您选择成都之音！如有任何问题，请联系我们：kylw02@outlook.com。
+感谢您选择成都之音！如有任何问题，请联系我们：hello@chengduvoice.com。
 
 此致，
 成都之音团队`;
