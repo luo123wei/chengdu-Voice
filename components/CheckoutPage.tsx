@@ -609,13 +609,6 @@ export default function CheckoutPage() {
                 <Shield className="w-4 h-4 mr-1" />
                 Secure payment with PayPal
               </div>
-
-              <div className="mt-4 p-4 bg-amber-50 rounded-lg text-sm text-amber-700">
-                <p><strong>Test PayPal Account:</strong></p>
-                <p><strong>Email:</strong> sb-xxxx@personal.example.com</p>
-                <p><strong>Password:</strong> Your test password</p>
-                <p className="mt-2 text-xs">Use PayPal Sandbox for testing</p>
-              </div>
             </div>
           </div>
         </div>
