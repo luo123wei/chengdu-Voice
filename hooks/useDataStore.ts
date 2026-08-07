@@ -186,7 +186,7 @@ export function useSettings() {
     siteName: 'Chengdu Voice | 成都之音',
     siteDescription: '闭上眼，听成都',
     downloadLink: process.env.NEXT_PUBLIC_DOWNLOAD_LINK || 'https://cdn.example.com/download.zip',
-    mailFrom: 'Chengdu Voice <hello@chengduvoice.com>',
+    mailFrom: 'Chengdu Voice <kylw02@outlook.com>',
     appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
     gaMeasurementId: '',
     bannerImage: 'https://picsum.photos/id/1015/1920/1080',

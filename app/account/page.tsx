@@ -448,7 +448,7 @@ export default function AccountPage() {
                   If you have any questions about your orders, please contact our support team.
                 </p>
                 <a
-                  href="mailto:hello@chengduvoice.com"
+                  href="mailto:kylw02@outlook.com"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
                 >
                   <Mail className="w-4 h-4" />

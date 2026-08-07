@@ -88,7 +88,7 @@ export default function AboutPage() {
                 <Mail className="w-8 h-8 text-bamboo" />
               </div>
               <h3 className="font-serif font-bold text-secondary text-lg mb-2">Email</h3>
-              <p className="text-gray-600">hello@chengduvoice.com</p>
+              <p className="text-gray-600">kylw02@outlook.com</p>
             </div>
           </div>
         </div>
