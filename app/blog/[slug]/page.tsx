@@ -53,12 +53,11 @@ export default function BlogDetailPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-secondary mb-4">
             {post.titleEn}
           </h1>
-          <p className="text-lg text-gray-500 mb-6">{post.title}</p>
 
           <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
             <span className="flex items-center">
               <Calendar className="w-4 h-4 mr-2" />
-              {post.publishDate}
+              {post.publishDate.split('T')[0]}
             </span>
             <span className="flex items-center">
               <Eye className="w-4 h-4 mr-2" />
@@ -117,8 +116,6 @@ export default function BlogDetailPage() {
 
           <div className="prose prose-lg max-w-none">
             <div className="text-gray-600 leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: post.contentEn || '<p>No content available</p>' }} />
-            
-            <div className="text-gray-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content || '<p>暂无内容</p>' }} />
           </div>
         </div>
       </section>

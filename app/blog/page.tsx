@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Search, Filter, Star, Camera, Music, Video, ChevronLeft, ChevronRight, Volume2, Utensils, Home } from 'lucide-react';
+import { Search, Filter, Star, Camera, Music, Video, ChevronLeft, ChevronRight, Volume2, Utensils, Home, BookOpen, Plane, Palette } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,9 +10,10 @@ import { useBlogs } from '@/hooks/useDataStore';
 const ITEMS_PER_PAGE = 12;
 
 const chengduCategories = [
-  { id: 'sounds', name: 'Sounds of Chengdu', icon: Volume2, color: 'bg-primary' },
-  { id: 'taste', name: 'Taste of Chengdu', icon: Utensils, color: 'bg-gold' },
-  { id: 'life', name: 'Life in Chengdu', icon: Home, color: 'bg-secondary' },
+  { id: 'culture', name: 'Culture', icon: BookOpen, color: 'bg-primary' },
+  { id: 'food', name: 'Food', icon: Utensils, color: 'bg-gold' },
+  { id: 'travel', name: 'Travel', icon: Plane, color: 'bg-secondary' },
+  { id: 'art', name: 'Art', icon: Palette, color: 'bg-chinese-red' },
 ];
 
 export default function BlogPage() {
@@ -218,13 +219,12 @@ export default function BlogPage() {
                   <h3 className="font-bold text-secondary mb-2 group-hover:text-primary transition-colors line-clamp-2">
                     {post.titleEn}
                   </h3>
-                  <p className="text-xs text-gray-500 mb-3">{post.title}</p>
                   <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                     {post.contentEn.replace(/<[^>]*>/g, '').substring(0, 100)}...
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">{post.author}</span>
-                    <span className="text-xs text-gray-500">{post.publishDate}</span>
+                    <span className="text-xs text-gray-500">{post.publishDate.split('T')[0]}</span>
                   </div>
                 </div>
               </Link>

@@ -12,6 +12,7 @@ export interface BlogPost {
   author: string;
   publishDate: string;
   views: number;
+  scheduledAt?: string;
 }
 
 export interface Product {

@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-export async function GET() {
-  const blogs = await db.blogs.getAll();
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const includeScheduled = searchParams.get('includeScheduled') === 'true';
+  const blogs = await db.blogs.getAll({ includeScheduled });
   return NextResponse.json(blogs);
 }
 

@@ -78,6 +78,7 @@ function mapBlog(row: any): BlogPost {
     author: row.author,
     publishDate: row.publish_date,
     views: row.views || 0,
+    scheduledAt: row.scheduled_at || undefined,
   };
 }
 
@@ -205,8 +206,9 @@ export const db = {
   },
 
   blogs: {
-    getAll: async (): Promise<BlogPost[]> => {
+    getAll: async (options: { includeScheduled?: boolean } = {}): Promise<BlogPost[]> => {
       try {
+        const { includeScheduled = false } = options;
         const { data, error } = await supabase.from('blogs').select('*').order('publish_date', { ascending: false });
         if (error) {
           console.error('Failed to get blogs from Supabase:', error);
@@ -217,8 +219,16 @@ export const db = {
           return [];
         }
         const mapped = data.map(mapBlog);
-        console.log(`[Blogs] Loaded ${mapped.length} blogs from Supabase`);
-        return mapped;
+        console.log(`[Blogs] Loaded ${mapped.length} blogs from Supabase (includeScheduled=${includeScheduled})`);
+        if (includeScheduled) {
+          return mapped;
+        }
+        const now = new Date();
+        const published = mapped.filter(b => !b.scheduledAt || new Date(b.scheduledAt) <= now);
+        if (published.length < mapped.length) {
+          console.log(`[Blogs] Filtered out ${mapped.length - published.length} scheduled (not-yet-published) blogs`);
+        }
+        return published;
       } catch (err: any) {
         console.error('Exception in getAll blogs:', err.message);
         return [];
@@ -250,6 +260,7 @@ export const db = {
         author: newBlog.author,
         publish_date: newBlog.publishDate,
         views: newBlog.views,
+        scheduled_at: newBlog.scheduledAt || null,
       }).select('*').single();
       if (error) {
         console.error('Failed to create blog:', error);
@@ -260,17 +271,18 @@ export const db = {
     update: async (id: string, updates: Partial<BlogPost>): Promise<BlogPost | null> => {
       const updateData: any = {};
       if (updates.slug !== undefined) updateData.slug = updates.slug;
-      if (updates.title) updateData.title = updates.title;
+      if (updates.title !== undefined) updateData.title = updates.title;
       if (updates.titleEn !== undefined) updateData.title_en = updates.titleEn;
       if (updates.content !== undefined) updateData.content = updates.content;
       if (updates.contentEn !== undefined) updateData.content_en = updates.contentEn;
-      if (updates.category) updateData.category = updates.category;
+      if (updates.category !== undefined) updateData.category = updates.category;
       if (updates.images !== undefined) updateData.images = updates.images;
       if (updates.audio !== undefined) updateData.audio = updates.audio;
       if (updates.video !== undefined) updateData.video = updates.video;
-      if (updates.author) updateData.author = updates.author;
-      if (updates.publishDate) updateData.publish_date = updates.publishDate;
+      if (updates.author !== undefined) updateData.author = updates.author;
+      if (updates.publishDate !== undefined) updateData.publish_date = updates.publishDate;
       if (updates.views !== undefined) updateData.views = updates.views;
+      if (updates.scheduledAt !== undefined) updateData.scheduled_at = updates.scheduledAt || null;
 
       const { data, error } = await supabase.from('blogs').update(updateData).eq('id', id).select('*').single();
       if (error || !data) return null;

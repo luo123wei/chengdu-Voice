@@ -77,12 +77,13 @@ export function useProducts(useMockFallback = true) {
   return { products, loading, saveProduct, updateProduct: saveProduct, addProduct, deleteProduct, refreshProducts };
 }
 
-export function useBlogs() {
+export function useBlogs(includeScheduled = false) {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/blogs')
+    const url = includeScheduled ? '/api/blogs?includeScheduled=true' : '/api/blogs';
+    fetch(url)
       .then(res => res.json())
       .then(data => {
         setBlogs(data.length > 0 ? data : defaultBlogs);
@@ -92,13 +93,14 @@ export function useBlogs() {
         setBlogs(defaultBlogs);
         setLoading(false);
       });
-  }, []);
+  }, [includeScheduled]);
 
   const refreshBlogs = useCallback(() => {
-    fetch('/api/blogs')
+    const url = includeScheduled ? '/api/blogs?includeScheduled=true' : '/api/blogs';
+    fetch(url)
       .then(res => res.json())
       .then(data => setBlogs(data));
-  }, []);
+  }, [includeScheduled]);
 
   const saveBlog = useCallback(async (blog: BlogPost) => {
     await fetch('/api/blogs', {

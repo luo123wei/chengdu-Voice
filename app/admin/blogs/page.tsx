@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Eye, Search, Filter, Image, Music, Video, Save, X, FileText, Link as LinkIcon, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Search, Filter, Image, Music, Video, Save, X, FileText, Link as LinkIcon, RefreshCw, Clock, Calendar, Send } from 'lucide-react';
 import Link from 'next/link';
 import { categoryLabels } from '@/data/mockData';
 import type { BlogPost } from '@/data/mockData';
@@ -8,12 +8,17 @@ import { useBlogs } from '@/hooks/useDataStore';
 import RichTextEditor from '@/components/RichTextEditor';
 import { generateSlug, ensureUniqueSlug } from '@/lib/slug';
 
+type PublishMode = 'now' | 'scheduled';
+
 export default function AdminBlogs() {
-  const { blogs: posts, saveBlog, addBlog, deleteBlog } = useBlogs();
+  const { blogs: posts, saveBlog, addBlog, deleteBlog } = useBlogs(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [publishMode, setPublishMode] = useState<PublishMode>('now');
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('14:25');
   const [formData, setFormData] = useState({
     title: '',
     titleEn: '',
@@ -26,15 +31,15 @@ export default function AdminBlogs() {
     audioUploading: false,
     video: '',
     videoUploading: false,
-    author: '',
+    author: 'Chengdu-Voice',
   });
 
   const categories = [
     { value: 'all', label: { en: '全部', zh: '全部' } },
-    { value: 'culture', label: { en: '文化', zh: '文化' } },
-    { value: 'food', label: { en: '美食', zh: '美食' } },
-    { value: 'travel', label: { en: '旅行', zh: '旅行' } },
-    { value: 'art', label: { en: '艺术', zh: '艺术' } },
+    { value: 'culture', label: { en: '文化 Culture', zh: '文化' } },
+    { value: 'food', label: { en: '美食 Food', zh: '美食' } },
+    { value: 'travel', label: { en: '旅行 Travel', zh: '旅行' } },
+    { value: 'art', label: { en: '艺术 Art', zh: '艺术' } },
   ];
 
   const [autoSlug, setAutoSlug] = useState(true);
@@ -80,8 +85,18 @@ export default function AdminBlogs() {
         audioUploading: false,
         video: post.video || '',
         videoUploading: false,
-        author: post.author,
+        author: post.author || 'Chengdu-Voice',
       });
+      if (post.scheduledAt) {
+        const d = new Date(post.scheduledAt);
+        setPublishMode('scheduled');
+        setScheduleDate(d.toISOString().split('T')[0]);
+        setScheduleTime(`${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`);
+      } else {
+        setPublishMode('now');
+        setScheduleDate('');
+        setScheduleTime('14:25');
+      }
     } else {
       setEditingPost(null);
       setAutoSlug(true);
@@ -97,8 +112,11 @@ export default function AdminBlogs() {
         audioUploading: false,
         video: '',
         videoUploading: false,
-        author: '',
+        author: 'Chengdu-Voice',
       });
+      setPublishMode('now');
+      setScheduleDate('');
+      setScheduleTime('14:25');
     }
     setIsModalOpen(true);
   };
@@ -108,24 +126,49 @@ export default function AdminBlogs() {
     setEditingPost(null);
   };
 
+  const getTodayStr = () => new Date().toISOString().split('T')[0];
+  const getMaxDateStr = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
+  };
+
+  const buildScheduledAt = (): string | undefined => {
+    if (publishMode !== 'scheduled') return undefined;
+    if (!scheduleDate) return undefined;
+    return new Date(`${scheduleDate}T${scheduleTime || '14:25'}:00`).toISOString();
+  };
+
   const handleSave = () => {
     if (!formData.slug.trim()) {
       alert('Please set a URL slug for this article');
       return;
     }
+    const scheduledAt = buildScheduledAt();
+    const publishDate = publishMode === 'scheduled' && scheduledAt
+      ? scheduledAt.split('T')[0]
+      : new Date().toISOString().split('T')[0];
     if (editingPost) {
-      saveBlog({ ...editingPost, ...formData });
+      saveBlog({ ...editingPost, ...formData, scheduledAt });
     } else {
       const existingSlugs = posts.map(p => p.slug);
       const uniqueSlug = ensureUniqueSlug(formData.slug, existingSlugs);
       addBlog({
         ...formData,
         slug: uniqueSlug,
-        publishDate: new Date().toISOString().split('T')[0],
+        publishDate,
         views: 0,
+        scheduledAt,
       });
     }
     handleCloseModal();
+  };
+
+  const getPostStatus = (post: BlogPost): { label: string; color: string } => {
+    if (post.scheduledAt && new Date(post.scheduledAt) > new Date()) {
+      return { label: '已排期', color: 'bg-amber-100 text-amber-700' };
+    }
+    return { label: '已发布', color: 'bg-green-100 text-green-700' };
   };
 
   const handleDelete = (id: string) => {
@@ -141,15 +184,15 @@ export default function AdminBlogs() {
     if (files) {
       const remainingSlots = MAX_IMAGES - formData.images.length;
       const filesToUpload = Array.from(files).slice(0, remainingSlots);
-      
+
       const { compressImageToFile } = await import('@/lib/imageUtils');
-      
+
       for (const file of filesToUpload) {
         try {
           const compressedFile = await compressImageToFile(file, 1920);
           const formDataToSend = new FormData();
           formDataToSend.append('file', compressedFile);
-          
+
           const response = await fetch('/api/upload', {
             method: 'POST',
             body: formDataToSend,
@@ -170,10 +213,10 @@ export default function AdminBlogs() {
     if (!file) return;
 
     setFormData({ ...formData, audioUploading: true });
-    
+
     const formDataToSend = new FormData();
     formDataToSend.append('file', file);
-    
+
     try {
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -194,10 +237,10 @@ export default function AdminBlogs() {
     if (!file) return;
 
     setFormData({ ...formData, videoUploading: true });
-    
+
     const formDataToSend = new FormData();
     formDataToSend.append('file', file);
-    
+
     try {
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -268,6 +311,7 @@ export default function AdminBlogs() {
             <tr>
               <th className="px-6 py-4 text-left font-medium">标题</th>
               <th className="px-6 py-4 text-left font-medium">分类</th>
+              <th className="px-6 py-4 text-left font-medium">状态</th>
               <th className="px-6 py-4 text-left font-medium">媒体</th>
               <th className="px-6 py-4 text-left font-medium">日期</th>
               <th className="px-6 py-4 text-left font-medium">浏览量</th>
@@ -275,65 +319,76 @@ export default function AdminBlogs() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {filteredPosts.map((post) => (
-              <tr key={post.id} className="hover:bg-amber-50/50 transition-colors">
-                <td className="px-6 py-4">
-                  <p className="font-bold text-gray-800">{post.title}</p>
-                  <p className="text-sm text-gray-500 font-serif">{post.titleEn}</p>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="px-3 py-1 bg-amber-100 text-amber-700 text-sm rounded-full">
-                    {categories.find(c => c.value === post.category)?.label.en}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center space-x-2">
-                    {post.images.length > 0 && (
-                      <span className="flex items-center text-xs text-gray-600">
-                        <Image className="w-4 h-4 mr-1" />
-                        图片
-                      </span>
-                    )}
-                    {post.audio && (
-                      <span className="flex items-center text-xs text-red-600">
-                        <Music className="w-4 h-4 mr-1" />
-                        音频
-                      </span>
-                    )}
-                    {post.video && (
-                      <span className="flex items-center text-xs text-green-600">
-                        <Video className="w-4 h-4 mr-1" />
-                        视频
-                      </span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-gray-600">{post.publishDate}</td>
-                <td className="px-6 py-4 text-gray-600">{post.views}</td>
-                <td className="px-6 py-4">
-                  <div className="flex space-x-2">
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </Link>
-                    <button
-                      onClick={() => handleOpenModal(post)}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(post.id)}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-red-600"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {filteredPosts.map((post) => {
+              const status = getPostStatus(post);
+              return (
+                <tr key={post.id} className="hover:bg-amber-50/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <p className="font-bold text-gray-800">{post.titleEn}</p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="px-3 py-1 bg-amber-100 text-amber-700 text-sm rounded-full">
+                      {categories.find(c => c.value === post.category)?.label.en}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-3 py-1 text-sm rounded-full ${status.color}`}>
+                      {status.label}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-2">
+                      {post.images.length > 0 && (
+                        <span className="flex items-center text-xs text-gray-600">
+                          <Image className="w-4 h-4 mr-1" />
+                          图片
+                        </span>
+                      )}
+                      {post.audio && (
+                        <span className="flex items-center text-xs text-red-600">
+                          <Music className="w-4 h-4 mr-1" />
+                          音频
+                        </span>
+                      )}
+                      {post.video && (
+                        <span className="flex items-center text-xs text-green-600">
+                          <Video className="w-4 h-4 mr-1" />
+                          视频
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">
+                    {post.scheduledAt && new Date(post.scheduledAt) > new Date()
+                      ? post.scheduledAt.split('T')[0]
+                      : post.publishDate}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{post.views}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex space-x-2">
+                      <Link
+                        href={`/blog/${post.slug}`}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </Link>
+                      <button
+                        onClick={() => handleOpenModal(post)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
+                      >
+                        <Edit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(post.id)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-red-600"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
@@ -361,27 +416,15 @@ export default function AdminBlogs() {
             </div>
 
             <div className="p-6 space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">标题 (中文)</label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
-                    placeholder="文章标题"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">标题 (英文)</label>
-                  <input
-                    type="text"
-                    value={formData.titleEn}
-                    onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
-                    placeholder="Article Title"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">标题 (英文) <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={formData.titleEn}
+                  onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  placeholder="Article Title"
+                />
               </div>
 
               <div>
@@ -451,6 +494,71 @@ export default function AdminBlogs() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
                   placeholder="作者名称"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">发布设置</label>
+                <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setPublishMode('now')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                      publishMode === 'now'
+                        ? 'border-amber-500 bg-amber-50 text-amber-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <Send className="w-4 h-4" />
+                    立即发布
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPublishMode('scheduled')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                      publishMode === 'scheduled'
+                        ? 'border-amber-500 bg-amber-50 text-amber-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <Clock className="w-4 h-4" />
+                    定时发布
+                  </button>
+                </div>
+                {publishMode === 'scheduled' && (
+                  <div className="grid grid-cols-2 gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        <Calendar className="w-3 h-3 inline mr-1" />
+                        日期 (30天内)
+                      </label>
+                      <input
+                        type="date"
+                        value={scheduleDate}
+                        min={getTodayStr()}
+                        max={getMaxDateStr()}
+                        onChange={(e) => setScheduleDate(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        <Clock className="w-3 h-3 inline mr-1" />
+                        时间
+                      </label>
+                      <input
+                        type="time"
+                        value={scheduleTime}
+                        onChange={(e) => setScheduleTime(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors text-sm"
+                      />
+                    </div>
+                    {scheduleDate && (
+                      <p className="col-span-2 text-xs text-gray-500">
+                        将于 {scheduleDate} {scheduleTime} 自动上线
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div>
@@ -540,25 +648,14 @@ export default function AdminBlogs() {
                 )}
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    内容 (中文) <span className="text-red-500">*</span>
-                  </label>
-                  <RichTextEditor
-                    value={formData.content}
-                    onChange={(content) => setFormData({ ...formData, content })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    内容 (英文) <span className="text-red-500">*</span>
-                  </label>
-                  <RichTextEditor
-                    value={formData.contentEn}
-                    onChange={(content) => setFormData({ ...formData, contentEn: content })}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  内容 (英文) <span className="text-red-500">*</span>
+                </label>
+                <RichTextEditor
+                  value={formData.contentEn}
+                  onChange={(content) => setFormData({ ...formData, contentEn: content })}
+                />
               </div>
             </div>
 
