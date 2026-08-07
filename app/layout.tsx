@@ -15,7 +15,7 @@ const notoSansSC = Noto_Sans_SC({
   display: 'swap',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

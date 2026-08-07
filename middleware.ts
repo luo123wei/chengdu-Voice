@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, hostname } = request.nextUrl;
+
+  if (hostname === 'voiceculture.world') {
+    const url = request.nextUrl;
+    return NextResponse.redirect(
+      `https://www.voiceculture.world${url.pathname}${url.search}`,
+      301
+    );
+  }
 
   const blogIdPattern = /^\/blog\/blog-\d+$/;
   if (blogIdPattern.test(pathname)) {
@@ -21,5 +29,17 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/blog/:path*'],
+  matcher: [
+    '/',
+    '/blog/:path*',
+    '/shop/:path*',
+    '/about/:path*',
+    '/free-sounds/:path*',
+    '/checkout/:path*',
+    '/account/:path*',
+    '/verify-review/:path*',
+    '/reviews-sketch/:path*',
+    '/sitemap.xml',
+    '/robots.txt',
+  ],
 };
