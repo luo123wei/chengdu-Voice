@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, CreditCard, MapPin, User, Truck, Shield, Check, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useShippingRates, useOrders } from '@/hooks/useDataStore';
 
 interface CartItem {
@@ -16,8 +15,6 @@ interface CartItem {
 }
 
 export default function CheckoutPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoadingCart, setIsLoadingCart] = useState(true);
 
@@ -36,31 +33,16 @@ export default function CheckoutPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
   const [emailSent, setEmailSent] = useState(false);
-  const [countdown, setCountdown] = useState(10);
-  const [isPaymentComplete, setIsPaymentComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
-  const [paypalOrderId, setPaypalOrderId] = useState('');
 
   const { rates: shippingRates } = useShippingRates();
-  const { addOrder, updateOrderStatus } = useOrders();
+  const { addOrder } = useOrders();
   const [currentOrderId, setCurrentOrderId] = useState('');
 
   useEffect(() => {
     fetchCart();
   }, []);
-
-  useEffect(() => {
-    const success = searchParams.get('success');
-    const cancel = searchParams.get('cancel');
-    const token = searchParams.get('token');
-
-    if (success === 'true' && token) {
-      handlePayPalSuccess(token);
-    } else if (cancel === 'true') {
-      setError('Payment was cancelled. Please try again.');
-    }
-  }, [searchParams]);
 
   const fetchCart = async () => {
     setIsLoadingCart(true);
@@ -114,18 +96,7 @@ export default function CheckoutPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  useEffect(() => {
-    if (isPaymentComplete && countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 60000);
-      return () => clearTimeout(timer);
-    } else if (isPaymentComplete && countdown === 0 && !emailSent) {
-      sendOrderConfirmation();
-    }
-  }, [isPaymentComplete, countdown, emailSent]);
-
-  const sendOrderConfirmation = async () => {
+  const sendOrderConfirmation = async (newOrderNumber: string) => {
     try {
       const items = cartItems.map(item => ({
         name: item.name,
@@ -140,7 +111,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           email: formData.email,
           customerName: `${formData.firstName} ${formData.lastName}`,
-          orderNumber,
+          orderNumber: newOrderNumber,
           items,
           total,
           shippingMethod: formData.shippingMethod,
@@ -153,108 +124,50 @@ export default function CheckoutPage() {
     }
   };
 
-  const createPendingOrder = () => {
-    const orderId = `order-${Date.now()}`;
-    setCurrentOrderId(orderId);
-    
-    addOrder({
-      customerName: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      country: formData.country,
-      items: cartItems.map(item => ({
-        productId: item.productId,
-        name: item.nameEn,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      totalAmount: total,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    });
-    
-    return orderId;
-  };
-
-  const handlePaymentSuccess = async (newOrderNumber: string) => {
-    setOrderNumber(newOrderNumber);
-    setIsPaymentComplete(true);
-    setIsSubmitted(true);
-
-    await createUserOnOrder(formData.email, `${formData.firstName} ${formData.lastName}`);
-    await clearCart();
-
-    if (currentOrderId) {
-      updateOrderStatus(currentOrderId, 'paid');
+  const handlePlaceOrder = async () => {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
+      setError('Please fill in all personal information.');
+      return;
     }
-  };
-
-  const handlePayPalSuccess = async (token: string) => {
-    try {
-      const response = await fetch('/api/payment/capture-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId: token }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.order) {
-        const orderNumber = data.order.purchase_units[0].reference_id;
-        handlePaymentSuccess(orderNumber);
-      } else {
-        setError('Payment capture failed. Please contact support.');
-      }
-    } catch (error) {
-      console.error('Failed to capture PayPal payment:', error);
-      setError('Payment capture failed. Please contact support.');
+    if (hasPhysicalProducts && (!formData.address || !formData.city || !formData.country || !formData.postalCode)) {
+      setError('Please fill in all shipping address fields.');
+      return;
     }
-  };
 
-  const handlePayPalPayment = async () => {
     setIsProcessing(true);
     setError('');
 
     try {
-      createPendingOrder();
+      const orderNumber = `ORD-${Date.now()}`;
+      setCurrentOrderId(orderNumber);
 
-      const items = cartItems.map(item => ({
-        name: item.name,
-        nameEn: item.nameEn,
-        price: item.price,
-        quantity: item.quantity,
-      }));
-
-      const response = await fetch('/api/payment/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items,
-          total,
-          email: formData.email,
-          customerName: `${formData.firstName} ${formData.lastName}`,
-          shippingMethod: formData.shippingMethod,
-        }),
+      addOrder({
+        customerName: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        country: formData.country,
+        items: cartItems.map(item => ({
+          productId: item.productId,
+          name: item.nameEn,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        totalAmount: total,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
       });
 
-      const data = await response.json();
+      await createUserOnOrder(formData.email, `${formData.firstName} ${formData.lastName}`);
+      await clearCart();
 
-      if (!data.success) {
-        setError(data.error || 'Payment creation failed');
-        setIsProcessing(false);
-        return;
-      }
+      setOrderNumber(orderNumber);
+      setIsSubmitted(true);
 
-      setPaypalOrderId(data.orderId);
-
-      const approveLink = data.links.find((link: { rel: string }) => link.rel === 'approve');
-      if (approveLink) {
-        window.location.href = approveLink.href;
-      } else {
-        setError('Failed to get PayPal approval link');
-        setIsProcessing(false);
-      }
+      // 提交订单后立即发送通知邮件
+      sendOrderConfirmation(orderNumber);
     } catch (err) {
-      setError('Error during payment');
+      console.error('Failed to place order:', err);
+      setError('Failed to place order. Please try again.');
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -293,37 +206,57 @@ export default function CheckoutPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Clock className="w-10 h-10 text-amber-600" />
           </div>
-          <h1 className="text-3xl font-serif font-bold text-secondary mb-4">Payment Successful!</h1>
+          <h1 className="text-3xl font-serif font-bold text-secondary mb-4">Order Submitted!</h1>
           <p className="text-gray-600 mb-6">
-            Thank you for your purchase!
+            Thank you! We have received your order.
           </p>
           <div className="bg-amber-50 rounded-xl p-6 mb-6">
             <p className="text-sm text-gray-500 mb-2">Order Number / 订单号</p>
             <p className="text-xl font-bold text-secondary">{orderNumber}</p>
           </div>
 
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
+            <h3 className="font-bold text-amber-900 mb-3">⚠️ Payment Pending / 待付款</h3>
+            <p className="text-amber-800 text-sm mb-3">
+              <strong>Step 1:</strong> Our customer service team will contact you via email within 24 hours to arrange payment details.
+            </p>
+            <p className="text-amber-800 text-sm mb-3">
+              <strong>Step 2:</strong> After confirming payment, we will ship your order within 24 hours.
+            </p>
+            <p className="text-amber-800 text-sm">
+              <strong>支持付款方式：</strong>PayPal · Payoneer · 国际电汇
+            </p>
+            <div className="mt-4 pt-4 border-t border-amber-200">
+              <p className="text-sm text-amber-900">
+                📧 <strong>Contact / 联系邮箱:</strong><br />
+                <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+              </p>
+            </div>
+          </div>
+
           {!emailSent ? (
             <div className="flex items-center justify-center space-x-2 text-amber-600 mb-6">
-              <Clock className="w-5 h-5 animate-pulse" />
-              <span>Sending confirmation email in {countdown} minutes...</span>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Sending order notification...</span>
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-2 text-green-600 mb-6">
               <Check className="w-5 h-5" />
-              <span>Confirmation email sent!</span>
+              <span>Order notification has been sent to you and our team.</span>
             </div>
           )}
 
           <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left max-w-md mx-auto">
-            <p className="text-sm text-blue-800 font-bold mb-2">📦 Shipping Notice / 配送通知</p>
+            <p className="text-sm text-blue-800 font-bold mb-2">📦 Next Steps / 后续流程</p>
             <p className="text-sm text-blue-600">
-              We have received your order and will begin processing within 24 hours. Your package will be shipped via cross-border logistics.
+              Please check your email inbox (and spam folder) for our message within 24 hours.
+              If you do not hear from us, please contact us directly.
             </p>
             <p className="text-sm text-blue-600 mt-2">
-              我们已收到您的订单，将在24小时内开始处理。您的包裹将通过跨境物流发出。
+              请在 24 小时内查收邮件（含垃圾箱）。如未收到请直接邮箱联系我们。
             </p>
           </div>
 
@@ -578,7 +511,7 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-serif font-bold text-secondary mb-6 flex items-center">
                 <CreditCard className="w-5 h-5 mr-2 text-primary" />
-                Payment Method
+                Payment / 付款方式
               </h2>
 
               {error && (
@@ -587,27 +520,50 @@ export default function CheckoutPage() {
                 </div>
               )}
 
+              <div className="mb-6 p-5 bg-amber-50 rounded-xl border border-amber-200">
+                <p className="text-amber-800 font-medium flex items-start">
+                  <Shield className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>
+                    <strong>Customer Service Assisted Checkout</strong><br />
+                    <span className="text-amber-700 text-sm">
+                      After placing your order, we will contact you via email within 24 hours to arrange payment.
+                      We support PayPal, Payoneer and international wire transfer.
+                    </span>
+                  </span>
+                </p>
+                <p className="mt-3 text-sm text-amber-700">
+                  <strong>提交订单后，客服将在 24 小时内通过邮件与您联系完成付款。</strong><br />
+                  支持：PayPal、Payoneer、国际电汇
+                </p>
+                <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
+                  <p className="text-amber-800">
+                    📧 <strong>Contact Email / 联系邮箱:</strong><br />
+                    <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+                  </p>
+                </div>
+              </div>
+
               <button
-                onClick={handlePayPalPayment}
+                onClick={handlePlaceOrder}
                 disabled={isProcessing}
-                className="w-full flex items-center justify-center px-6 py-4 bg-[#FFC439] text-[#253B80] rounded-xl font-medium hover:bg-[#F5B800] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center px-6 py-4 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Processing Payment...
+                    Submitting Order...
                   </>
                 ) : (
                   <>
-                    <span className="font-bold mr-2">PP</span>
-                    Pay with PayPal ${total.toFixed(2)}
+                    <Check className="w-5 h-5 mr-2" />
+                    Place Order - ${total.toFixed(2)}
                   </>
                 )}
               </button>
 
               <div className="mt-4 flex items-center justify-center text-gray-500 text-sm">
                 <Shield className="w-4 h-4 mr-1" />
-                Secure payment with PayPal
+                Your information is secure and will only be used for order fulfillment
               </div>
             </div>
           </div>
