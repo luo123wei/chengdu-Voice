@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Package, Truck, CheckCircle, Clock, Eye, Download, Send, ExternalLink, AlertCircle } from 'lucide-react';
+import { Search, Filter, Package, Truck, CheckCircle, Clock, Eye, Download, Send, ExternalLink, AlertCircle, Mail, DollarSign, Loader2 } from 'lucide-react';
 import { orderStatusLabels } from '@/data/mockData';
 import type { Order } from '@/data/mockData';
 import { useOrders } from '@/hooks/useDataStore';
@@ -16,6 +16,15 @@ export default function AdminOrders() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // 联系买家相关状态
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactSubject, setContactSubject] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactPaymentLink, setContactPaymentLink] = useState('');
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<{ type: 'success' | 'error' | ''; msg: string }>({ type: '', msg: '' });
+  const [isMarkingPaid, setIsMarkingPaid] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -145,10 +154,76 @@ export default function AdminOrders() {
     );
   };
 
+  const handleMarkPaid = async (orderId: string) => {
+    setIsMarkingPaid(true);
+    setEmailStatus({ type: '', msg: '' });
+    try {
+      await updateOrderStatus(orderId, 'paid');
+      setSelectedOrder((prev) =>
+        prev?.id === orderId ? { ...prev, status: 'paid' } : prev
+      );
+      setEmailStatus({ type: 'success', msg: '已确认收款，订单状态已更新为「已付款」，买家将收到付款确认邮件。' });
+    } catch (err) {
+      console.error('Failed to mark order as paid:', err);
+      setEmailStatus({ type: 'error', msg: '确认收款失败，请重试。' });
+    } finally {
+      setIsMarkingPaid(false);
+    }
+  };
+
+  const handleSendContactEmail = async () => {
+    if (!selectedOrder) return;
+    if (!contactSubject.trim() || !contactMessage.trim()) {
+      setEmailStatus({ type: 'error', msg: '请填写邮件主题和内容' });
+      return;
+    }
+
+    setIsSendingEmail(true);
+    setEmailStatus({ type: '', msg: '' });
+    try {
+      const res = await fetch('/api/orders/contact-buyer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: selectedOrder.id,
+          subject: contactSubject,
+          message: contactMessage,
+          paymentLink: contactPaymentLink.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || '发送失败');
+      }
+      setEmailStatus({ type: 'success', msg: `邮件已发送至 ${selectedOrder.email}` });
+      setContactSubject('');
+      setContactMessage('');
+      setContactPaymentLink('');
+      setShowContactForm(false);
+    } catch (err: any) {
+      console.error('Failed to send contact email:', err);
+      setEmailStatus({ type: 'error', msg: err.message || '邮件发送失败，请重试' });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
+  const openContactForm = () => {
+    setShowContactForm(true);
+    setEmailStatus({ type: '', msg: '' });
+    // 预填默认内容
+    if (selectedOrder) {
+      setContactSubject(`Payment Instructions for Order ${selectedOrder.id}`);
+      setContactMessage(`Dear ${selectedOrder.customerName},\n\nThank you for your order #${selectedOrder.id}. To complete your payment, please use the payment link below.\n\nWe support PayPal, Payoneer and international wire transfer. If you have any questions, please reply to this email.\n\nBest regards,\nChengdu Voice Team`);
+    }
+  };
+
   const openOrderDetail = (order: Order) => {
     setSelectedOrder(order);
     setTrackingNumber(order.trackingNumber || '');
     setCarrier(order.carrier || '');
+    setShowContactForm(false);
+    setEmailStatus({ type: '', msg: '' });
   };
 
   return (
@@ -260,6 +335,24 @@ export default function AdminOrders() {
                       >
                         <Eye className="w-5 h-5" />
                       </button>
+                      {order.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => openOrderDetail(order)}
+                            className="p-2 hover:bg-green-50 rounded-lg transition-colors text-green-600 hover:text-green-700"
+                            title="确认已收款"
+                          >
+                            <DollarSign className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => openOrderDetail(order)}
+                            className="p-2 hover:bg-amber-50 rounded-lg transition-colors text-amber-600 hover:text-amber-700"
+                            title="联系买家"
+                          >
+                            <Mail className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
                       {order.status === 'paid' && (
                         <button
                           onClick={() => openOrderDetail(order)}
@@ -380,6 +473,124 @@ export default function AdminOrders() {
                   <span>${(selectedOrder.totalAmount + 5.99 + selectedOrder.totalAmount * 0.08).toFixed(2)}</span>
                 </div>
               </div>
+
+              {selectedOrder.status === 'pending' && (
+                <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                  <h3 className="font-bold text-amber-800 mb-3 flex items-center">
+                    <Clock className="w-5 h-5 mr-2" />
+                    待处理订单 - 等待付款
+                  </h3>
+                  <p className="text-sm text-amber-700 mb-4">
+                    买家已提交订单但尚未付款。你可以：
+                    <br />1. <strong>联系买家</strong> - 发送付款链接/收款码给买家
+                    <br />2. <strong>确认已收款</strong> - 收到付款后标记为已付款（买家将自动收到确认邮件）
+                  </p>
+
+                  {emailStatus.msg && (
+                    <div className={`mb-4 p-3 rounded-lg text-sm ${
+                      emailStatus.type === 'success'
+                        ? 'bg-green-50 text-green-700 border border-green-200'
+                        : 'bg-red-50 text-red-700 border border-red-200'
+                    }`}>
+                      {emailStatus.msg}
+                    </div>
+                  )}
+
+                  {!showContactForm ? (
+                    <div className="space-y-3">
+                      <button
+                        onClick={openContactForm}
+                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                      >
+                        <Mail className="w-5 h-5" />
+                        <span>联系买家 / 发送付款链接</span>
+                      </button>
+                      <button
+                        onClick={() => handleMarkPaid(selectedOrder.id)}
+                        disabled={isMarkingPaid}
+                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isMarkingPaid ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <span>处理中...</span>
+                          </>
+                        ) : (
+                          <>
+                            <DollarSign className="w-5 h-5" />
+                            <span>确认已收款</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-lg p-3 border border-amber-200">
+                        <p className="text-xs text-gray-500 mb-1">收件人</p>
+                        <p className="text-sm font-medium text-gray-800">{selectedOrder.email}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">邮件主题</label>
+                        <input
+                          type="text"
+                          value={contactSubject}
+                          onChange={(e) => setContactSubject(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500"
+                          placeholder="输入邮件主题"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">邮件内容</label>
+                        <textarea
+                          value={contactMessage}
+                          onChange={(e) => setContactMessage(e.target.value)}
+                          rows={6}
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 resize-none"
+                          placeholder="输入邮件内容（支持换行）"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          付款链接（可选）
+                        </label>
+                        <input
+                          type="url"
+                          value={contactPaymentLink}
+                          onChange={(e) => setContactPaymentLink(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500"
+                          placeholder="https://paypal.me/... 或其他收款链接"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">填入 PayPal / Payoneer 收款链接，买家可点击直接付款</p>
+                      </div>
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={handleSendContactEmail}
+                          disabled={isSendingEmail}
+                          className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSendingEmail ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              <span>发送中...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-5 h-5" />
+                              <span>发送邮件</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => setShowContactForm(false)}
+                          className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                        >
+                          取消
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {selectedOrder.status === 'paid' && (
                 <div className="bg-blue-50 rounded-xl p-4">

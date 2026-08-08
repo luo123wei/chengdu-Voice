@@ -89,10 +89,10 @@ export async function sendOrderConfirmationEmail(
     </tr>
   `).join('');
 
-  const defaultSubjectEn = 'Your Order Has Been Confirmed - Chengdu Voice';
+  const defaultSubjectEn = "We've Received Your Order - Chengdu Voice";
   const defaultBodyEn = `Dear ${customerName},
 
-Thank you for your order! We have received your order #${orderNumber} and will begin processing it within 24 hours.
+Thank you for your order! We have received your order #${orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.
 
 **Order Summary:**
 ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
@@ -100,17 +100,17 @@ ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item
 **Total:** $${total.toFixed(2)}
 **Shipping Method:** ${shippingMethod === 'standard' ? 'Standard Shipping (5-7 business days)' : 'Express Shipping (2-3 business days)'}
 
-Your package will be shipped via cross-border logistics and we will send you a tracking number once it's dispatched.
+**Payment is still pending.** We support PayPal, Payoneer and international wire transfer. Please wait for our email with payment instructions.
 
-Thank you for choosing Chengdu Voice! If you have any questions, please contact us at hello@chengduvoice.com.
+If you have any questions, please contact us at kylw02@outlook.com.
 
 Best regards,
 The Chengdu Voice Team`;
 
-  const defaultSubjectZh = '您的订单已确认 - 成都之音';
+  const defaultSubjectZh = '我们已收到您的订单 - 成都之音';
   const defaultBodyZh = `尊敬的 ${customerName}，
 
-感谢您的订单！我们已收到您的订单 #${orderNumber}，将在24小时内开始处理。
+感谢您的订单！我们已收到您的订单 #${orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。
 
 **订单摘要：**
 ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
@@ -118,9 +118,9 @@ ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.q
 **订单总额：** $${total.toFixed(2)}
 **配送方式：** ${shippingMethod === 'standard' ? '标准配送（5-7个工作日）' : '加急配送（2-3个工作日）'}
 
-您的包裹将通过跨境物流发出，发货后我们会发送物流追踪号码给您。
+**付款尚未完成。** 我们支持 PayPal、Payoneer 和国际电汇。请等待我们发送付款说明的邮件。
 
-感谢您选择成都之音！如有任何问题，请联系我们：hello@chengduvoice.com。
+如有任何问题，请联系我们：kylw02@outlook.com。
 
 此致，
 成都之音团队`;
@@ -174,6 +174,107 @@ ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.q
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             此邮件由系统自动发送，请勿直接回复。<br>
             This email is automatically generated, please do not reply directly.<br>
+            Chengdu Voice - 成都之音
+          </p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+export async function sendPaymentReceivedEmail(
+  email: string,
+  customerName: string,
+  orderNumber: string,
+  total: number
+) {
+  return sendEmail({
+    to: email,
+    subject: 'Payment Received - Your Order is Being Processed | 付款已收到 - 成都之音',
+    html: `
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
+        <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Payment Received / 付款已收到</p>
+        </div>
+        <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
+          <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+            <p style="color: #155724; font-weight: bold; margin: 0;">✅ Payment Received / 付款已收到</p>
+          </div>
+          <p style="color: #4a5568; line-height: 1.6; margin: 0 0 16px;">
+            Dear ${customerName},<br><br>
+            We have received your payment for order <strong>#${orderNumber}</strong>. Your order is now being processed and will be shipped within 24 hours.
+          </p>
+          <div style="background: white; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">Order Number / 订单号</p>
+            <p style="font-size: 18px; font-weight: bold; color: #2d3748; margin: 0;">${orderNumber}</p>
+            <p style="color: #D4A574; font-weight: bold; margin-top: 12px;">Total: $${total.toFixed(2)}</p>
+          </div>
+          <p style="color: #4a5568; line-height: 1.6; margin: 0 0 16px;">
+            尊敬的 ${customerName}，<br><br>
+            我们已收到您订单 <strong>#${orderNumber}</strong> 的付款。您的订单正在处理中，将在 24 小时内发货。
+          </p>
+          <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
+            此邮件由系统自动发送，请勿直接回复。<br>
+            如有问题请联系：kylw02@outlook.com<br>
+            Chengdu Voice - 成都之音
+          </p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+export async function sendCustomEmailToBuyer(
+  email: string,
+  customerName: string,
+  orderNumber: string,
+  subject: string,
+  message: string,
+  paymentLink?: string
+) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
+
+  const paymentSection = paymentLink
+    ? `
+      <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+        <p style="color: #856404; font-weight: bold; margin: 0 0 12px;">💳 Payment Link / 付款链接</p>
+        <a href="${paymentLink}" style="display: inline-block; background: #8B4513; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 8px 0; word-break: break-all;">
+          Click to Pay / 点击付款
+        </a>
+        <p style="color: #856404; font-size: 12px; margin-top: 8px; word-break: break-all;">${paymentLink}</p>
+      </div>
+    `
+    : '';
+
+  const messageHtml = message.split('\n').map(line => `<p style="color: #4a5568; line-height: 1.6; margin: 0 0 12px;">${line || '&nbsp;'}</p>`).join('');
+
+  return sendEmail({
+    to: email,
+    subject: `${subject} | 成都之音 - 订单 ${orderNumber}`,
+    html: `
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
+        <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Customer Service Message / 客服消息</p>
+        </div>
+        <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
+          <p style="color: #4a5568; margin: 0 0 16px;">Dear ${customerName},</p>
+          <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            ${messageHtml}
+          </div>
+          ${paymentSection}
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
+            <p style="color: #4a5568; line-height: 1.6; margin: 0;">
+              This message is regarding your order <strong>#${orderNumber}</strong>.<br>
+              此邮件关于您的订单 <strong>#${orderNumber}</strong>。
+            </p>
+            <p style="color: #718096; font-size: 12px; margin-top: 20px;">
+              📧 Reply to this email or contact us at <a href="mailto:kylw02@outlook.com" style="color: #8B4513;">kylw02@outlook.com</a><br>
+              Visit <a href="${appUrl}" style="color: #8B4513;">${appUrl}</a>
+            </p>
+          </div>
+          <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             Chengdu Voice - 成都之音
           </p>
         </div>
