@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, BookOpen, Globe, ChefHat } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, BookOpen, Globe, ChefHat, FileText } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -132,12 +132,25 @@ export default function ProductDetailPage() {
                   Origin
                 </h4>
                 <p className="text-gray-600 text-sm">
-                  {product.category === 'spice' 
+                  {product.category === 'spice'
                     ? 'Hanyuan, Sichuan Province, China'
                     : 'Chengdu, Sichuan Province, China'
                   }
                 </p>
               </div>
+
+              {product.descriptionEn && (
+                <div className="bg-cream/30 rounded-xl p-6 mt-6">
+                  <h4 className="font-bold text-secondary mb-3 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Product Details
+                  </h4>
+                  <div
+                    className="text-gray-600 text-sm leading-relaxed prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: formatRichText(product.descriptionEn) }}
+                  />
+                </div>
+              )}
             </div>
 
             <div>
