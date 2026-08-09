@@ -7,6 +7,8 @@ import SubscribeForm from '@/components/SubscribeForm';
 import BlogCarousel from '@/components/BlogCarousel';
 import { db } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
 
 export const metadata: Metadata = {
