@@ -49,8 +49,8 @@ export default function Header() {
   const navLinks = [
     { name: { en: 'Home', zh: '首页' }, href: '/' },
     { name: { en: 'Discover', zh: '探索' }, href: '/blog' },
-    { name: { en: 'Taste', zh: '品味' }, href: '/shop' },
-    { name: { en: 'Free Sounds', zh: '免费声音' }, href: '/free-sounds' },
+    { name: { en: 'Live', zh: '生活' }, href: '/shop' },
+    { name: { en: 'Hear', zh: '听' }, href: '/free-sounds' },
     { name: { en: 'About', zh: '关于' }, href: '/about' },
   ];
 

@@ -3,14 +3,14 @@ import type { Metadata } from 'next'
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
 
 export const metadata: Metadata = {
-  title: 'Free Sounds | Chengdu Voice - Listen to Authentic Chengdu',
+  title: 'Hear Chengdu | Chengdu Voice - Listen to Authentic Chengdu',
   description: 'Free authentic Chengdu sounds - teahouses, rain streets, local markets. Experience the rhythm of Chengdu through immersive audio.',
   keywords: ['Chengdu sounds', '成都声音', 'free audio', 'teahouse sounds', 'Chinese soundscape', 'ASMR Chengdu'],
   alternates: {
     canonical: '/free-sounds',
   },
   openGraph: {
-    title: 'Free Sounds | Chengdu Voice',
+    title: 'Hear Chengdu | Chengdu Voice',
     description: 'Listen to authentic Chengdu sounds - teahouses, rain streets, local markets.',
     url: `${siteUrl}/free-sounds`,
     siteName: 'Chengdu Voice',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Sounds | Chengdu Voice',
+    title: 'Hear Chengdu | Chengdu Voice',
     description: 'Listen to authentic Chengdu sounds.',
     images: ['/og-image.jpg'],
   },

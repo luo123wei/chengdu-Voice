@@ -277,7 +277,7 @@ export default function FreeSoundsPage() {
                 <span className="text-2xl">🌶️</span>
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-secondary text-lg">Taste Chengdu</h3>
+                <h3 className="font-bold text-secondary text-lg">Live Chengdu</h3>
                 <p className="text-sm text-primary flex items-center gap-1 mt-1">
                   Hanyuan Sichuan Pepper
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

@@ -63,7 +63,7 @@ export default function ShopPage() {
       <section className="pt-24 pb-12 bg-gradient-to-br from-secondary to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-4">Taste</h1>
+            <h1 className="text-4xl font-bold text-white mb-4">Live</h1>
             <p className="text-gray-300 max-w-2xl mx-auto">
               Discover authentic Chinese treasures and traditional products
             </p>
