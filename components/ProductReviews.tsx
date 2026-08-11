@@ -139,10 +139,9 @@ export default function ProductReviews({ productId, productRating, productReview
   const calculateRatingDistribution = () => {
     const dist = [0, 0, 0, 0, 0];
     reviews.forEach((r) => {
-      // Round to nearest whole star (4.5 -> 5, 4.0 -> 4)
       const rounded = Math.round(r.rating);
-      const idx = Math.min(Math.max(rounded, 1), 5) - 1;
-      if (idx >= 0 && idx < 5) dist[idx]++;
+      const idx = 5 - Math.min(Math.max(rounded, 1), 5);
+      dist[idx]++;
     });
     const total = reviews.length || 1;
     return dist.map((count) => (count / total) * 100);
