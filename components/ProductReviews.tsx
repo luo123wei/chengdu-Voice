@@ -139,7 +139,9 @@ export default function ProductReviews({ productId, productRating, productReview
   const calculateRatingDistribution = () => {
     const dist = [0, 0, 0, 0, 0];
     reviews.forEach((r) => {
-      const idx = Math.min(Math.floor(r.rating), 5) - 1;
+      // Round to nearest whole star (4.5 -> 5, 4.0 -> 4)
+      const rounded = Math.round(r.rating);
+      const idx = Math.min(Math.max(rounded, 1), 5) - 1;
       if (idx >= 0 && idx < 5) dist[idx]++;
     });
     const total = reviews.length || 1;
@@ -196,7 +198,7 @@ export default function ProductReviews({ productId, productRating, productReview
                     />
                   </div>
                   <span className="text-xs text-gray-400 w-8 text-right">
-                    {reviews.filter((r) => Math.floor(r.rating) === star).length}
+                    {reviews.filter((r) => Math.round(r.rating) === star).length}
                   </span>
                 </div>
               ))}
