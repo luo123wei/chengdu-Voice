@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Package, Truck, CheckCircle, Clock, Eye, Download, Send, ExternalLink, AlertCircle, Mail, DollarSign, Loader2 } from 'lucide-react';
+import { Search, Filter, Package, Truck, CheckCircle, Clock, Eye, Download, Send, ExternalLink, AlertCircle, Mail, DollarSign, Loader2, MessageSquarePlus, Star } from 'lucide-react';
 import { orderStatusLabels } from '@/data/mockData';
 import type { Order } from '@/data/mockData';
 import { useOrders } from '@/hooks/useDataStore';
@@ -25,6 +25,15 @@ export default function AdminOrders() {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailStatus, setEmailStatus] = useState<{ type: 'success' | 'error' | ''; msg: string }>({ type: '', msg: '' });
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
+
+  // 代发评论相关状态
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewProductId, setReviewProductId] = useState<string>('');
+  const [reviewNickname, setReviewNickname] = useState('');
+  const [reviewRating, setReviewRating] = useState<number>(5.0);
+  const [reviewContent, setReviewContent] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewSubmitStatus, setReviewSubmitStatus] = useState<{ type: 'success' | 'error' | ''; msg: string }>({ type: '', msg: '' });
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -205,6 +214,59 @@ export default function AdminOrders() {
       setEmailStatus({ type: 'error', msg: err.message || '邮件发送失败，请重试' });
     } finally {
       setIsSendingEmail(false);
+    }
+  };
+
+  const openReviewForm = () => {
+    setShowReviewForm(true);
+    setReviewSubmitStatus({ type: '', msg: '' });
+    // 默认选订单里的第一个产品
+    if (selectedOrder && selectedOrder.items && selectedOrder.items.length > 0) {
+      setReviewProductId(selectedOrder.items[0].productId);
+    }
+    // 默认用买家的用户名前几位做昵称
+    if (selectedOrder?.customerName) {
+      setReviewNickname(selectedOrder.customerName.split(' ')[0]);
+    } else if (selectedOrder?.email) {
+      setReviewNickname(selectedOrder.email.split('@')[0]);
+    }
+    setReviewRating(5.0);
+    setReviewContent('');
+  };
+
+  const handleSubmitAdminReview = async () => {
+    if (!selectedOrder) return;
+    if (!reviewProductId.trim() || !reviewNickname.trim() || !reviewContent.trim()) {
+      setReviewSubmitStatus({ type: 'error', msg: '请填写产品、昵称和评论内容' });
+      return;
+    }
+    setIsSubmittingReview(true);
+    setReviewSubmitStatus({ type: '', msg: '' });
+    try {
+      const res = await fetch('/api/admin/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: reviewProductId,
+          nickname: reviewNickname,
+          email: selectedOrder.email || 'admin@chengduvoice.world',
+          rating: reviewRating,
+          content: reviewContent,
+        }),
+      });
+      if (res.ok) {
+        setReviewSubmitStatus({ type: 'success', msg: '评论添加成功！商品评分和评论数已同步更新。' });
+        setShowReviewForm(false);
+        setReviewContent('');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setReviewSubmitStatus({ type: 'error', msg: data.error || '提交失败，请重试。' });
+      }
+    } catch (err) {
+      console.error('Admin review submit failed:', err);
+      setReviewSubmitStatus({ type: 'error', msg: '网络错误，请重试。' });
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -670,13 +732,141 @@ export default function AdminOrders() {
               )}
 
               {selectedOrder.status === 'delivered' && (
-                <div className="bg-green-50 rounded-xl p-4">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                    <div>
-                      <h3 className="font-bold text-green-800">订单已完成</h3>
-                      <p className="text-sm text-green-600">客户已收到商品，订单流程结束</p>
+                <div className="space-y-4">
+                  <div className="bg-green-50 rounded-xl p-4">
+                    <div className="flex items-center space-x-3">
+                      <CheckCircle className="w-8 h-8 text-green-600" />
+                      <div>
+                        <h3 className="font-bold text-green-800">订单已完成</h3>
+                        <p className="text-sm text-green-600">客户已收到商品，订单流程结束</p>
+                      </div>
                     </div>
+                  </div>
+
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    {!showReviewForm ? (
+                      <button
+                        onClick={openReviewForm}
+                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                      >
+                        <MessageSquarePlus className="w-5 h-5" />
+                        <span>为买家代发好评</span>
+                      </button>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-bold text-blue-800 flex items-center gap-2">
+                            <MessageSquarePlus className="w-5 h-5" />
+                            添加代发好评
+                          </h4>
+                          <button
+                            onClick={() => setShowReviewForm(false)}
+                            className="text-sm text-gray-500 hover:text-gray-700"
+                          >
+                            取消
+                          </button>
+                        </div>
+
+                        {reviewSubmitStatus.msg && (
+                          <div className={`p-3 rounded-lg text-sm border ${
+                            reviewSubmitStatus.type === 'success'
+                              ? 'bg-green-50 text-green-700 border-green-200'
+                              : 'bg-red-50 text-red-700 border-red-200'
+                          }`}>
+                            {reviewSubmitStatus.msg}
+                          </div>
+                        )}
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            选择产品 *
+                          </label>
+                          <select
+                            value={reviewProductId}
+                            onChange={(e) => setReviewProductId(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+                          >
+                            {(selectedOrder.items || []).map((item: any, idx: number) => (
+                              <option key={idx} value={item.productId}>
+                                {item.nameEn || item.name || item.productId} — {item.quantity}件
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            评论者昵称 *
+                          </label>
+                          <input
+                            type="text"
+                            value={reviewNickname}
+                            onChange={(e) => setReviewNickname(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+                            placeholder="e.g. Emma or James"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            邮箱自动使用：{selectedOrder.email ? (
+                              selectedOrder.email.slice(0, 3) + '******'
+                            ) : 'admin******'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            评分 *
+                          </label>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {[4, 4.5, 5].map((rating) => (
+                              <button
+                                key={rating}
+                                type="button"
+                                onClick={() => setReviewRating(rating)}
+                                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all ${
+                                  reviewRating === rating
+                                    ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-300'
+                                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                                }`}
+                              >
+                                <Star className="w-4 h-4 fill-current" />
+                                <span className="text-sm font-medium">{rating}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            评论内容 * ({reviewContent.length}/300)
+                          </label>
+                          <textarea
+                            value={reviewContent}
+                            onChange={(e) => setReviewContent(e.target.value.slice(0, 300))}
+                            rows={4}
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                            placeholder="写一条真实感的好评，如：包装很仔细，香气非常棒，朋友推荐的牌子，质量很不错，下次还会回购..."
+                          />
+                        </div>
+
+                        <button
+                          onClick={handleSubmitAdminReview}
+                          disabled={isSubmittingReview}
+                          className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSubmittingReview ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              <span>提交中...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Star className="w-5 h-5" />
+                              <span>提交评论</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
