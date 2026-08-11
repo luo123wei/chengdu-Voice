@@ -4,6 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Star, Check, User, Lock } from 'lucide-react';
 import { Review } from '@/data/mockData';
 
+function maskEmail(email: string): string {
+  if (!email || email.length < 3) return '*********';
+  return email.slice(0, 3) + '******';
+}
+
 interface ProductReviewsProps {
   productId: string;
   productRating: number;
@@ -222,8 +227,9 @@ export default function ProductReviews({ productId, productRating, productReview
                     </div>
                     <div>
                       <p className="font-medium text-gray-800 text-sm">{review.nickname}</p>
+                      <p className="text-xs text-gray-400">{maskEmail(review.email)}</p>
                       {review.verified && (
-                        <span className="flex items-center text-xs text-green-600">
+                        <span className="flex items-center text-xs text-green-600 mt-0.5">
                           <Check className="w-3 h-3 mr-1" />
                           Verified Buyer
                         </span>
