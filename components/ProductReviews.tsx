@@ -136,11 +136,22 @@ export default function ProductReviews({ productId, productRating, productReview
     }
   };
 
+  // 综合评分 = 算术均值，保留1位小数
+  const computedRating = reviews.length > 0
+    ? parseFloat((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1))
+    : 0;
+
   const calculateRatingDistribution = () => {
+    // 5 buckets: index 0=5星(含4.5), 1=4星, 2=3星, 3=2星, 4=1星
     const dist = [0, 0, 0, 0, 0];
     reviews.forEach((r) => {
-      const rounded = Math.round(r.rating);
-      const idx = 5 - Math.min(Math.max(rounded, 1), 5);
+      const rating = r.rating;
+      let idx: number;
+      if (rating >= 4.25) idx = 0;       // 5星桶: 5.0 和 4.5
+      else if (rating >= 3.25) idx = 1;  // 4星桶
+      else if (rating >= 2.25) idx = 2;  // 3星桶
+      else if (rating >= 1.25) idx = 3;  // 2星桶
+      else idx = 4;                      // 1星桶
       dist[idx]++;
     });
     const total = reviews.length || 1;
@@ -165,22 +176,22 @@ export default function ProductReviews({ productId, productRating, productReview
                   <div key={i} className="relative">
                     <Star
                       className={`w-6 h-6 ${
-                        i < Math.floor(productRating)
+                        i < Math.floor(computedRating)
                           ? 'text-amber-500 fill-amber-500'
-                          : i < productRating
+                          : i < computedRating
                           ? 'text-amber-500 fill-amber-500'
                           : 'text-gray-300'
                       }`}
                       style={{
                         clipPath:
-                          i === Math.floor(productRating) && productRating % 1 !== 0
+                          i === Math.floor(computedRating) && computedRating % 1 !== 0
                             ? 'polygon(0 0, 50% 0, 50% 100%, 0 100%)'
                             : 'none',
                       }}
                     />
                   </div>
                 ))}
-                <span className="text-2xl font-bold text-gray-800">{productRating}</span>
+                <span className="text-2xl font-bold text-gray-800">{computedRating}</span>
               </div>
               <p className="text-gray-500">Based on {productReviewsCount} reviews</p>
             </div>
@@ -197,7 +208,14 @@ export default function ProductReviews({ productId, productRating, productReview
                     />
                   </div>
                   <span className="text-xs text-gray-400 w-8 text-right">
-                    {reviews.filter((r) => Math.round(r.rating) === star).length}
+                    {reviews.filter((r) => {
+                      const rating = r.rating;
+                      if (star === 5) return rating >= 4.25;
+                      if (star === 4) return rating >= 3.25 && rating < 4.25;
+                      if (star === 3) return rating >= 2.25 && rating < 3.25;
+                      if (star === 2) return rating >= 1.25 && rating < 2.25;
+                      return rating < 1.25;
+                    }).length}
                   </span>
                 </div>
               ))}
