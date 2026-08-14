@@ -89,12 +89,6 @@ export default function RootLayout({
         <meta charSet="UTF-8" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body className={inter.className}>
-        <GoogleAnalytics />
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
         <script
           type="text/javascript"
           dangerouslySetInnerHTML={{
@@ -102,9 +96,15 @@ export default function RootLayout({
 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
 t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, "clarity", "script", "xrth1n5csu");`,
+})(window, document, "clarity", "script", "xxjee056b4");`,
           }}
         />
+      </head>
+      <body className={inter.className}>
+        <GoogleAnalytics />
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   )
