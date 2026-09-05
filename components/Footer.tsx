@@ -8,17 +8,17 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-gold rounded-lg flex items-center justify-center">
-                <span className="text-white font-serif text-xl font-bold">成</span>
-              </div>
-              <div>
-                <span className="text-xl font-serif font-bold">Chengdu Voice</span>
-                <p className="text-sm text-gray-400 font-serif">成都之音</p>
-              </div>
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <span className="text-black font-serif text-xl font-bold">造</span>
             </div>
-            <p className="text-gray-400 mb-4 max-w-md">
-              Experience the authentic voice of Chengdu. We bring the best of Chinese traditional culture to the world, blending Eastern elegance with Western aesthetics.
-            </p>
+            <div>
+              <span className="text-xl font-serif font-bold">Chengdu Craft Studio</span>
+              <p className="text-sm text-gray-400 font-serif">成都造物</p>
+            </div>
+          </div>
+          <p className="text-gray-400 mb-4 max-w-md">
+            A small craft design studio in Chengdu. We turn everyday Chengdu moments into objects on your desk. Designed in Chengdu, shipped worldwide.
+          </p>
             <div className="flex space-x-4">
               <a href="#" className="p-2 bg-white/10 rounded-lg hover:bg-primary transition-colors">
                 <Instagram className="w-5 h-5" />
@@ -39,10 +39,10 @@ export default function Footer() {
                 <Link href="/" className="text-gray-400 hover:text-primary transition-colors">Home</Link>
               </li>
               <li>
-                <Link href="/blog" className="text-gray-400 hover:text-primary transition-colors">Discover</Link>
+                <Link href="/shop" className="text-gray-400 hover:text-primary transition-colors">Works</Link>
               </li>
               <li>
-                <Link href="/shop" className="text-gray-400 hover:text-primary transition-colors">Live</Link>
+                <Link href="/blog" className="text-gray-400 hover:text-primary transition-colors">Stories</Link>
               </li>
               <li>
                 <Link href="/about" className="text-gray-400 hover:text-primary transition-colors">About</Link>
@@ -66,7 +66,8 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>2026 Chengdu Voice. All rights reserved.</p>
+          <p>2026 Chengdu Craft Studio 成都造物. All rights reserved.</p>
+          <span className="text-gray-500">Chengdu, Sichuan, China · 跨境直邮全球</span>
         </div>
       </div>
     </footer>

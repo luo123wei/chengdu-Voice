@@ -6,25 +6,44 @@ import { useProducts } from '@/hooks/useDataStore';
 import RichTextEditor from '@/components/RichTextEditor';
 
 const categoryMap: Record<string, string> = {
-  tea: '茶叶',
-  spice: '调味品',
-  craft: '工艺品',
-  snack: '零食',
-  digital: '数字下载',
+  stationery: '文具纸品',
+  home: '家居生活',
+  decor: '装饰摆件',
+  toy: '玩偶潮玩',
 };
 
 const categories = [
-  { value: 'tea', label: '茶叶' },
-  { value: 'spice', label: '调味品' },
-  { value: 'craft', label: '工艺品' },
-  { value: 'snack', label: '零食' },
-  { value: 'digital', label: '数字下载' },
+  { value: 'stationery', label: '文具纸品' },
+  { value: 'home', label: '家居生活' },
+  { value: 'decor', label: '装饰摆件' },
+  { value: 'toy', label: '玩偶潮玩' },
 ];
+
+const statusOptions = [
+  { value: 'design', label: '投票中 · 设计中' },
+  { value: 'preorder', label: '预售' },
+  { value: 'on-sale', label: '在售' },
+];
+
+const statusMap: Record<string, string> = {
+  design: '投票中',
+  preorder: '预售',
+  'on-sale': '在售',
+};
 
 const types = [
   { value: 'physical', label: '实体产品' },
   { value: 'digital', label: '数字产品' },
 ];
+
+// ISO 时间 → datetime-local 输入框值(本地时区)
+function isoToLocalInput(iso?: string): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const z = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+}
 
 export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +56,7 @@ export default function AdminProducts() {
     descriptionEn: '',
     price: 0,
     originalPrice: 0,
-    category: 'tea' as 'tea' | 'spice' | 'craft' | 'snack' | 'digital',
+    category: 'decor' as 'stationery' | 'home' | 'decor' | 'toy',
     type: 'physical' as 'physical' | 'digital',
     images: [] as string[],
     stock: 0,
@@ -49,6 +68,10 @@ export default function AdminProducts() {
     story: '',
     culture: '',
     howToUse: '',
+    status: 'on-sale' as 'design' | 'preorder' | 'on-sale',
+    votesCount: 0,
+    preorderEndLocal: '',   // datetime-local 输入值
+    onSaleAtLocal: '',
   });
 
   const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts(false);
@@ -81,6 +104,10 @@ export default function AdminProducts() {
         story: product.story || '',
         culture: product.culture || '',
         howToUse: product.howToUse || '',
+        status: product.status || 'on-sale',
+        votesCount: product.votesCount || 0,
+        preorderEndLocal: isoToLocalInput(product.preorderEnd),
+        onSaleAtLocal: isoToLocalInput(product.onSaleAt),
       });
     } else {
       setEditingProduct(null);
@@ -91,7 +118,7 @@ export default function AdminProducts() {
         descriptionEn: '',
         price: 0,
         originalPrice: 0,
-        category: 'tea',
+        category: 'decor',
         type: 'physical',
         images: [],
         stock: 0,
@@ -103,6 +130,10 @@ export default function AdminProducts() {
         story: '',
         culture: '',
         howToUse: '',
+        status: 'on-sale',
+        votesCount: 0,
+        preorderEndLocal: '',
+        onSaleAtLocal: '',
       });
     }
     setIsModalOpen(true);
@@ -119,6 +150,24 @@ export default function AdminProducts() {
       return;
     }
 
+    // 预售时间校验与转换(datetime-local → ISO)
+    let preorderEnd: string | undefined;
+    let onSaleAt: string | undefined;
+    if (formData.status === 'preorder') {
+      const preEnd = formData.preorderEndLocal ? new Date(formData.preorderEndLocal).getTime() : NaN;
+      const onSale = formData.onSaleAtLocal ? new Date(formData.onSaleAtLocal).getTime() : NaN;
+      if (isNaN(preEnd) || isNaN(onSale)) {
+        alert('预售产品必须设置「预售截止时间」和「开始销售时间」');
+        return;
+      }
+      if (onSale <= preEnd) {
+        alert('开始销售时间必须晚于预售截止时间');
+        return;
+      }
+      preorderEnd = new Date(preEnd).toISOString();
+      onSaleAt = new Date(onSale).toISOString();
+    }
+
     const productData: Product = {
       id: editingProduct?.id || `prod-${Date.now()}`,
       ...formData,
@@ -128,7 +177,11 @@ export default function AdminProducts() {
       story: formData.story,
       culture: formData.culture,
       howToUse: formData.howToUse,
-    };
+      status: formData.status,
+      votesCount: editingProduct?.votesCount ?? formData.votesCount ?? 0, // 保留真实票数,不被表单覆盖
+      preorderEnd,
+      onSaleAt,
+    } as Product;
 
     try {
       if (editingProduct) {
@@ -206,7 +259,7 @@ export default function AdminProducts() {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center space-x-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+          className="flex items-center space-x-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           <Plus className="w-5 h-5" />
           <span>添加产品</span>
@@ -222,7 +275,7 @@ export default function AdminProducts() {
               placeholder="搜索产品..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none"
             />
           </div>
           <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
@@ -239,6 +292,7 @@ export default function AdminProducts() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">价格</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">库存</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态/票数</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
               </tr>
             </thead>
@@ -259,7 +313,7 @@ export default function AdminProducts() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-bold text-amber-600">${product.price}</span>
+                    <span className="font-bold text-black">${product.price}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-gray-800">{product.stock}</span>
@@ -270,10 +324,22 @@ export default function AdminProducts() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      product.status === 'design' ? 'bg-white border border-black text-black'
+                        : product.status === 'preorder' ? 'bg-black text-white'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {statusMap[product.status || 'on-sale']}
+                    </span>
+                    {product.status === 'design' && (
+                      <span className="ml-2 text-xs text-gray-500">🗳 {product.votesCount || 0}</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleOpenModal(product)}
-                        className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                        className="p-2 text-black hover:bg-gray-100 rounded-lg transition-colors"
                       >
                         <Edit className="w-5 h-5" />
                       </button>
@@ -315,7 +381,7 @@ export default function AdminProducts() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                     placeholder="例如：蒙顶山茶"
                   />
                 </div>
@@ -325,7 +391,7 @@ export default function AdminProducts() {
                     type="text"
                     value={formData.nameEn}
                     onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                     placeholder="例如：Mengding Mountain Tea"
                   />
                 </div>
@@ -336,7 +402,7 @@ export default function AdminProducts() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                   rows={3}
                   placeholder="请输入产品描述"
                 />
@@ -347,7 +413,7 @@ export default function AdminProducts() {
                 <textarea
                   value={formData.descriptionEn}
                   onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                   rows={3}
                   placeholder="Enter product description"
                 />
@@ -362,7 +428,7 @@ export default function AdminProducts() {
                     min="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -374,7 +440,7 @@ export default function AdminProducts() {
                     min="0"
                     value={formData.originalPrice}
                     onChange={(e) => setFormData({ ...formData, originalPrice: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -385,7 +451,7 @@ export default function AdminProducts() {
                     min="0"
                     value={formData.stock}
                     onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                     placeholder="0"
                   />
                 </div>
@@ -405,14 +471,14 @@ export default function AdminProducts() {
                           setFormData({ ...formData, unit: isNaN(num) ? formData.unit : num });
                         }
                       }}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                       placeholder="150"
                     />
                     <input
                       type="text"
                       value={formData.unitType}
                       onChange={(e) => setFormData({ ...formData, unitType: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                       placeholder="g / ml / 个"
                     />
                   </div>
@@ -425,7 +491,7 @@ export default function AdminProducts() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as Product['category'] })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                   >
                     {categories.map(cat => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -437,13 +503,59 @@ export default function AdminProducts() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as 'physical' | 'digital' })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                   >
                     {types.map(t => (
                       <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* 产品生命周期 */}
+              <div className="grid md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">产品状态</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as 'design' | 'preorder' | 'on-sale' })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                  >
+                    {statusOptions.map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                {formData.status === 'preorder' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">预售截止时间 *</label>
+                      <input
+                        type="datetime-local"
+                        value={formData.preorderEndLocal}
+                        onChange={(e) => setFormData({ ...formData, preorderEndLocal: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">开始销售时间 *</label>
+                      <input
+                        type="datetime-local"
+                        value={formData.onSaleAtLocal}
+                        onChange={(e) => setFormData({ ...formData, onSaleAtLocal: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                  </>
+                )}
+                {formData.status === 'design' && (
+                  <div className="md:col-span-2 flex items-center">
+                    <p className="text-sm text-gray-500">
+                      投票中产品不显示价格与购买按钮,前台展示票数与「我想要它」按钮。票数:
+                      <b className="text-black ml-1">{editingProduct?.votesCount ?? 0}</b>
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -461,7 +573,7 @@ export default function AdminProducts() {
                     </div>
                   ))}
                 </div>
-                <label className="flex items-center space-x-2 px-4 py-3 border border-dashed border-gray-300 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition-colors cursor-pointer">
+                <label className="flex items-center space-x-2 px-4 py-3 border border-dashed border-gray-300 rounded-lg hover:border-black hover:bg-gray-100 transition-colors cursor-pointer">
                   <Image className="w-5 h-5 text-gray-400" />
                   <span className="text-sm text-gray-600">点击上传图片</span>
                   <input
@@ -482,7 +594,7 @@ export default function AdminProducts() {
                       onClick={() => handleTagChange(tag)}
                       className={`px-3 py-1 text-sm rounded-full transition-colors ${
                         formData.tags.includes(tag)
-                          ? 'bg-amber-600 text-white'
+                          ? 'bg-black text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -529,7 +641,7 @@ export default function AdminProducts() {
               </button>
               <button
                 onClick={handleSave}
-                className="flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+                className="flex items-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
               >
                 <Save className="w-5 h-5 mr-2" />
                 {editingProduct ? '保存修改' : '添加产品'}

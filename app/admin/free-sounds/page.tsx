@@ -171,7 +171,7 @@ export default function AdminFreeSounds() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-            <Music className="w-5 h-5 text-amber-600" />
+            <Music className="w-5 h-5 text-black" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Free Sounds 管理</h1>
@@ -180,7 +180,7 @@ export default function AdminFreeSounds() {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center space-x-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
+          className="flex items-center space-x-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           <Plus className="w-5 h-5" />
           <span>添加声音</span>
@@ -195,7 +195,7 @@ export default function AdminFreeSounds() {
             placeholder="搜索声音..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
           />
         </div>
       </div>
@@ -273,7 +273,7 @@ export default function AdminFreeSounds() {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                   placeholder="例如：Birdsong at Qingcheng Mountain"
                   required
                 />
@@ -287,7 +287,7 @@ export default function AdminFreeSounds() {
                   type="text"
                   value={formData.duration}
                   onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                   placeholder="例如：03:45"
                   required
                 />
@@ -302,7 +302,7 @@ export default function AdminFreeSounds() {
                     type="button"
                     onClick={() => setUploadMode('file')}
                     className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                      uploadMode === 'file' ? 'bg-white shadow text-amber-600' : 'text-gray-600 hover:text-gray-800'
+                      uploadMode === 'file' ? 'bg-white shadow text-black' : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     <Upload className="w-4 h-4" />
@@ -312,7 +312,7 @@ export default function AdminFreeSounds() {
                     type="button"
                     onClick={() => setUploadMode('url')}
                     className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                      uploadMode === 'url' ? 'bg-white shadow text-amber-600' : 'text-gray-600 hover:text-gray-800'
+                      uploadMode === 'url' ? 'bg-white shadow text-black' : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     <Link className="w-4 h-4" />
@@ -321,7 +321,7 @@ export default function AdminFreeSounds() {
                 </div>
 
                 {uploadMode === 'file' ? (
-                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-amber-500 transition-colors cursor-pointer">
+                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-black transition-colors cursor-pointer">
                     <input
                       type="file"
                       accept="audio/*"
@@ -353,7 +353,7 @@ export default function AdminFreeSounds() {
                     type="url"
                     value={formData.audio}
                     onChange={(e) => setFormData({ ...formData, audio: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                     placeholder="例如：https://example.com/audio.mp3"
                   />
                 )}
@@ -394,7 +394,7 @@ export default function AdminFreeSounds() {
                 type="submit"
                 form="sound-form"
                 disabled={uploading || saving}
-                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? '保存中...' : editingSound ? '保存修改' : '添加声音'}</span>

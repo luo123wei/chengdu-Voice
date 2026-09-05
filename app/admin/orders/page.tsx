@@ -100,7 +100,7 @@ export default function AdminOrders() {
       case 'pending':
         return 'bg-yellow-100 text-yellow-700';
       case 'paid':
-        return 'bg-amber-100 text-amber-700';
+        return 'bg-amber-100 text-gray-800';
       case 'shipped':
         return 'bg-blue-100 text-blue-700';
       case 'delivered':
@@ -129,7 +129,7 @@ export default function AdminOrders() {
 
   const getCountdownStyle = (days: number) => {
     if (days <= 3) return 'text-red-600 bg-red-50';
-    if (days <= 7) return 'text-amber-600 bg-amber-50';
+    if (days <= 7) return 'text-black bg-gray-50';
     return 'text-blue-600 bg-blue-50';
   };
 
@@ -276,7 +276,7 @@ export default function AdminOrders() {
     // 预填默认内容
     if (selectedOrder) {
       setContactSubject(`Payment Instructions for Order ${selectedOrder.id}`);
-      setContactMessage(`Dear ${selectedOrder.customerName},\n\nThank you for your order #${selectedOrder.id}. To complete your payment, please use the payment link below.\n\nWe support PayPal, Payoneer and international wire transfer. If you have any questions, please reply to this email.\n\nBest regards,\nChengdu Voice Team`);
+      setContactMessage(`Dear ${selectedOrder.customerName},\n\nThank you for your order #${selectedOrder.id}. To complete your payment, please use the payment link below.\n\nWe support PayPal, Payoneer and international wire transfer. If you have any questions, please reply to this email.\n\nBest regards,\nChengdu Craft Studio Team`);
     }
   };
 
@@ -310,7 +310,7 @@ export default function AdminOrders() {
               placeholder="搜索订单..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
             />
           </div>
           <div className="relative">
@@ -318,7 +318,7 @@ export default function AdminOrders() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="pl-12 pr-8 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors appearance-none bg-white cursor-pointer"
+              className="pl-12 pr-8 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors appearance-none bg-white cursor-pointer"
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -331,7 +331,7 @@ export default function AdminOrders() {
             <select
               value={selectedCountry}
               onChange={(e) => setSelectedCountry(e.target.value)}
-              className="pl-4 pr-8 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors appearance-none bg-white cursor-pointer"
+              className="pl-4 pr-8 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors appearance-none bg-white cursor-pointer"
             >
               {countries.map((country) => (
                 <option key={country} value={country}>
@@ -361,14 +361,14 @@ export default function AdminOrders() {
             {filteredOrders.map((order) => {
               const daysRemaining = order.status === 'shipped' ? getDaysRemaining(order.shippedAt) : 0;
               return (
-                <tr key={order.id} className="hover:bg-amber-50/50 transition-colors">
+                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 font-bold text-gray-800">{order.id}</td>
                   <td className="px-6 py-4">
                     <p className="font-medium text-gray-800">{order.customerName}</p>
                     <p className="text-sm text-gray-500">{order.email}</p>
                   </td>
                   <td className="px-6 py-4 text-gray-600">{order.country}</td>
-                  <td className="px-6 py-4 font-bold text-amber-600">${order.totalAmount.toFixed(2)}</td>
+                  <td className="px-6 py-4 font-bold text-black">${order.totalAmount.toFixed(2)}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-3 py-1 text-sm rounded-full ${getStatusStyle(order.status)}`}>
                       {getStatusIcon(order.status)}
@@ -392,7 +392,7 @@ export default function AdminOrders() {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => openOrderDetail(order)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-black"
                         title="查看详情"
                       >
                         <Eye className="w-5 h-5" />
@@ -408,7 +408,7 @@ export default function AdminOrders() {
                           </button>
                           <button
                             onClick={() => openOrderDetail(order)}
-                            className="p-2 hover:bg-amber-50 rounded-lg transition-colors text-amber-600 hover:text-amber-700"
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-black hover:text-gray-800"
                             title="联系买家"
                           >
                             <Mail className="w-5 h-5" />
@@ -506,12 +506,12 @@ export default function AdminOrders() {
                 <h3 className="font-bold text-gray-800 mb-3">订单商品</h3>
                 <div className="space-y-3">
                   {selectedOrder.items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-amber-50/50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div>
                         <p className="font-medium text-gray-800">{item.name}</p>
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
-                      <span className="font-bold text-amber-600">${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="font-bold text-black">${(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
@@ -537,12 +537,12 @@ export default function AdminOrders() {
               </div>
 
               {selectedOrder.status === 'pending' && (
-                <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                <div className="bg-gray-50 rounded-xl p-4 border border-amber-200">
                   <h3 className="font-bold text-amber-800 mb-3 flex items-center">
                     <Clock className="w-5 h-5 mr-2" />
                     待处理订单 - 等待付款
                   </h3>
-                  <p className="text-sm text-amber-700 mb-4">
+                  <p className="text-sm text-gray-800 mb-4">
                     买家已提交订单但尚未付款。你可以：
                     <br />1. <strong>联系买家</strong> - 发送付款链接/收款码给买家
                     <br />2. <strong>确认已收款</strong> - 收到付款后标记为已付款（买家将自动收到确认邮件）
@@ -562,7 +562,7 @@ export default function AdminOrders() {
                     <div className="space-y-3">
                       <button
                         onClick={openContactForm}
-                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                        className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
                       >
                         <Mail className="w-5 h-5" />
                         <span>联系买家 / 发送付款链接</span>
@@ -597,7 +597,7 @@ export default function AdminOrders() {
                           type="text"
                           value={contactSubject}
                           onChange={(e) => setContactSubject(e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500"
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black"
                           placeholder="输入邮件主题"
                         />
                       </div>
@@ -607,7 +607,7 @@ export default function AdminOrders() {
                           value={contactMessage}
                           onChange={(e) => setContactMessage(e.target.value)}
                           rows={6}
-                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 resize-none"
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black resize-none"
                           placeholder="输入邮件内容（支持换行）"
                         />
                       </div>
@@ -619,7 +619,7 @@ export default function AdminOrders() {
                           type="url"
                           value={contactPaymentLink}
                           onChange={(e) => setContactPaymentLink(e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500"
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black"
                           placeholder="https://paypal.me/... 或其他收款链接"
                         />
                         <p className="text-xs text-gray-500 mt-1">填入 PayPal / Payoneer 收款链接，买家可点击直接付款</p>
@@ -628,7 +628,7 @@ export default function AdminOrders() {
                         <button
                           onClick={handleSendContactEmail}
                           disabled={isSendingEmail}
-                          className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSendingEmail ? (
                             <>
@@ -824,7 +824,7 @@ export default function AdminOrders() {
                                 onClick={() => setReviewRating(rating)}
                                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all ${
                                   reviewRating === rating
-                                    ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-300'
+                                    ? 'bg-amber-100 text-gray-800 ring-1 ring-amber-300'
                                     : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                                 }`}
                               >
@@ -875,7 +875,7 @@ export default function AdminOrders() {
             <div className="flex justify-end p-6 border-t border-gray-200">
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                className="px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
               >
                 Close
               </button>

@@ -166,7 +166,7 @@ export default function AdminBlogs() {
 
   const getPostStatus = (post: BlogPost): { label: string; color: string } => {
     if (post.scheduledAt && new Date(post.scheduledAt) > new Date()) {
-      return { label: '已排期', color: 'bg-amber-100 text-amber-700' };
+      return { label: '已排期', color: 'bg-amber-100 text-gray-800' };
     }
     return { label: '已发布', color: 'bg-green-100 text-green-700' };
   };
@@ -269,7 +269,7 @@ export default function AdminBlogs() {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center px-6 py-3 bg-amber-600 text-white rounded-xl font-medium hover:bg-amber-700 transition-all shadow-lg hover:shadow-xl"
+          className="flex items-center px-6 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl"
         >
           <Plus className="w-5 h-5 mr-2" />
           添加新文章
@@ -285,7 +285,7 @@ export default function AdminBlogs() {
               placeholder="搜索文章..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
             />
           </div>
           <div className="relative">
@@ -293,7 +293,7 @@ export default function AdminBlogs() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="pl-12 pr-8 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors appearance-none bg-white cursor-pointer"
+              className="pl-12 pr-8 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors appearance-none bg-white cursor-pointer"
             >
               {categories.map((cat) => (
                 <option key={cat.value} value={cat.value}>
@@ -322,12 +322,12 @@ export default function AdminBlogs() {
             {filteredPosts.map((post) => {
               const status = getPostStatus(post);
               return (
-                <tr key={post.id} className="hover:bg-amber-50/50 transition-colors">
+                <tr key={post.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <p className="font-bold text-gray-800">{post.titleEn}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-3 py-1 bg-amber-100 text-amber-700 text-sm rounded-full">
+                    <span className="px-3 py-1 bg-amber-100 text-gray-800 text-sm rounded-full">
                       {categories.find(c => c.value === post.category)?.label.en}
                     </span>
                   </td>
@@ -368,13 +368,13 @@ export default function AdminBlogs() {
                     <div className="flex space-x-2">
                       <Link
                         href={`/blog/${post.slug}`}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-black"
                       >
                         <Eye className="w-5 h-5" />
                       </Link>
                       <button
                         onClick={() => handleOpenModal(post)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-amber-600"
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-black"
                       >
                         <Edit className="w-5 h-5" />
                       </button>
@@ -422,7 +422,7 @@ export default function AdminBlogs() {
                   type="text"
                   value={formData.titleEn}
                   onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                   placeholder="Article Title"
                 />
               </div>
@@ -444,14 +444,14 @@ export default function AdminBlogs() {
                         setAutoSlug(false);
                         setFormData({ ...formData, slug: e.target.value });
                       }}
-                      className="w-full pl-16 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors font-mono text-sm"
+                      className="w-full pl-16 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors font-mono text-sm"
                       placeholder="article-url-slug"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={handleAutoSlug}
-                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-amber-600"
+                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-black"
                     title="Regenerate from title"
                   >
                     <RefreshCw className="w-5 h-5" />
@@ -475,7 +475,7 @@ export default function AdminBlogs() {
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as typeof formData.category })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors appearance-none bg-white cursor-pointer"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors appearance-none bg-white cursor-pointer"
                 >
                   {categories.filter((c) => c.value !== 'all').map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -491,7 +491,7 @@ export default function AdminBlogs() {
                   type="text"
                   value={formData.author}
                   onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                   placeholder="作者名称"
                 />
               </div>
@@ -504,7 +504,7 @@ export default function AdminBlogs() {
                     onClick={() => setPublishMode('now')}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
                       publishMode === 'now'
-                        ? 'border-amber-500 bg-amber-50 text-amber-700'
+                        ? 'border-black bg-gray-50 text-gray-800'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
@@ -516,7 +516,7 @@ export default function AdminBlogs() {
                     onClick={() => setPublishMode('scheduled')}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
                       publishMode === 'scheduled'
-                        ? 'border-amber-500 bg-amber-50 text-amber-700'
+                        ? 'border-black bg-gray-50 text-gray-800'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
@@ -537,7 +537,7 @@ export default function AdminBlogs() {
                         min={getTodayStr()}
                         max={getMaxDateStr()}
                         onChange={(e) => setScheduleDate(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors text-sm"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors text-sm"
                       />
                     </div>
                     <div>
@@ -549,7 +549,7 @@ export default function AdminBlogs() {
                         type="time"
                         value={scheduleTime}
                         onChange={(e) => setScheduleTime(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors text-sm"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors text-sm"
                       />
                     </div>
                     {scheduleDate && (
@@ -576,7 +576,7 @@ export default function AdminBlogs() {
                     </div>
                   ))}
                   {formData.images.length < MAX_IMAGES && (
-                    <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-amber-500 transition-colors">
+                    <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-black transition-colors">
                       <Image className="w-6 h-6 text-gray-400" />
                       <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
                     </label>
@@ -599,10 +599,10 @@ export default function AdminBlogs() {
                     </button>
                   </div>
                 ) : (
-                  <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-amber-500 transition-colors">
+                  <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
                     {formData.audioUploading ? (
                       <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
                         <span className="text-gray-500">上传中...</span>
                       </div>
                     ) : (
@@ -631,10 +631,10 @@ export default function AdminBlogs() {
                     </button>
                   </div>
                 ) : (
-                  <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-amber-500 transition-colors">
+                  <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
                     {formData.videoUploading ? (
                       <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
                         <span className="text-gray-500">上传中...</span>
                       </div>
                     ) : (
@@ -668,7 +668,7 @@ export default function AdminBlogs() {
               </button>
               <button
                 onClick={handleSave}
-                className="flex items-center px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                className="flex items-center px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
               >
                 <Save className="w-5 h-5 mr-2" />
                 保存

@@ -12,18 +12,18 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 });
 
 const defaultSettings = {
-  siteName: 'Chengdu Voice | 成都之音',
-  siteDescription: '闭上眼，听成都',
+  siteName: 'Chengdu Craft Studio | 成都造物',
+  siteDescription: '把成都的日常,做成你桌上的日常',
   downloadLink: process.env.NEXT_PUBLIC_DOWNLOAD_LINK || 'https://cdn.example.com/download.zip',
-  mailFrom: 'Chengdu Voice <kylw02@outlook.com>',
+  mailFrom: 'Chengdu Craft Studio <kylw02@outlook.com>',
   appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   gaMeasurementId: '',
-  bannerImage: 'https://picsum.photos/id/1015/1920/1080',
-  orderEmailSubjectEn: "We've Received Your Order - Chengdu Voice",
+  bannerImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20design%20studio%20interior%20with%20panda%20ceramic%20crafts%20on%20white%20shelves%2C%20black%20and%20white%20photography&image_size=landscape_16_9',
+  orderEmailSubjectEn: "We've Received Your Order - Chengdu Craft Studio",
   orderEmailBodyEn: 'Dear {customerName},\n\nThank you for your order! We have received your order #{orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.\n\nPayment is still pending. We support PayPal, Payoneer and international wire transfer.\n\nIf you have any questions, please contact us at kylw02@outlook.com.',
-  orderEmailSubjectZh: '我们已收到您的订单 - 成都之音',
+  orderEmailSubjectZh: '我们已收到您的订单 - 成都造物',
   orderEmailBodyZh: '尊敬的 {customerName}，\n\n感谢您的订单！我们已收到您的订单 #{orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。\n\n付款尚未完成。我们支持 PayPal、Payoneer 和国际电汇。\n\n如有任何问题，请联系我们：kylw02@outlook.com。',
-  aboutContent: '<h2>Experience Chengdu</h2><p>Through Sound &amp; Flavor</p>',
+  aboutContent: '<h2>Everyday objects, designed in Chengdu.</h2><p>成都造物 · 一间小型文创设计工作室</p>',
 };
 
 const defaultShippingRates: ShippingRate[] = [
@@ -48,7 +48,7 @@ function mapProduct(row: any): Product {
     descriptionEn: row.description_en || '',
     price: row.price ? parseFloat(row.price) : 0,
     originalPrice: row.original_price ? parseFloat(row.original_price) : undefined,
-    category: row.category || 'craft',
+    category: row.category || 'decor',
     type: row.type || 'physical',
     images: Array.isArray(row.images) ? row.images : [],
     stock: row.stock ? parseInt(row.stock) : 0,
@@ -60,6 +60,10 @@ function mapProduct(row: any): Product {
     story: row.story || '',
     culture: row.culture || '',
     howToUse: row.how_to_use || '',
+    status: row.status || 'on-sale',
+    votesCount: row.votes_count ? parseInt(row.votes_count) : 0,
+    preorderEnd: row.preorder_end || undefined,
+    onSaleAt: row.on_sale_at || undefined,
   };
 }
 
@@ -157,6 +161,9 @@ export const db = {
         story: newProduct.story,
         culture: newProduct.culture,
         how_to_use: newProduct.howToUse,
+        status: newProduct.status || 'on-sale',
+        preorder_end: newProduct.preorderEnd || null,
+        on_sale_at: newProduct.onSaleAt || null,
       }).select('*').single();
       if (error) {
         console.error('Failed to create product:', error);
@@ -184,6 +191,10 @@ export const db = {
       if (updates.story !== undefined) updateData.story = updates.story;
       if (updates.culture !== undefined) updateData.culture = updates.culture;
       if (updates.howToUse !== undefined) updateData.how_to_use = updates.howToUse;
+      // 生命周期与预售时间可由后台编辑;votes_count 刻意不映射,只能经 RPC 原子自增
+      if (updates.status !== undefined) updateData.status = updates.status;
+      if (updates.preorderEnd !== undefined) updateData.preorder_end = updates.preorderEnd || null;
+      if (updates.onSaleAt !== undefined) updateData.on_sale_at = updates.onSaleAt || null;
 
       console.log('Update product:', id, 'with data:', updateData);
 
@@ -202,6 +213,43 @@ export const db = {
     delete: async (id: string): Promise<boolean> => {
       const { error } = await supabase.from('products').delete().eq('id', id);
       return !error;
+    },
+  },
+
+  // 投票/预订意向(市场调研)
+  intents: {
+    // 新增意向;返回 true=新插入,false=该访客已存在(重复投票被忽略)
+    add: async (i: { productId: string; visitorId: string; type: 'vote' | 'preorder'; email?: string }): Promise<boolean> => {
+      const id = `pi-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const { data, error } = await supabase.from('product_intents')
+        .upsert({
+          id,
+          product_id: i.productId,
+          visitor_id: i.visitorId,
+          type: i.type,
+          email: i.email || null,
+        }, { onConflict: 'product_id,visitor_id', ignoreDuplicates: true })
+        .select('id');
+      if (error) {
+        console.error('Failed to add intent:', error);
+        throw error;
+      }
+      return !!(data && data.length > 0);
+    },
+    hasVoted: async (productId: string, visitorId: string): Promise<boolean> => {
+      const { count } = await supabase.from('product_intents')
+        .select('id', { count: 'exact', head: true })
+        .eq('product_id', productId)
+        .eq('visitor_id', visitorId);
+      return (count || 0) > 0;
+    },
+    // 票数原子自增(RPC),失败抛出由调用方提示重试
+    incrementVotes: async (productId: string): Promise<void> => {
+      const { error } = await supabase.rpc('increment_votes', { p_id: productId });
+      if (error) {
+        console.error('Failed to increment votes:', error);
+        throw error;
+      }
     },
   },
 

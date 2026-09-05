@@ -9,12 +9,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   
   if (!product) {
     return {
-      title: 'Product Not Found | Chengdu Voice',
+      title: 'Product Not Found | Chengdu Craft Studio',
     }
   }
 
   return {
-    title: `${product.nameEn} | Chengdu Voice`,
+    title: `${product.nameEn} | Chengdu Craft Studio`,
     description: product.descriptionEn?.slice(0, 160) || `Buy authentic ${product.nameEn} from Chengdu, China. Premium quality, worldwide shipping.`,
     keywords: [product.nameEn, product.category, 'Chengdu', '成都', 'buy online', 'premium quality'],
     alternates: {
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       url: `${siteUrl}/shop/${id}`,
       type: 'article',
       images: product.images?.[0] ? [{ url: product.images[0] }] : [{ url: '/og-image.jpg' }],
-      siteName: 'Chengdu Voice',
+      siteName: 'Chengdu Craft Studio',
     },
     twitter: {
       card: 'summary_large_image',

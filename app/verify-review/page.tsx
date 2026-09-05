@@ -51,7 +51,7 @@ function ReviewVerificationContent() {
           {status === 'loading' && (
             <div>
               <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Loader2 className="w-10 h-10 text-amber-600 animate-spin" />
+                <Loader2 className="w-10 h-10 text-black animate-spin" />
               </div>
               <h1 className="text-2xl font-bold text-gray-800 mb-4">验证中...</h1>
               <p className="text-gray-500">正在验证您的评价，请稍候</p>
@@ -80,7 +80,7 @@ function ReviewVerificationContent() {
               <p className="text-gray-500 mb-6">链接无效或已过期，请重新提交评价</p>
               <button
                 onClick={() => router.push('/shop')}
-                className="px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors"
+                className="px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
               >
                 返回商店
               </button>

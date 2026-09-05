@@ -1,246 +1,193 @@
-import { ArrowRight, Star, Volume2, BookOpen, Utensils } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SubscribeForm from '@/components/SubscribeForm';
-import BlogCarousel from '@/components/BlogCarousel';
+import ProductCard from '@/components/ProductCard';
 import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
-  title: 'Chengdu Voice | 成都之音 - Authentic Chengdu Culture & Products',
-  description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
-  keywords: ['Chengdu', '成都', 'Sichuan pepper', 'tea', 'culture', 'cross-border e-commerce'],
-  alternates: {
-    canonical: '/',
-  },
+  title: 'Chengdu Craft Studio | 成都造物 - Panda-themed Designer Crafts from Chengdu',
+  description: 'Everyday objects, designed in Chengdu. A small craft studio making panda-themed designer objects — vote for what we make next, pre-order, shop worldwide.',
+  keywords: ['Chengdu', 'panda', 'craft studio', 'designer crafts', '文创', 'cultural creative', 'cross-border e-commerce'],
+  alternates: { canonical: '/' },
   openGraph: {
-    title: 'Chengdu Voice | 成都之音',
-    description: 'Experience authentic Chengdu through sound, taste, and stories.',
+    title: 'Chengdu Craft Studio | 成都造物',
+    description: 'Everyday objects, designed in Chengdu. Vote for what we make next.',
     url: siteUrl,
-    siteName: 'Chengdu Voice',
+    siteName: 'Chengdu Craft Studio',
     type: 'website',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chengdu Voice | 成都之音',
-    description: 'Experience authentic Chengdu through sound, taste, and stories.',
+    title: 'Chengdu Craft Studio | 成都造物',
+    description: 'Everyday objects, designed in Chengdu.',
     images: ['/og-image.jpg'],
   },
 };
 
 export default async function HomePage() {
-  const [blogs, products, settings] = await Promise.all([
-    db.blogs.getAll(),
-    db.products.getAll(),
-    db.settings.get(),
-  ]);
-  const featuredPosts = blogs.slice(0, 5);
-  const featuredProducts = products.slice(0, 4);
+  const [products] = await Promise.all([db.products.getAll()]);
+
+  const voteProducts = products.filter(p => p.status === 'design');
+  const onSaleProducts = products.filter(p => !p.status || p.status === 'on-sale').slice(0, 4);
+  const heroProduct = products.find(p => p.status === 'preorder') || products[0];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white text-ink">
       <Header />
 
-      <section className="relative min-h-screen flex items-center justify-center pt-16">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={settings.bannerImage || 'https://picsum.photos/id/1015/1920/1080'}
-            alt="Chengdu Teahouse"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
-        
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6">
-            Experience Chengdu
-            <br />
-            <span className="text-primary">Through Sound & Flavor</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-200 mb-4">
-            We share the hidden rhythm of Chengdu — from traditional teahouses to mountain-grown Sichuan flavors.
-          </p>
-          <p className="text-lg text-gray-300 mb-12">
-            A gateway to experience Chengdu through sound, taste and stories.
-          </p>
-          
-          <Link
-            href="#explore"
-            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-full text-lg font-medium transition-all animate-bounce"
-          >
-            <span>Explore Chengdu</span>
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
-      </section>
-
-      <section id="explore" className="py-20 bg-cream">
+      {/* ===== Hero ===== */}
+      <section className="pt-32 pb-16 md:pt-40 md:pb-20 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-serif font-bold text-secondary mb-4">Explore Chengdu</h2>
-            <p className="text-gray-600">Discover the soul of Chengdu through our three pillars</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Link
-              href="/free-sounds"
-              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
-            >
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src="https://picsum.photos/id/1025/800/600"
-                  alt="Hear Chengdu"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="w-14 h-14 bg-primary/90 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Volume2 className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Hear Chengdu</h3>
-                  <p className="text-white/80 text-sm mb-4">Listen to authentic Chengdu sounds - tea houses, rain streets, and local markets.</p>
-                  <div className="inline-flex items-center gap-2 text-primary bg-white/90 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-white group-hover:scale-105 transition-all">
-                    <span>Explore</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
+            <div>
+              <div className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-6">
+                Chengdu Craft Studio · 成都造物
               </div>
-            </Link>
-            
-            <Link
-              href="/blog"
-              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
-            >
-              <div className="relative h-56 overflow-hidden">
-                <img
-                  src="https://picsum.photos/id/1035/800/600"
-                  alt="Discover Stories"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="w-14 h-14 bg-secondary/90 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <BookOpen className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Discover Stories</h3>
-                  <p className="text-white/80 text-sm mb-4">Explore Chengdu's rich culture, history, and way of life through our stories.</p>
-                  <div className="inline-flex items-center gap-2 text-secondary bg-white/90 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-white group-hover:scale-105 transition-all">
-                    <span>Explore</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
+              <h1 className="font-serif text-4xl md:text-5xl lg:text-[52px] leading-[1.2] font-bold tracking-tight mb-6">
+                Everyday objects,
+                <br />
+                <span className="border-b-4 border-black pb-0.5">designed in Chengdu.</span>
+              </h1>
+              <p className="text-base md:text-lg text-gray-500 max-w-lg mb-9">
+                我们是一间小型文创设计工作室,把成都的松弛与熊猫的可爱,做成你握在手里的日常物件。每一款,都先由你投票,再投入生产。
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-black text-white text-sm font-medium border border-black hover:bg-gray-800 transition-colors"
+                >
+                  Explore Works 逛作品 <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/shop?tab=design"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black text-sm font-medium border border-black hover:bg-black hover:text-white transition-colors"
+                >
+                  Vote for Next 投票新品
+                </Link>
               </div>
-            </Link>
-            
-            <Link
-              href="/shop"
-              className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
-            >
-              <div className="relative h-56 overflow-hidden">
+            </div>
+
+            <div className="relative">
+              {heroProduct && (
                 <img
-                  src="https://picsum.photos/id/1080/800/600"
-                  alt="Live Chengdu"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  src={heroProduct.images[0]}
+                  alt={heroProduct.nameEn}
+                  className="w-full aspect-[4/3] object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="w-14 h-14 bg-gold/90 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Utensils className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Live Chengdu</h3>
-                  <p className="text-white/80 text-sm mb-4">Bring authentic Chengdu flavors home - from Sichuan pepper to premium tea.</p>
-                  <div className="inline-flex items-center gap-2 text-gold bg-white/90 px-4 py-2 rounded-full text-sm font-medium group-hover:bg-white group-hover:scale-105 transition-all">
-                    <span>Explore</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
+              )}
+              <div className="absolute left-4 bottom-4 bg-white border border-gray-200 px-3.5 py-2 text-xs">
+                ① 首款作品 · {heroProduct?.nameEn} {heroProduct?.name} · 预售中
               </div>
-            </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {featuredPosts.length > 0 && (
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <BlogCarousel posts={featuredPosts} />
-          </div>
-        </section>
-      )}
+      {/* ===== 理念条 ===== */}
+      <section className="border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3">
+          {[
+            { n: '01', t: 'We design', d: '工作室原创设计,每件都有成都故事' },
+            { n: '02', t: 'You vote', d: '概念稿先展出,票数达标才开模生产' },
+            { n: '03', t: 'We make', d: '小批量手作,预售订单优先发货' },
+          ].map((item, i) => (
+            <div
+              key={item.n}
+              className={`py-9 px-6 text-center ${i < 2 ? 'md:border-r border-b md:border-b-0 border-gray-200' : ''}`}
+            >
+              <div className="font-serif text-xs text-gray-400 mb-2">{item.n}</div>
+              <div className="font-serif text-xl font-bold mb-1.5">{item.t}</div>
+              <div className="text-[13px] text-gray-500">{item.d}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      <section className="py-16">
+      {/* ===== 新品投票 ===== */}
+      <section className="py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Featured Products</h2>
-            <p className="text-gray-600">Bring authentic Chengdu flavors home</p>
+          <div className="flex items-end justify-between mb-9 gap-4 flex-wrap">
+            <div>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold">What should we make next?</h2>
+              <p className="text-sm text-gray-500 mt-1.5">下一款做什么,你说了算 · 投票达标即开启预售</p>
+            </div>
+            <Link href="/shop?tab=design" className="text-[13px] border-b border-black pb-0.5 hover:text-gray-600">
+              查看全部投票 →
+            </Link>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <Link
-                key={product.id}
-                href={`/shop/${product.id}`}
-                className="bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-all"
-              >
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src={product.images[0]}
-                    alt={product.nameEn}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-800 mb-1">{product.nameEn}</h3>
-                  <p className="text-xs text-gray-500 mb-2">{product.name}</p>
-                  <div className="flex items-center space-x-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}`}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold text-amber-600">${product.price}</span>
-                    {product.unit && product.unitType && (
-                      <span className="text-sm text-gray-500">/ {product.unit}{product.unitType}</span>
-                    )}
-                    {product.originalPrice && (
-                      <span className="text-sm text-gray-400 line-through">${product.originalPrice}</span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-          
-          <div className="text-center mt-8">
-            <Link
-              href="/shop"
-              className="inline-flex items-center px-6 py-3 border-2 border-amber-600 text-amber-600 rounded-lg"
-            >
-              View All Products
-              <ArrowRight className="w-5 h-5 ml-2" />
+          {voteProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {voteProducts.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">暂无投票中的作品。</p>
+          )}
+        </div>
+      </section>
+
+      {/* ===== 三入口 ===== */}
+      <section className="pb-16 md:pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link href="/shop" className="block border border-gray-200 p-9 hover:border-black hover:bg-cream transition-all group">
+              <div className="font-serif text-[13px] text-gray-400 tracking-[0.2em] mb-4">WORKS</div>
+              <h3 className="font-serif text-2xl mb-2">作品</h3>
+              <p className="text-[13px] text-gray-500 mb-5">在售、预售与设计中的全部文创作品</p>
+              <span className="text-[13px] border-b border-black pb-0.5">进入作品店 →</span>
+            </Link>
+            <Link href="/blog" className="block border border-gray-200 p-9 hover:border-black hover:bg-cream transition-all group">
+              <div className="font-serif text-[13px] text-gray-400 tracking-[0.2em] mb-4">STORIES</div>
+              <h3 className="font-serif text-2xl mb-2">故事</h3>
+              <p className="text-[13px] text-gray-500 mb-5">每件作品背后的设计草图、打样与成都灵感</p>
+              <span className="text-[13px] border-b border-black pb-0.5">读设计故事 →</span>
+            </Link>
+            <Link href="/about" className="block border border-gray-200 p-9 hover:border-black hover:bg-cream transition-all group">
+              <div className="font-serif text-[13px] text-gray-400 tracking-[0.2em] mb-4">ABOUT</div>
+              <h3 className="font-serif text-2xl mb-2">关于</h3>
+              <p className="text-[13px] text-gray-500 mb-5">一间成都的小工作室,和它的造物方法论</p>
+              <span className="text-[13px] border-b border-black pb-0.5">了解我们 →</span>
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-primary">
+      {/* ===== 在售精选 ===== */}
+      <section className="pb-16 md:pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-9 gap-4 flex-wrap">
+            <div>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold">In Stock Now</h2>
+              <p className="text-sm text-gray-500 mt-1.5">已投产在售 · 跨境直邮全球</p>
+            </div>
+            <Link href="/shop?tab=on-sale" className="text-[13px] border-b border-black pb-0.5 hover:text-gray-600">
+              全部在售 →
+            </Link>
+          </div>
+          {onSaleProducts.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {onSaleProducts.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== 订阅 ===== */}
+      <section className="py-16 bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-serif font-bold text-white mb-4">
-            Want more sounds of Chengdu?
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-white mb-4">
+            新作品开售,第一时间通知你
           </h2>
-          <p className="text-white/80 mb-8">
-            Subscribe to our newsletter and get the full Chengdu Sound Map white noise album for free.
+          <p className="text-white/60 text-sm md:text-base mb-8">
+            Subscribe to get first access to pre-orders and new drops from the studio.
           </p>
-          
           <SubscribeForm />
         </div>
       </section>

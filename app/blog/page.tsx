@@ -13,7 +13,7 @@ const chengduCategories = [
   { id: 'culture', name: 'Culture', icon: BookOpen, color: 'bg-primary' },
   { id: 'food', name: 'Food', icon: Utensils, color: 'bg-gold' },
   { id: 'travel', name: 'Travel', icon: Plane, color: 'bg-secondary' },
-  { id: 'art', name: 'Art', icon: Palette, color: 'bg-chinese-red' },
+  { id: 'art', name: 'Art', icon: Palette, color: 'bg-accent' },
 ];
 
 export default function BlogPage() {
@@ -134,13 +134,13 @@ export default function BlogPage() {
                       {categoryLabels[post.category].en}
                     </span>
                     {post.audio && (
-                      <span className="px-3 py-1 bg-bamboo/90 text-white text-xs rounded-full flex items-center gap-1">
+                      <span className="px-3 py-1 bg-black text-white text-xs rounded-full flex items-center gap-1">
                         <Music className="w-3 h-3" />
                         Audio
                       </span>
                     )}
                     {post.video && (
-                      <span className="px-3 py-1 bg-chinese-red/90 text-white text-xs rounded-full flex items-center gap-1">
+                      <span className="px-3 py-1 bg-accent text-white text-xs rounded-full flex items-center gap-1">
                         <Video className="w-3 h-3" />
                         Video
                       </span>

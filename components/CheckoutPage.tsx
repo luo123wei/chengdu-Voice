@@ -207,18 +207,18 @@ export default function CheckoutPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
           <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Clock className="w-10 h-10 text-amber-600" />
+            <Clock className="w-10 h-10 text-black" />
           </div>
           <h1 className="text-3xl font-serif font-bold text-secondary mb-4">Order Submitted!</h1>
           <p className="text-gray-600 mb-6">
             Thank you! We have received your order.
           </p>
-          <div className="bg-amber-50 rounded-xl p-6 mb-6">
+          <div className="bg-gray-50 rounded-xl p-6 mb-6">
             <p className="text-sm text-gray-500 mb-2">Order Number / 订单号</p>
             <p className="text-xl font-bold text-secondary">{orderNumber}</p>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
+          <div className="bg-gray-50 border border-amber-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
             <h3 className="font-bold text-amber-900 mb-3">⚠️ Payment Pending / 待付款</h3>
             <p className="text-amber-800 text-sm mb-3">
               <strong>Step 1:</strong> Our customer service team will contact you via email within 24 hours to arrange payment details.
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
           </div>
 
           {!emailSent ? (
-            <div className="flex items-center justify-center space-x-2 text-amber-600 mb-6">
+            <div className="flex items-center justify-center space-x-2 text-black mb-6">
               <Loader2 className="w-5 h-5 animate-spin" />
               <span>Sending order notification...</span>
             </div>
@@ -483,7 +483,7 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 {!hasPhysicalProducts && (
-                  <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                  <div className="text-xs text-black bg-gray-50 p-2 rounded">
                     💡 All items are digital downloads - no shipping required
                   </div>
                 )}
@@ -520,18 +520,18 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <div className="mb-6 p-5 bg-amber-50 rounded-xl border border-amber-200">
+              <div className="mb-6 p-5 bg-gray-50 rounded-xl border border-amber-200">
                 <p className="text-amber-800 font-medium flex items-start">
                   <Shield className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
                   <span>
                     <strong>Customer Service Assisted Checkout</strong><br />
-                    <span className="text-amber-700 text-sm">
+                    <span className="text-gray-800 text-sm">
                       After placing your order, we will contact you via email within 24 hours to arrange payment.
                       We support PayPal, Payoneer and international wire transfer.
                     </span>
                   </span>
                 </p>
-                <p className="mt-3 text-sm text-amber-700">
+                <p className="mt-3 text-sm text-gray-800">
                   <strong>提交订单后，客服将在 24 小时内通过邮件与您联系完成付款。</strong><br />
                   支持：PayPal、Payoneer、国际电汇
                 </p>

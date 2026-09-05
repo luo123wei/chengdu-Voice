@@ -75,7 +75,7 @@ export default function ReviewsSketchPage() {
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-amber-100">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-amber-600" />
+                <User className="w-6 h-6 text-black" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-secondary">商品评价区域</h2>
@@ -83,14 +83,14 @@ export default function ReviewsSketchPage() {
               </div>
             </div>
 
-            <div className="bg-amber-50 rounded-xl p-6 mb-8">
+            <div className="bg-gray-50 rounded-xl p-6 mb-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-8 h-8 ${i < Math.floor(4.7) ? 'text-amber-500 fill-amber-500' : 'text-gray-300'} transition-all`}
+                        className={`w-8 h-8 ${i < Math.floor(4.7) ? 'text-black fill-amber-500' : 'text-gray-300'} transition-all`}
                       />
                     ))}
                     <span className="text-2xl font-bold text-secondary">4.7</span>
@@ -103,7 +103,7 @@ export default function ReviewsSketchPage() {
                       <span className="text-gray-600">{star}星</span>
                       <div className="w-24 bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-amber-500 h-2 rounded-full"
+                          className="bg-gray-500 h-2 rounded-full"
                           style={{ width: star === 5 ? '85%' : star === 4 ? '12%' : star === 3 ? '2%' : '1%' }}
                         />
                       </div>
@@ -127,7 +127,7 @@ export default function ReviewsSketchPage() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                            <User className="w-4 h-4 text-amber-600" />
+                            <User className="w-4 h-4 text-black" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-800">{review.nickname}</p>
@@ -145,9 +145,9 @@ export default function ReviewsSketchPage() {
                               key={i}
                               className={`w-4 h-4 ${
                                 i < Math.floor(review.rating)
-                                  ? 'text-amber-500 fill-amber-500'
+                                  ? 'text-black fill-amber-500'
                                   : i < review.rating
-                                  ? 'text-amber-500 fill-amber-500'
+                                  ? 'text-black fill-amber-500'
                                   : 'text-gray-300'
                               }`}
                               style={{
@@ -193,7 +193,7 @@ export default function ReviewsSketchPage() {
                     type="text"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                     placeholder="请输入您的昵称"
                     required
                   />
@@ -208,7 +208,7 @@ export default function ReviewsSketchPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                       placeholder="用于验证评价"
                       required
                     />
@@ -231,7 +231,7 @@ export default function ReviewsSketchPage() {
                         <Star
                           className={`w-8 h-8 transition-all ${
                             (hoverRating || rating) >= star
-                              ? 'text-amber-500 fill-amber-500'
+                              ? 'text-black fill-amber-500'
                               : 'text-gray-300'
                           }`}
                         />
@@ -249,7 +249,7 @@ export default function ReviewsSketchPage() {
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value.slice(0, 300))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black resize-none"
                   rows={4}
                   placeholder="分享您的使用体验（最多300字符）..."
                   maxLength={300}
@@ -257,10 +257,10 @@ export default function ReviewsSketchPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-4 mb-6 p-4 bg-amber-50 rounded-lg">
-                <Shield className="w-5 h-5 text-amber-600 flex-shrink-0" />
+              <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                <Shield className="w-5 h-5 text-black flex-shrink-0" />
                 <div className="text-sm text-gray-600">
-                  <p className="font-medium text-amber-700 mb-1">评价流程说明：</p>
+                  <p className="font-medium text-gray-800 mb-1">评价流程说明：</p>
                   <p>1. 提交评价后，系统将发送验证邮件到您的邮箱</p>
                   <p>2. 点击邮件中的链接完成验证</p>
                   <p>3. 系统将自动检查该邮箱是否有购买记录，有则显示"已验证购买者"标签</p>
@@ -269,7 +269,7 @@ export default function ReviewsSketchPage() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
               >
                 <Send className="w-5 h-5" />
                 提交评价

@@ -19,7 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={link.href}
                     href={link.href}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                      pathname === link.href ? 'bg-amber-600' : 'hover:bg-white/10'
+                      pathname === link.href ? 'bg-black' : 'hover:bg-white/10'
                     }`}
                   >
                     <link.icon className="w-5 h-5" />

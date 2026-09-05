@@ -7,14 +7,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#C59B6D',
-        'primary-dark': '#A68455',
-        secondary: '#2C3E50',
-        'secondary-dark': '#1A252F',
-        accent: '#E74C3C',
-        cream: '#FDF5E6',
-        ink: '#2C2C2C',
-        gold: '#D4AF37',
+        // 黑白灰极简工作室风
+        primary: '#000000',
+        'primary-dark': '#1A1A1A',
+        secondary: '#1A1A1A',
+        'secondary-dark': '#000000',
+        accent: '#B54A32',        // 唯一克制点缀:赭红
+        cream: '#FAFAFA',         // 浅底近白
+        ink: '#111111',
+        gold: '#111111',
       },
       fontFamily: {
         serif: ['Noto Serif SC', 'serif'],

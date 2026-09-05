@@ -177,9 +177,9 @@ export default function ProductReviews({ productId, productRating, productReview
                     <Star
                       className={`w-6 h-6 ${
                         i < Math.floor(computedRating)
-                          ? 'text-amber-500 fill-amber-500'
+                          ? 'text-black fill-amber-500'
                           : i < computedRating
-                          ? 'text-amber-500 fill-amber-500'
+                          ? 'text-black fill-amber-500'
                           : 'text-gray-300'
                       }`}
                       style={{
@@ -203,7 +203,7 @@ export default function ProductReviews({ productId, productRating, productReview
                   <span className="text-xs text-gray-500 w-8">{star}★</span>
                   <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-amber-500 rounded-full transition-all duration-500"
+                      className="h-full bg-gray-500 rounded-full transition-all duration-500"
                       style={{ width: `${ratingDist[5 - star]}%` }}
                     />
                   </div>
@@ -242,7 +242,7 @@ export default function ProductReviews({ productId, productRating, productReview
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-amber-600" />
+                      <User className="w-4 h-4 text-black" />
                     </div>
                     <div>
                       <p className="font-medium text-gray-800 text-sm">{review.nickname}</p>
@@ -261,9 +261,9 @@ export default function ProductReviews({ productId, productRating, productReview
                         key={i}
                         className={`w-4 h-4 ${
                           i < Math.floor(review.rating)
-                            ? 'text-amber-500 fill-amber-500'
+                            ? 'text-black fill-amber-500'
                             : i < review.rating
-                            ? 'text-amber-500 fill-amber-500'
+                            ? 'text-black fill-amber-500'
                             : 'text-gray-300'
                         }`}
                         style={{
@@ -342,14 +342,14 @@ export default function ProductReviews({ productId, productRating, productReview
                         onClick={() => setFormData({ ...formData, rating })}
                         className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-all ${
                           formData.rating === rating
-                            ? 'bg-amber-100 text-amber-700'
+                            ? 'bg-amber-100 text-gray-800'
                             : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                         }`}
                       >
                         <Star
                           className={`w-5 h-5 ${
                             formData.rating >= rating
-                              ? 'text-amber-500 fill-amber-500'
+                              ? 'text-black fill-amber-500'
                               : 'text-gray-300'
                           }`}
                         />

@@ -48,9 +48,8 @@ export default function Header() {
 
   const navLinks = [
     { name: { en: 'Home', zh: '首页' }, href: '/' },
-    { name: { en: 'Discover', zh: '探索' }, href: '/blog' },
-    { name: { en: 'Live', zh: '生活' }, href: '/shop' },
-    { name: { en: 'Hear', zh: '听' }, href: '/free-sounds' },
+    { name: { en: 'Works', zh: '作品' }, href: '/shop' },
+    { name: { en: 'Stories', zh: '故事' }, href: '/blog' },
     { name: { en: 'About', zh: '关于' }, href: '/about' },
   ];
 
@@ -59,12 +58,12 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-gold rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <span className="text-white font-serif text-xl font-bold">成</span>
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+              <span className="text-white font-serif text-xl font-bold">造</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-serif font-bold text-secondary">Chengdu Voice</span>
-              <span className="text-xs text-primary/80 font-serif hidden sm:block">成都之音</span>
+              <span className="text-lg font-serif font-bold text-secondary leading-tight">Chengdu Craft Studio</span>
+              <span className="text-xs text-primary/80 font-serif hidden sm:block">成都造物</span>
             </div>
           </Link>
 

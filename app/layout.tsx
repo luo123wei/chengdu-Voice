@@ -20,8 +20,8 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.wor
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Chengdu Voice | 成都之音 - Authentic Chengdu Culture & Products',
-    template: '%s | Chengdu Voice',
+    default: 'Chengdu Craft Studio | 成都造物 - Authentic Chengdu Culture & Products',
+    template: '%s | Chengdu Craft Studio',
   },
   description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
   keywords: [
@@ -31,30 +31,30 @@ export const metadata: Metadata = {
     'Hanyuan pepper', '汉源花椒', 'Mongding tea', '蒙顶茶',
     'authentic Chinese products', '正宗中国产品', 'traditional Sichuan', '传统四川'
   ],
-  authors: [{ name: 'Chengdu Voice', url: siteUrl }],
-  creator: 'Chengdu Voice',
-  publisher: 'Chengdu Voice',
+  authors: [{ name: 'Chengdu Craft Studio', url: siteUrl }],
+  creator: 'Chengdu Craft Studio',
+  publisher: 'Chengdu Craft Studio',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     url: siteUrl,
-    siteName: 'Chengdu Voice | 成都之音',
-    title: 'Chengdu Voice | Authentic Chengdu Culture & Products',
+    siteName: 'Chengdu Craft Studio | 成都造物',
+    title: 'Chengdu Craft Studio | Authentic Chengdu Culture & Products',
     description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Chengdu Voice - Authentic Chengdu Culture & Products',
+        alt: 'Chengdu Craft Studio - Authentic Chengdu Culture & Products',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chengdu Voice | Authentic Chengdu Culture & Products',
+    title: 'Chengdu Craft Studio | Authentic Chengdu Culture & Products',
     description: 'Experience authentic Chengdu through sound, taste, and stories.',
     images: ['/og-image.jpg'],
   },
@@ -75,6 +75,7 @@ export const metadata: Metadata = {
   other: {
     'charset': 'UTF-8',
     'baidu-site-verification': 'your-baidu-verification-code',
+    'msvalidate.01': '817C21E6CCB0018DC7884C88EBCAC36C',
   },
 }
 

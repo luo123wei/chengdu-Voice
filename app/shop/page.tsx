@@ -1,22 +1,49 @@
 'use client';
-import { useState } from 'react';
-import { Search, Filter, Star, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
+import { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProductCard from '@/components/ProductCard';
 import { productCategoryLabels } from '@/data/mockData';
 import { useProducts } from '@/hooks/useDataStore';
+import type { Product } from '@/data/mockData';
 
 const ITEMS_PER_PAGE = 12;
 
-export default function ShopPage() {
+type StatusKey = 'design' | 'preorder' | 'on-sale';
+
+const statusTabs: { key: StatusKey; zh: string; en: string }[] = [
+  { key: 'design', zh: '投票中 · 设计中', en: 'Voting' },
+  { key: 'preorder', zh: '预售', en: 'Pre-order' },
+  { key: 'on-sale', zh: '在售', en: 'In Stock' },
+];
+
+const categories = ['stationery', 'home', 'decor', 'toy'] as const;
+
+function ShopPageInner() {
   const { products } = useProducts();
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get('tab') as StatusKey) || 'on-sale';
+
+  const [activeStatus, setActiveStatus] = useState<StatusKey>(
+    statusTabs.some(t => t.key === initialTab) ? initialTab : 'on-sale'
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'rating' | 'name'>('name');
   const [currentPage, setCurrentPage] = useState(1);
 
+  const statusOf = (p: Product) => p.status || 'on-sale';
+
+  const counts = {
+    design: products.filter(p => statusOf(p) === 'design').length,
+    preorder: products.filter(p => statusOf(p) === 'preorder').length,
+    'on-sale': products.filter(p => statusOf(p) === 'on-sale').length,
+  };
+
   const filteredProducts = products
+    .filter(p => statusOf(p) === activeStatus)
     .filter((product) => {
       const matchesSearch =
         product.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -38,12 +65,9 @@ export default function ShopPage() {
       }
     });
 
-  const categories = ['tea', 'spice', 'craft', 'snack'] as const;
-
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -52,90 +76,101 @@ export default function ShopPage() {
     }
   };
 
-  const resetPagination = () => {
-    setCurrentPage(1);
-  };
+  const resetPagination = () => setCurrentPage(1);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <section className="pt-24 pb-12 bg-gradient-to-br from-secondary to-gray-800">
+      {/* 页头 */}
+      <section className="pt-28 pb-8 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-4">Live</h1>
-            <p className="text-gray-300 max-w-2xl mx-auto">
-              Discover authentic Chinese treasures and traditional products
-            </p>
-          </div>
+          <h1 className="font-serif text-4xl font-bold mb-2">
+            Works <span className="text-xl text-gray-400 font-normal">作品</span>
+          </h1>
+          <p className="text-gray-500 text-[15px]">投票中的概念 · 预售中的新作 · 已投产的在售款</p>
         </div>
       </section>
 
-      <section className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-6 mb-8">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  resetPagination();
-                }}
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-            </div>
+      {/* 状态 Tabs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex border-b border-gray-200 overflow-x-auto">
+          {statusTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => { setActiveStatus(tab.key); resetPagination(); }}
+              className={`px-6 py-4 text-sm border-b-2 -mb-px flex items-center gap-2 whitespace-nowrap transition-colors ${
+                activeStatus === tab.key
+                  ? 'border-black text-black font-semibold'
+                  : 'border-transparent text-gray-400 hover:text-black'
+              }`}
+            >
+              {tab.zh}
+              <span className={`text-[11px] px-2 py-0.5 rounded-full border ${
+                activeStatus === tab.key
+                  ? 'bg-black text-white border-black'
+                  : 'bg-cream text-gray-500 border-gray-200'
+              }`}>
+                {counts[tab.key]}
+              </span>
+            </button>
+          ))}
+        </div>
 
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => {
-                  setSelectedCategory(null);
-                  resetPagination();
-                }}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  !selectedCategory
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                All
-              </button>
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    resetPagination();
-                  }}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    selectedCategory === category
-                      ? 'bg-primary text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {productCategoryLabels[category].en}
-                </button>
-              ))}
-            </div>
+        {/* 搜索 + 分类 */}
+        <div className="flex flex-col lg:flex-row gap-4 py-5">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search products... 搜索作品"
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); resetPagination(); }}
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm"
+            />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-            <span className="text-gray-600">
-              Showing {filteredProducts.length} products
+          <div className="flex flex-wrap gap-2.5">
+            <button
+              onClick={() => { setSelectedCategory(null); resetPagination(); }}
+              className={`px-4 py-2 rounded-lg text-sm border transition-all ${
+                !selectedCategory
+                  ? 'border-black bg-black text-white'
+                  : 'border-gray-200 text-gray-500 hover:border-black hover:text-black'
+              }`}
+            >
+              All
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => { setSelectedCategory(category); resetPagination(); }}
+                className={`px-4 py-2 rounded-lg text-sm border transition-all ${
+                  selectedCategory === category
+                    ? 'border-black bg-black text-white'
+                    : 'border-gray-200 text-gray-500 hover:border-black hover:text-black'
+                }`}
+              >
+                {productCategoryLabels[category].en} {productCategoryLabels[category].zh}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 产品网格 */}
+      <section className="pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-6">
+            <span className="text-sm text-gray-500">
+              Showing {filteredProducts.length} products · 共 {filteredProducts.length} 件
             </span>
-            
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-600 text-sm">Sort by:</span>
+              <span className="text-gray-500 text-sm">Sort by:</span>
               <select
                 value={sortBy}
-                onChange={(e) => {
-                  setSortBy(e.target.value as typeof sortBy);
-                  resetPagination();
-                }}
-                className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                onChange={(e) => { setSortBy(e.target.value as typeof sortBy); resetPagination(); }}
+                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-black"
               >
                 <option value="name">Name</option>
                 <option value="price-asc">Price: Low to High</option>
@@ -147,59 +182,13 @@ export default function ShopPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {paginatedProducts.map((product) => (
-              <Link
-                key={product.id}
-                href={`/shop/${product.id}`}
-                className="group bg-cream rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300"
-              >
-                <div className="relative overflow-hidden h-48">
-                  <img
-                    src={product.images[0]}
-                    alt={product.nameEn}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {product.originalPrice && (
-                    <span className="absolute top-3 left-3 px-2 py-1 bg-accent text-white text-xs rounded-lg">
-                      Sale
-                    </span>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-secondary mb-1 group-hover:text-primary transition-colors line-clamp-1">
-                    {product.nameEn}
-                  </h3>
-                  <p className="text-xs text-gray-500 mb-2">{product.name}</p>
-                  <div className="flex items-center space-x-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-gold fill-gold' : 'text-gray-300'}`}
-                      />
-                    ))}
-                    <span className="text-xs text-gray-500 ml-1">({product.reviews})</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg font-bold text-primary">${product.price}</span>
-                      {product.unit && product.unitType && (
-                        <span className="text-sm text-gray-500">/ {product.unit}{product.unitType}</span>
-                      )}
-                      {product.originalPrice && (
-                        <span className="text-sm text-gray-400 line-through">${product.originalPrice}</span>
-                      )}
-                    </div>
-                    <button className="p-2 bg-primary/10 rounded-lg hover:bg-primary hover:text-white transition-colors">
-                      <ShoppingCart className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </Link>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
           {filteredProducts.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-gray-500">No products found matching your criteria.</p>
+            <div className="text-center py-20">
+              <p className="text-gray-400 text-sm">该分区暂无作品。No products in this section yet.</p>
             </div>
           )}
 
@@ -209,7 +198,7 @@ export default function ShopPage() {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>上一页</span>
@@ -219,9 +208,9 @@ export default function ShopPage() {
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm transition-colors ${
                       currentPage === page
-                        ? 'bg-primary text-white'
+                        ? 'bg-black text-white'
                         : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
                     }`}
                   >
@@ -232,7 +221,7 @@ export default function ShopPage() {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>下一页</span>
                   <ChevronRight className="w-4 h-4" />
@@ -240,16 +229,18 @@ export default function ShopPage() {
               </div>
             </div>
           )}
-
-          {filteredProducts.length > 0 && totalPages > 1 && (
-            <div className="text-center mt-4 text-sm text-gray-500">
-              显示 {startIndex + 1} - {Math.min(endIndex, filteredProducts.length)} 条，共 {filteredProducts.length} 条
-            </div>
-          )}
         </div>
       </section>
 
       <Footer />
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <ShopPageInner />
+    </Suspense>
   );
 }

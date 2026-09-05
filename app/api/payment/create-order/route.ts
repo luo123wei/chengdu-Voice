@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         purchase_units: [
           {
             reference_id: orderNumber,
-            description: `Chengdu Voice Order ${orderNumber}`,
+            description: `Chengdu Craft Studio Order ${orderNumber}`,
             items: paypalItems,
             amount: {
               currency_code: 'USD',
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
           },
         ],
         application_context: {
-          brand_name: 'Chengdu Voice',
+          brand_name: 'Chengdu Craft Studio',
           locale: 'en-US',
           shipping_preference: 'SET_PROVIDED_ADDRESS',
           user_action: 'PAY_NOW',

@@ -9,12 +9,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!blog) {
     return {
-      title: 'Blog Not Found | Chengdu Voice',
+      title: 'Blog Not Found | Chengdu Craft Studio',
     }
   }
 
   return {
-    title: `${blog.titleEn} | Chengdu Voice`,
+    title: `${blog.titleEn} | Chengdu Craft Studio`,
     description: blog.contentEn?.replace(/<[^>]*>/g, '').slice(0, 160) || blog.titleEn,
     keywords: [blog.category, 'Chengdu', '成都', 'culture', 'story'],
     alternates: {
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       type: 'article',
       publishedTime: blog.publishDate,
       images: blog.images?.[0] ? [{ url: blog.images[0] }] : [{ url: '/og-image.jpg' }],
-      siteName: 'Chengdu Voice',
+      siteName: 'Chengdu Craft Studio',
     },
     twitter: {
       card: 'summary_large_image',

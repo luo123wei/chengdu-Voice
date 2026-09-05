@@ -6,7 +6,9 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductReviews from '@/components/ProductReviews';
+import { VoteButton, PreorderBlock } from '@/components/IntentButtons';
 import { productCategoryLabels } from '@/data/mockData';
+import { statusBadge } from '@/lib/productStatus';
 import { useProducts } from '@/hooks/useDataStore';
 
 function formatRichText(text: string): string {
@@ -132,10 +134,7 @@ export default function ProductDetailPage() {
                   Origin
                 </h4>
                 <p className="text-gray-600 text-sm">
-                  {product.category === 'spice'
-                    ? 'Hanyuan, Sichuan Province, China'
-                    : 'Chengdu, Sichuan Province, China'
-                  }
+                  Chengdu, Sichuan Province, China
                 </p>
               </div>
 
@@ -154,98 +153,136 @@ export default function ProductDetailPage() {
             </div>
 
             <div>
-              <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm rounded-full mb-4">
-                {productCategoryLabels[product.category].en}
-              </span>
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
+                <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                  {productCategoryLabels[product.category as keyof typeof productCategoryLabels]?.en || product.category}
+                </span>
+                {product.status && product.status !== 'on-sale' && (
+                  <span className={`inline-block px-3 py-1 text-sm rounded-full ${statusBadge(product).cls}`}>
+                    {statusBadge(product).label}
+                  </span>
+                )}
+              </div>
 
               <h1 className="text-3xl sm:text-4xl font-bold text-secondary mb-2">
                 {product.nameEn}
               </h1>
               <p className="text-lg text-gray-500 mb-4">{product.name}</p>
 
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="flex items-center space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-gold fill-gold' : 'text-gray-300'}`}
-                    />
-                  ))}
-                </div>
-                <span className="text-gray-600">{product.rating}</span>
-                <span className="text-gray-400">|</span>
-                <span className="text-gray-600">{product.reviews} reviews</span>
-              </div>
-
-              <div className="flex items-center space-x-3 mb-6">
-                <span className="text-3xl font-bold text-primary">${product.price}</span>
-                {product.unit && product.unitType && (
-                  <span className="text-lg text-gray-500">/ {product.unit}{product.unitType}</span>
-                )}
-                {product.originalPrice && (
-                  <span className="text-lg text-gray-400 line-through">${product.originalPrice}</span>
-                )}
-              </div>
-
-              <div className="bg-cream/50 rounded-xl p-6 mb-6">
-                <p className="text-gray-700 font-medium italic text-lg">
-                  Bring the authentic flavor of Chengdu home.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-6 mb-8">
-                <div>
-                  <span className="text-gray-600 mb-2 block">Quantity</span>
-                  <div className="flex items-center border border-gray-200 rounded-lg">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-3 hover:bg-gray-100 transition-colors"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="px-6 py-3 font-medium">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                      className="p-3 hover:bg-gray-100 transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+              {product.reviews > 0 && (
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="flex items-center space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-gold fill-gold' : 'text-gray-300'}`}
+                      />
+                    ))}
                   </div>
+                  <span className="text-gray-600">{product.rating}</span>
+                  <span className="text-gray-400">|</span>
+                  <span className="text-gray-600">{product.reviews} reviews</span>
                 </div>
-                <div>
-                  <span className="text-gray-600 mb-2 block">Stock</span>
-                  <span className={`font-medium ${product.stock > 10 ? 'text-green-600' : 'text-accent'}`}>
-                    {product.stock} in stock
-                  </span>
-                </div>
-              </div>
+              )}
 
-              <button
-                onClick={handleAddToCart}
-                disabled={isAdding}
-                className={`w-full py-4 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-3 ${
-                  addedSuccess
-                    ? 'bg-green-600 text-white'
-                    : 'bg-primary text-white hover:bg-primary-dark'
-                } disabled:opacity-70`}
-              >
-                {addedSuccess ? (
-                  <>
-                    <Check className="w-6 h-6" />
-                    Added to Cart!
-                  </>
-                ) : isAdding ? (
-                  <>
-                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-6 h-6" />
-                    Add to Cart - ${(product.price * quantity).toFixed(2)}
-                  </>
-                )}
-              </button>
+              {product.story && product.status === 'design' && (
+                <div className="border-l-2 border-gray-200 pl-4 mb-6">
+                  <p className="text-gray-600 text-sm leading-relaxed italic">{product.story}</p>
+                </div>
+              )}
+
+              {/* ===== 投票中:无价格无加购,投票决定生产 ===== */}
+              {product.status === 'design' && (
+                <div className="mb-6">
+                  <VoteButton productId={product.id} initialVotes={product.votesCount || 0} size="detail" />
+                </div>
+              )}
+
+              {/* ===== 预售:价格 + 预订意向 ===== */}
+              {product.status === 'preorder' && (
+                <div className="mb-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <span className="text-3xl font-bold text-primary">${product.price}</span>
+                    <span className="text-sm text-gray-400">预售价格 · Pre-order price</span>
+                  </div>
+                  <PreorderBlock product={product} />
+                </div>
+              )}
+
+              {/* ===== 在售:常规购买流程 ===== */}
+              {(!product.status || product.status === 'on-sale') && (
+                <>
+                  <div className="flex items-center space-x-3 mb-6">
+                    <span className="text-3xl font-bold text-primary">${product.price}</span>
+                    {product.unit && product.unitType && (
+                      <span className="text-lg text-gray-500">/ {product.unit}{product.unitType}</span>
+                    )}
+                    {product.originalPrice && (
+                      <span className="text-lg text-gray-400 line-through">${product.originalPrice}</span>
+                    )}
+                  </div>
+
+                  <div className="bg-cream/50 rounded-xl p-6 mb-6">
+                    <p className="text-gray-700 font-medium italic text-lg">
+                      Bring a piece of Chengdu craft home.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-6 mb-8">
+                    <div>
+                      <span className="text-gray-600 mb-2 block">Quantity</span>
+                      <div className="flex items-center border border-gray-200 rounded-lg">
+                        <button
+                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          className="p-3 hover:bg-gray-100 transition-colors"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="px-6 py-3 font-medium">{quantity}</span>
+                        <button
+                          onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                          className="p-3 hover:bg-gray-100 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-600 mb-2 block">Stock</span>
+                      <span className={`font-medium ${product.stock > 10 ? 'text-green-600' : 'text-accent'}`}>
+                        {product.stock} in stock
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={isAdding}
+                    className={`w-full py-4 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-3 ${
+                      addedSuccess
+                        ? 'bg-green-600 text-white'
+                        : 'bg-primary text-white hover:bg-primary-dark'
+                    } disabled:opacity-70`}
+                  >
+                    {addedSuccess ? (
+                      <>
+                        <Check className="w-6 h-6" />
+                        Added to Cart!
+                      </>
+                    ) : isAdding ? (
+                      <>
+                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-6 h-6" />
+                        Add to Cart - ${(product.price * quantity).toFixed(2)}
+                      </>
+                    )}
+                  </button>
+                </>
+              )}
 
               <div className="grid grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-200">
                 <div className="text-center">
@@ -327,10 +364,7 @@ export default function ProductDetailPage() {
                       />
                     ) : (
                       <p className="text-gray-600 leading-relaxed text-lg">
-                        {product.category === 'spice' 
-                          ? 'From the mountains of Hanyuan, Sichuan pepper has been cultivated for generations. This unique spice carries the essence of Sichuan\'s mountainous terrain and rich culinary heritage. Hanyuan, known as the "home of Sichuan pepper," has ideal climate and soil conditions for growing this precious spice.'
-                          : product.descriptionEn
-                        }
+                        {product.descriptionEn}
                       </p>
                     )}
                   </div>
@@ -346,10 +380,7 @@ export default function ProductDetailPage() {
                       />
                     ) : (
                       <p className="text-gray-600 leading-relaxed text-lg">
-                        {product.category === 'spice'
-                          ? 'Sichuan pepper is not only a spice. It is part of Chengdu\'s identity. The unique numbing sensation (ma la) is more than just taste - it represents home for people in Sichuan. In traditional Chinese medicine, Sichuan pepper is also valued for its warming properties.'
-                          : 'This product embodies the rich cultural traditions of Chengdu, connecting you to centuries of Chinese heritage. Every piece tells a story of craftsmanship and dedication passed down through generations.'
-                        }
+                        This piece is designed in Chengdu and carries the city&apos;s everyday warmth — the slow mornings, the tea houses, the lightness of a panda&apos;s afternoon. It is made in small batches by local makers, and every one is checked by hand before it reaches you.
                       </p>
                     )}
                   </div>
@@ -365,10 +396,7 @@ export default function ProductDetailPage() {
                       />
                     ) : (
                       <p className="text-gray-600 leading-relaxed text-lg">
-                        {product.category === 'spice'
-                          ? 'Toast Sichuan pepper lightly before grinding for maximum aroma. Use in stir-fries, soups, and marinades. Pair with chili for the classic Sichuan "ma la" numbing-spicy flavor. For best results, grind just before use to preserve its unique fragrance.'
-                          : 'Enjoy this authentic product as part of your daily routine or special occasions. Follow traditional preparation methods for the best experience. Each piece is hand-selected to ensure the highest quality.'
-                        }
+                        Use it every day — that&apos;s what it is made for. Keep it on your desk, carry it in your bag, or give it to someone who misses Chengdu. Small marks and imperfections from hand-making are part of the piece, and part of the city it comes from.
                       </p>
                     )}
                   </div>

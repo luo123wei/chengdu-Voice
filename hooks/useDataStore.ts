@@ -185,16 +185,16 @@ export function useOrders() {
 
 export function useSettings() {
   const [settings, setSettings] = useState({
-    siteName: 'Chengdu Voice | 成都之音',
-    siteDescription: '闭上眼，听成都',
+    siteName: 'Chengdu Craft Studio | 成都造物',
+    siteDescription: '把成都的日常,做成你桌上的日常',
     downloadLink: process.env.NEXT_PUBLIC_DOWNLOAD_LINK || 'https://cdn.example.com/download.zip',
-    mailFrom: 'Chengdu Voice <kylw02@outlook.com>',
+    mailFrom: 'Chengdu Craft Studio <kylw02@outlook.com>',
     appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
     gaMeasurementId: '',
     bannerImage: 'https://picsum.photos/id/1015/1920/1080',
-    orderEmailSubjectEn: "We've Received Your Order - Chengdu Voice",
+    orderEmailSubjectEn: "We've Received Your Order - Chengdu Craft Studio",
     orderEmailBodyEn: 'Dear {customerName},\n\nThank you for your order! We have received your order #{orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.\n\nPayment is still pending. We support PayPal, Payoneer and international wire transfer.\n\nIf you have any questions, please contact us at kylw02@outlook.com.',
-    orderEmailSubjectZh: '我们已收到您的订单 - 成都之音',
+    orderEmailSubjectZh: '我们已收到您的订单 - 成都造物',
     orderEmailBodyZh: '尊敬的 {customerName}，\n\n感谢您的订单！我们已收到您的订单 #{orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。\n\n付款尚未完成。我们支持 PayPal、Payoneer 和国际电汇。\n\n如有任何问题，请联系我们：kylw02@outlook.com。',
     aboutContent: '<h2>Experience Chengdu</h2><p>Through Sound &amp; Flavor</p>',
   });

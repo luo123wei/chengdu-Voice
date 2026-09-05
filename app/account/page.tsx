@@ -162,7 +162,7 @@ export default function AccountPage() {
       case 'pending':
         return 'bg-yellow-100 text-yellow-700';
       case 'paid':
-        return 'bg-amber-100 text-amber-700';
+        return 'bg-amber-100 text-gray-800';
       case 'shipped':
         return 'bg-blue-100 text-blue-700';
       case 'delivered':
@@ -401,9 +401,9 @@ export default function AccountPage() {
                         </div>
 
                         {order.status === 'delivered' && order.items.length > 0 && (
-                          <div className="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                            <p className="text-xs text-amber-700 font-medium mb-2 flex items-center gap-1">
-                              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                          <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-amber-200">
+                            <p className="text-xs text-gray-800 font-medium mb-2 flex items-center gap-1">
+                              <Star className="w-3.5 h-3.5 fill-amber-500 text-black" />
                               感谢您的购买！请为商品写一条评价吧~
                             </p>
                             <div className="space-y-1.5">
@@ -416,7 +416,7 @@ export default function AccountPage() {
                                   <span className="text-sm text-gray-700 truncate max-w-[200px]">
                                     {item.nameEn || item.name || item.productId}
                                   </span>
-                                  <span className="flex items-center gap-1 text-xs text-amber-600 font-medium whitespace-nowrap">
+                                  <span className="flex items-center gap-1 text-xs text-black font-medium whitespace-nowrap">
                                     <MessageSquarePlus className="w-3.5 h-3.5" />
                                     去评价
                                   </span>

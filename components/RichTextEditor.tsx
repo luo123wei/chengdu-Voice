@@ -157,7 +157,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
               onClick={btn.onClick}
               title={btn.title}
               className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-                btn.isActive ? 'bg-amber-100 text-amber-700' : 'text-gray-600'
+                btn.isActive ? 'bg-amber-100 text-gray-800' : 'text-gray-600'
               }`}
             >
               {btn.icon}

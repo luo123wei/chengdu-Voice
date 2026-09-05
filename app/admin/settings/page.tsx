@@ -111,7 +111,7 @@ export default function AdminSettings() {
   if (settingsLoading || ratesLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -128,7 +128,7 @@ export default function AdminSettings() {
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Globe className="w-6 h-6 text-amber-600" />
+            <Globe className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">网站基本信息</h2>
           </div>
 
@@ -139,7 +139,7 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.siteName}
                 onChange={(e) => setLocalSettings({ ...localSettings, siteName: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="网站名称"
               />
             </div>
@@ -150,7 +150,7 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.siteDescription}
                 onChange={(e) => setLocalSettings({ ...localSettings, siteDescription: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="网站描述"
               />
             </div>
@@ -161,7 +161,7 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.appUrl}
                 onChange={(e) => setLocalSettings({ ...localSettings, appUrl: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="https://your-domain.com"
               />
               <p className="text-xs text-gray-400 mt-1">用于生成邮件中的链接</p>
@@ -171,7 +171,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Image className="w-6 h-6 text-amber-600" />
+            <Image className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">首页 Banner 图片</h2>
           </div>
 
@@ -183,13 +183,13 @@ export default function AdminSettings() {
                   type="text"
                   value={localSettings.bannerImage}
                   onChange={(e) => setLocalSettings({ ...localSettings, bannerImage: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                   placeholder="https://your-image-url.com/banner.jpg"
                 />
               </div>
             </div>
 
-            <div className="relative rounded-lg overflow-hidden border-2 border-dashed border-gray-300 hover:border-amber-500 transition-colors">
+            <div className="relative rounded-lg overflow-hidden border-2 border-dashed border-gray-300 hover:border-black transition-colors">
               <div className="flex flex-col items-center justify-center py-8">
                 {localSettings.bannerImage && (
                   <div className="relative w-full max-w-md mb-4">
@@ -238,7 +238,7 @@ export default function AdminSettings() {
               />
             </div>
 
-            <div className="p-4 bg-amber-50 rounded-lg">
+            <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-amber-800">
                 <strong>提示：</strong>您可以直接输入图片 URL，或点击上方区域上传图片。上传的图片将自动保存到服务器。
               </p>
@@ -248,7 +248,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Download className="w-6 h-6 text-amber-600" />
+            <Download className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">下载链接配置</h2>
           </div>
 
@@ -259,13 +259,13 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.downloadLink}
                 onChange={(e) => setLocalSettings({ ...localSettings, downloadLink: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="https://cdn.your-domain.com/chengdu-sound-map.zip"
               />
               <p className="text-xs text-gray-400 mt-1">用户订阅后收到的下载链接</p>
             </div>
 
-            <div className="p-4 bg-amber-50 rounded-lg">
+            <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-amber-800">
                 <strong>提示：</strong>您可以使用国内云存储（如阿里云 OSS、腾讯云 COS）存储文件。
                 部署到国外服务器时，用户仍然可以正常访问国内链接下载文件。
@@ -276,7 +276,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Mail className="w-6 h-6 text-amber-600" />
+            <Mail className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">邮件配置</h2>
           </div>
 
@@ -287,8 +287,8 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.mailFrom}
                 onChange={(e) => setLocalSettings({ ...localSettings, mailFrom: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
-                placeholder="Chengdu Voice <kylw02@outlook.com>"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="Chengdu Craft Studio <kylw02@outlook.com>"
               />
             </div>
 
@@ -312,7 +312,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Globe className="w-6 h-6 text-amber-600" />
+            <Globe className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">Google Analytics</h2>
           </div>
 
@@ -323,7 +323,7 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.gaMeasurementId}
                 onChange={(e) => setLocalSettings({ ...localSettings, gaMeasurementId: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="G-XXXXXXXXXX"
               />
               <p className="text-xs text-gray-400 mt-1">格式：G-XXXXXXXXXX，如 G-1234567890</p>
@@ -358,7 +358,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Truck className="w-6 h-6 text-amber-600" />
+            <Truck className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">邮费配置</h2>
           </div>
 
@@ -382,7 +382,7 @@ export default function AdminSettings() {
                           type="text"
                           value={rate.country}
                           onChange={(e) => updateShippingRate(index, 'country', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 text-sm"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black text-sm"
                           placeholder="Country Name"
                         />
                       </td>
@@ -392,7 +392,7 @@ export default function AdminSettings() {
                           step="0.01"
                           value={rate.standard}
                           onChange={(e) => updateShippingRate(index, 'standard', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 text-sm text-right"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black text-sm text-right"
                         />
                       </td>
                       <td className="py-3 px-4">
@@ -401,7 +401,7 @@ export default function AdminSettings() {
                           step="0.01"
                           value={rate.express}
                           onChange={(e) => updateShippingRate(index, 'express', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 text-sm text-right"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black text-sm text-right"
                         />
                       </td>
                       <td className="py-3 px-4">
@@ -410,7 +410,7 @@ export default function AdminSettings() {
                           step="0.01"
                           value={rate.freeThreshold}
                           onChange={(e) => updateShippingRate(index, 'freeThreshold', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 text-sm text-right"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black text-sm text-right"
                         />
                       </td>
                       <td className="py-3 px-4">
@@ -430,17 +430,17 @@ export default function AdminSettings() {
 
             <button
               onClick={addShippingRate}
-              className="flex items-center px-4 py-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+              className="flex items-center px-4 py-2 text-black hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
               添加国家/地区
             </button>
 
-            <div className="p-4 bg-amber-50 rounded-lg">
+            <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-amber-800">
                 <strong>邮费规则：</strong>
               </p>
-              <ul className="mt-2 text-xs text-amber-700 space-y-1">
+              <ul className="mt-2 text-xs text-gray-800 space-y-1">
                 <li>• 虚拟产品（如白噪音专辑）不产生邮费</li>
                 <li>• 实体产品根据目的地国家计算邮费</li>
                 <li>• 当订单金额达到免运费门槛时，自动免邮</li>
@@ -452,7 +452,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <FileText className="w-6 h-6 text-amber-600" />
+            <FileText className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">文件上传</h2>
           </div>
 
@@ -482,7 +482,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
           <div className="flex items-center space-x-3 mb-6">
-            <Info className="w-6 h-6 text-amber-600" />
+            <Info className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">About 页面内容</h2>
           </div>
 
@@ -503,7 +503,7 @@ export default function AdminSettings() {
 
         <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
           <div className="flex items-center space-x-3 mb-6">
-            <MessageSquare className="w-6 h-6 text-amber-600" />
+            <MessageSquare className="w-6 h-6 text-black" />
             <h2 className="text-xl font-bold text-gray-800">订单确认邮件模板</h2>
           </div>
 
@@ -514,7 +514,7 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.orderEmailSubjectEn}
                 onChange={(e) => setLocalSettings({ ...localSettings, orderEmailSubjectEn: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="Your Order Has Been Confirmed"
               />
             </div>
@@ -524,7 +524,7 @@ export default function AdminSettings() {
                 type="text"
                 value={localSettings.orderEmailSubjectZh}
                 onChange={(e) => setLocalSettings({ ...localSettings, orderEmailSubjectZh: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="您的订单已确认"
               />
             </div>
@@ -533,15 +533,15 @@ export default function AdminSettings() {
               <textarea
                 value={localSettings.orderEmailBodyEn}
                 onChange={(e) => setLocalSettings({ ...localSettings, orderEmailBodyEn: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 rows={6}
                 placeholder="Dear {customerName},..."
               />
               <div className="mt-2 flex flex-wrap gap-2">
-                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                <span className="text-xs bg-amber-100 text-gray-800 px-2 py-1 rounded">
                   {'{customerName}'} - 客户姓名
                 </span>
-                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                <span className="text-xs bg-amber-100 text-gray-800 px-2 py-1 rounded">
                   {'{orderNumber}'} - 订单号
                 </span>
               </div>
@@ -551,26 +551,26 @@ export default function AdminSettings() {
               <textarea
                 value={localSettings.orderEmailBodyZh}
                 onChange={(e) => setLocalSettings({ ...localSettings, orderEmailBodyZh: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 rows={6}
                 placeholder="尊敬的 {customerName}，..."
               />
               <div className="mt-2 flex flex-wrap gap-2">
-                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                <span className="text-xs bg-amber-100 text-gray-800 px-2 py-1 rounded">
                   {'{customerName}'} - 客户姓名
                 </span>
-                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                <span className="text-xs bg-amber-100 text-gray-800 px-2 py-1 rounded">
                   {'{orderNumber}'} - 订单号
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-amber-50 rounded-lg">
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-amber-800">
               <strong>使用说明：</strong>在邮件内容中可以使用以下变量，系统会自动替换为实际值：
             </p>
-            <ul className="mt-2 text-xs text-amber-700 space-y-1">
+            <ul className="mt-2 text-xs text-gray-800 space-y-1">
               <li>• <code>{'{customerName}'}</code> - 客户姓名</li>
               <li>• <code>{'{orderNumber}'}</code> - 订单号</li>
               <li>• <code>{'{total}'}</code> - 订单总额</li>
@@ -582,7 +582,7 @@ export default function AdminSettings() {
 
       <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
         <div className="flex items-center mb-6">
-          <Lock className="w-6 h-6 text-amber-600 mr-3" />
+          <Lock className="w-6 h-6 text-black mr-3" />
           <h2 className="text-xl font-bold text-gray-800">修改密码</h2>
         </div>
 
@@ -595,7 +595,7 @@ export default function AdminSettings() {
                 type={showCurrentPassword ? 'text' : 'password'}
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="输入当前密码"
               />
               <button
@@ -615,7 +615,7 @@ export default function AdminSettings() {
                 type={showNewPassword ? 'text' : 'password'}
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="输入新密码（至少6位）"
               />
               <button
@@ -635,7 +635,7 @@ export default function AdminSettings() {
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="再次输入新密码"
               />
               <button
@@ -689,7 +689,7 @@ export default function AdminSettings() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className={`flex items-center px-8 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`flex items-center px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
             saved ? 'bg-green-600 hover:bg-green-700' : ''
           }`}
         >

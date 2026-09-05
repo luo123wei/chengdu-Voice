@@ -43,12 +43,12 @@ export async function sendVerificationEmail(email: string, code: string) {
 
   return sendEmail({
     to: email,
-    subject: 'Your Login Verification Code - Chengdu Voice',
+    subject: 'Your Login Verification Code - Chengdu Craft Studio',
     text: `Your verification code is: ${code}\n\nThis code expires in 10 minutes.\n\nVisit ${appUrl} to complete your login.`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 24px; border-radius: 12px; text-align: center;">
-          <h2 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h2>
+          <h2 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h2>
         </div>
         <div style="padding: 24px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <p style="color: #4a5568; margin: 0 0 16px;">Hello,</p>
@@ -58,7 +58,7 @@ export async function sendVerificationEmail(email: string, code: string) {
           </div>
           <p style="color: #4a5568; margin: 0 0 8px;">This code expires in 10 minutes.</p>
           <p style="color: #4a5568; margin: 0;">Visit <a href="${appUrl}" style="color: #8B4513;">${appUrl}</a> to complete your login.</p>
-          <p style="color: #718096; font-size: 12px; margin: 24px 0 0; text-align: center;">Chengdu Voice | 成都之音</p>
+          <p style="color: #718096; font-size: 12px; margin: 24px 0 0; text-align: center;">Chengdu Craft Studio | 成都造物</p>
         </div>
       </div>
     `,
@@ -89,7 +89,7 @@ export async function sendOrderConfirmationEmail(
     </tr>
   `).join('');
 
-  const defaultSubjectEn = "We've Received Your Order - Chengdu Voice";
+  const defaultSubjectEn = "We've Received Your Order - Chengdu Craft Studio";
   const defaultBodyEn = `Dear ${customerName},
 
 Thank you for your order! We have received your order #${orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.
@@ -105,9 +105,9 @@ ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item
 If you have any questions, please contact us at kylw02@outlook.com.
 
 Best regards,
-The Chengdu Voice Team`;
+The Chengdu Craft Studio Team`;
 
-  const defaultSubjectZh = '我们已收到您的订单 - 成都之音';
+  const defaultSubjectZh = '我们已收到您的订单 - 成都造物';
   const defaultBodyZh = `尊敬的 ${customerName}，
 
 感谢您的订单！我们已收到您的订单 #${orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。
@@ -123,7 +123,7 @@ ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.q
 如有任何问题，请联系我们：kylw02@outlook.com。
 
 此致，
-成都之音团队`;
+成都造物团队`;
 
   const subjectEn = emailContent?.subjectEn || defaultSubjectEn;
   const subjectZh = emailContent?.subjectZh || defaultSubjectZh;
@@ -136,7 +136,7 @@ ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.q
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
           <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Experience the authentic voice of Chengdu</p>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
@@ -174,7 +174,7 @@ ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.q
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             此邮件由系统自动发送，请勿直接回复。<br>
             This email is automatically generated, please do not reply directly.<br>
-            Chengdu Voice - 成都之音
+            Chengdu Craft Studio - 成都造物
           </p>
         </div>
       </div>
@@ -190,11 +190,11 @@ export async function sendPaymentReceivedEmail(
 ) {
   return sendEmail({
     to: email,
-    subject: 'Payment Received - Your Order is Being Processed | 付款已收到 - 成都之音',
+    subject: 'Payment Received - Your Order is Being Processed | 付款已收到 - 成都造物',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
           <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Payment Received / 付款已收到</p>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
@@ -217,7 +217,7 @@ export async function sendPaymentReceivedEmail(
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             此邮件由系统自动发送，请勿直接回复。<br>
             如有问题请联系：kylw02@outlook.com<br>
-            Chengdu Voice - 成都之音
+            Chengdu Craft Studio - 成都造物
           </p>
         </div>
       </div>
@@ -251,11 +251,11 @@ export async function sendCustomEmailToBuyer(
 
   return sendEmail({
     to: email,
-    subject: `${subject} | 成都之音 - 订单 ${orderNumber}`,
+    subject: `${subject} | 成都造物 - 订单 ${orderNumber}`,
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
           <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Customer Service Message / 客服消息</p>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
@@ -275,7 +275,7 @@ export async function sendCustomEmailToBuyer(
             </p>
           </div>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
-            Chengdu Voice - 成都之音
+            Chengdu Craft Studio - 成都造物
           </p>
         </div>
       </div>
@@ -288,14 +288,14 @@ export async function sendDownloadLinkEmail(email: string) {
 
   return sendEmail({
     to: email,
-    subject: 'Get Your Free Chengdu Sound Map - Chengdu Voice',
+    subject: 'Get Your Free Chengdu Sound Map - Chengdu Craft Studio',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
-          <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Welcome to Chengdu Voice!</h2>
+          <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Welcome to Chengdu Craft Studio!</h2>
           <p style="color: #4a5568; line-height: 1.6; margin-bottom: 20px;">
             Thank you for subscribing! Click the button below to download your free Chengdu Sound Map white noise album.
           </p>
@@ -304,7 +304,7 @@ export async function sendDownloadLinkEmail(email: string) {
           </a>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             This email is automatically generated. Please do not reply directly.<br>
-            Chengdu Voice - 成都之音
+            Chengdu Craft Studio - 成都造物
           </p>
         </div>
       </div>
@@ -322,11 +322,11 @@ export async function sendReviewVerificationEmail(
 
   return sendEmail({
     to: email,
-    subject: 'Verify Your Review - Chengdu Voice',
+    subject: 'Verify Your Review - Chengdu Craft Studio',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Hello ${nickname},</h2>
@@ -338,7 +338,7 @@ export async function sendReviewVerificationEmail(
           </a>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             This email is automatically generated. Please do not reply directly.<br>
-            Chengdu Voice - 成都之音
+            Chengdu Craft Studio - 成都造物
           </p>
         </div>
       </div>
@@ -356,11 +356,11 @@ export async function sendReviewInvitationEmail(
 
   return sendEmail({
     to: email,
-    subject: 'Share Your Review - Chengdu Voice',
+    subject: 'Share Your Review - Chengdu Craft Studio',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Voice | 成都之音</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Hello ${customerName},</h2>
@@ -372,7 +372,7 @@ export async function sendReviewInvitationEmail(
           </a>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             This email is automatically generated. Please do not reply directly.<br>
-            Chengdu Voice - 成都之音
+            Chengdu Craft Studio - 成都造物
           </p>
         </div>
       </div>
