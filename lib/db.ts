@@ -228,7 +228,7 @@ export const db = {
           visitor_id: i.visitorId,
           type: i.type,
           email: i.email || null,
-        }, { onConflict: 'product_id,visitor_id', ignoreDuplicates: true })
+        }, { onConflict: 'product_id,visitor_id,type', ignoreDuplicates: true })
         .select('id');
       if (error) {
         console.error('Failed to add intent:', error);
@@ -236,11 +236,13 @@ export const db = {
       }
       return !!(data && data.length > 0);
     },
-    hasVoted: async (productId: string, visitorId: string): Promise<boolean> => {
-      const { count } = await supabase.from('product_intents')
+    hasVoted: async (productId: string, visitorId: string, type?: 'vote' | 'preorder'): Promise<boolean> => {
+      let query = supabase.from('product_intents')
         .select('id', { count: 'exact', head: true })
         .eq('product_id', productId)
         .eq('visitor_id', visitorId);
+      if (type) query = query.eq('type', type);
+      const { count } = await query;
       return (count || 0) > 0;
     },
     // 票数原子自增(RPC),失败抛出由调用方提示重试

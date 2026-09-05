@@ -20,7 +20,7 @@ export function VoteButton({ productId, initialVotes = 0, size = 'card' }: {
     (async () => {
       try {
         const vid = getVisitorId();
-        const res = await fetch(`/api/intents?productId=${productId}&visitorId=${vid}`);
+        const res = await fetch(`/api/intents?productId=${productId}&visitorId=${vid}&type=vote`);
         const data = await res.json();
         if (!mounted) return;
         setVotes(data.votes ?? initialVotes);

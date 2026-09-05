@@ -40,6 +40,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');
     const visitorId = searchParams.get('visitorId');
+    const type = searchParams.get('type') === 'preorder' ? 'preorder' as const
+      : searchParams.get('type') === 'vote' ? 'vote' as const
+      : undefined;
 
     if (!productId) {
       return NextResponse.json({ error: 'productId required' }, { status: 400 });
@@ -47,7 +50,7 @@ export async function GET(request: Request) {
 
     const product = await db.products.getById(productId);
     const hasVoted = visitorId
-      ? await db.intents.hasVoted(productId, visitorId)
+      ? await db.intents.hasVoted(productId, visitorId, type)
       : false;
 
     return NextResponse.json({
