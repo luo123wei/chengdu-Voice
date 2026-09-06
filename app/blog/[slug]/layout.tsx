@@ -9,12 +9,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!blog) {
     return {
-      title: 'Blog Not Found | Chengdu Craft Studio',
+      title: 'Story Not Found · 故事不存在',
     }
   }
 
   return {
-    title: `${blog.titleEn} | Chengdu Craft Studio`,
+    title: blog.titleEn,
     description: blog.contentEn?.replace(/<[^>]*>/g, '').slice(0, 160) || blog.titleEn,
     keywords: [blog.category, 'Chengdu', '成都', 'culture', 'story'],
     alternates: {

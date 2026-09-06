@@ -23,13 +23,13 @@ export const metadata: Metadata = {
     default: 'Chengdu Craft Studio | 成都造物 - Authentic Chengdu Culture & Products',
     template: '%s | Chengdu Craft Studio',
   },
-  description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
+  description: 'Chengdu Craft Studio 成都造物 — 一间成都的文创设计工作室。你投票决定下一件作品,预售登记,小批量手作,全球直邮。Everyday objects, designed in Chengdu.',
   keywords: [
-    'Chengdu', '成都', 'Sichuan pepper', '四川花椒', 'tea', '茶叶',
-    'Chengdu culture', '成都文化', 'cross-border e-commerce', '跨境电商',
-    'Chinese culture', '中国文化', 'sound map', '声音地图',
-    'Hanyuan pepper', '汉源花椒', 'Mongding tea', '蒙顶茶',
-    'authentic Chinese products', '正宗中国产品', 'traditional Sichuan', '传统四川'
+    'Chengdu', '成都', '文创', '成都造物', 'Chengdu Craft Studio',
+    'panda design', '熊猫周边', '文创设计工作室', 'design studio',
+    'Chinese design', '中国设计', 'handmade craft', '手作',
+    'stationery', 'home decor', 'designer toys', 'Chengdu design',
+    'free Chengdu sounds', '成都声音', '白噪音'
   ],
   authors: [{ name: 'Chengdu Craft Studio', url: siteUrl }],
   creator: 'Chengdu Craft Studio',
@@ -41,21 +41,21 @@ export const metadata: Metadata = {
     type: 'website',
     url: siteUrl,
     siteName: 'Chengdu Craft Studio | 成都造物',
-    title: 'Chengdu Craft Studio | Authentic Chengdu Culture & Products',
-    description: 'Experience authentic Chengdu through sound, taste, and stories. Premium Sichuan pepper, tea, and cultural products delivered worldwide.',
+    title: 'Chengdu Craft Studio | 成都造物 — Everyday objects, designed in Chengdu',
+    description: 'A small craft design studio in Chengdu. Vote on what we make next, pre-order new pieces, shop small-batch crafts worldwide.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Chengdu Craft Studio - Authentic Chengdu Culture & Products',
+        alt: 'Chengdu Craft Studio 成都造物 — Everyday objects, designed in Chengdu',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chengdu Craft Studio | Authentic Chengdu Culture & Products',
-    description: 'Experience authentic Chengdu through sound, taste, and stories.',
+    title: 'Chengdu Craft Studio | 成都造物',
+    description: 'Vote on what we make next. Small-batch crafts designed in Chengdu, shipped worldwide.',
     images: ['/og-image.jpg'],
   },
   robots: {
