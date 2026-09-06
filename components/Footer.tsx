@@ -47,6 +47,9 @@ export default function Footer() {
               <li>
                 <Link href="/about" className="text-gray-400 hover:text-primary transition-colors">About</Link>
               </li>
+              <li>
+                <Link href="/free-sounds" className="text-gray-400 hover:text-primary transition-colors">Free Sounds · 声音</Link>
+              </li>
             </ul>
           </div>
 
