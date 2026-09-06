@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, FileText, ShoppingBag, BarChart3, ArrowLeft, LogOut, Package, Settings, Music } from 'lucide-react';
+import { LayoutDashboard, FileText, ShoppingBag, BarChart3, ArrowLeft, LogOut, Package, Settings, Music, Mail } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -34,6 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: '订单管理', href: '/admin/orders', icon: ShoppingBag },
     { name: '产品管理', href: '/admin/products', icon: Package },
     { name: '声音管理', href: '/admin/free-sounds', icon: Music },
+    { name: '候补名单', href: '/admin/waitlist', icon: Mail },
     { name: '系统设置', href: '/admin/settings', icon: Settings },
   ];
 
