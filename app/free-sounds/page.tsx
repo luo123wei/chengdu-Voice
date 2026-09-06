@@ -1,11 +1,28 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Play, Pause, X, ChevronRight, MapPin, Check, Volume2, Mail } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Play, Pause, X, ChevronRight, ChevronLeft, MapPin, Check, Volume2, Mail, Clock } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { playScene, stopScene, onPlayingChange } from '@/lib/soundscapeEngine';
+
+const ITEMS_PER_PAGE = 12;
+
+/* ---------- 后台「声音管理」发布的实录音频 ---------- */
+interface DbSound {
+  id: string;
+  title: string;
+  titleEn: string;
+  description: string;
+  duration: string;
+  audio: string;
+  culturalStory?: string;
+}
+
+type SoundItem =
+  | ({ kind: 'synth' } & Soundscape)
+  | ({ kind: 'audio' } & DbSound);
 
 /* ---------- 六段合成音景 + 双语文案 ---------- */
 interface Soundscape {
@@ -98,25 +115,84 @@ const SOUNDSCAPES: Soundscape[] = [
 
 export default function FreeSoundsPage() {
   const [playingId, setPlayingId] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Soundscape | null>(null);
+  const [selected, setSelected] = useState<SoundItem | null>(null);
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [dbSounds, setDbSounds] = useState<DbSound[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [audioPlayingId, setAudioPlayingId] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => onPlayingChange(setPlayingId), []);
+
+  // 拉取后台「声音管理」发布的实录音频
+  useEffect(() => {
+    fetch('/api/free-sounds?limit=100&page=1')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) setDbSounds(data.data);
+      })
+      .catch((err) => console.error('Failed to load sounds:', err));
+  }, []);
+
+  // 合并列表：合成音景置顶，实录音频在后；每页 12 条分页
+  const allItems = useMemo<SoundItem[]>(
+    () => [
+      ...SOUNDSCAPES.map((s) => ({ kind: 'synth' as const, ...s })),
+      ...dbSounds.map((s) => ({ kind: 'audio' as const, ...s })),
+    ],
+    [dbSounds]
+  );
+  const totalPages = Math.ceil(allItems.length / ITEMS_PER_PAGE);
+  const pageItems = allItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    setAudioPlayingId(null);
+  }, []);
+
+  const toggleAudio = useCallback((item: Extract<SoundItem, { kind: 'audio' }>) => {
+    if (audioPlayingId === item.id) {
+      stopAudio();
+      return;
+    }
+    stopScene(); // 合成音景与实录音频互斥
+    if (audioRef.current) audioRef.current.pause();
+    const a = new Audio(item.audio);
+    a.loop = true;
+    audioRef.current = a;
+    a.play().catch(() => setAudioPlayingId(null));
+    setAudioPlayingId(item.id);
+  }, [audioPlayingId, stopAudio]);
 
   const toggle = useCallback((id: string) => {
     if (playingId === id) {
       stopScene();
     } else {
+      stopAudio();
       playScene(id);
     }
-  }, [playingId]);
+  }, [playingId, stopAudio]);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    stopScene();
+    stopAudio();
+    setCurrentPage(page);
+  };
 
   // 关闭弹层时停止播放
   useEffect(() => {
-    if (!selected) stopScene();
-  }, [selected]);
+    if (!selected) {
+      stopScene();
+      stopAudio();
+    }
+  }, [selected, stopAudio]);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,17 +241,26 @@ export default function FreeSoundsPage() {
       <section className="py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-3">
-            {SOUNDSCAPES.map((s, i) => {
-              const isPlaying = playingId === s.id;
+            {pageItems.map((item, i) => {
+              const globalIndex = (currentPage - 1) * ITEMS_PER_PAGE + i;
+              const isSynth = item.kind === 'synth';
+              const isPlaying = isSynth
+                ? playingId === item.id
+                : audioPlayingId === item.id;
+              const hasStory =
+                item.kind === 'synth' ||
+                !!(item.description?.replace(/<[^>]*>/g, '').trim() || item.culturalStory?.replace(/<[^>]*>/g, '').trim());
               return (
                 <div
-                  key={s.id}
+                  key={`${item.kind}-${item.id}`}
                   className={`border p-5 flex items-center gap-5 transition-colors ${
                     isPlaying ? 'border-black bg-[#FAFAFA]' : 'border-[#EEEEEE] hover:border-black/40'
                   }`}
                 >
                   <button
-                    onClick={() => toggle(s.id)}
+                    onClick={() =>
+                      isSynth ? toggle(item.id) : toggleAudio(item as Extract<SoundItem, { kind: 'audio' }>)
+                    }
                     aria-label={isPlaying ? '暂停' : '播放'}
                     className={`w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                       isPlaying ? 'bg-black scale-105' : 'bg-black hover:bg-[#B54A32]'
@@ -190,16 +275,32 @@ export default function FreeSoundsPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-3 flex-wrap">
-                      <span className="text-xs text-gray-400 font-mono">0{i + 1}</span>
-                      <h3 className="font-serif font-bold text-lg text-black">{s.title}</h3>
-                      <h4 className="text-sm text-gray-500">{s.titleEn}</h4>
+                      <span className="text-xs text-gray-400 font-mono">{String(globalIndex + 1).padStart(2, '0')}</span>
+                      <h3 className="font-serif font-bold text-lg text-black">{item.title}</h3>
+                      {item.titleEn && item.titleEn !== item.title && (
+                        <h4 className="text-sm text-gray-500">{item.titleEn}</h4>
+                      )}
+                      {item.kind === 'audio' && (
+                        <span className="text-[10px] tracking-widest text-gray-400 border border-[#EEEEEE] px-2 py-0.5">实录</span>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                      {s.location}
-                      <span className="text-gray-300">·</span>
-                      <span className="truncate">{s.tags}</span>
-                    </p>
+                    {isSynth ? (
+                      <p className="text-sm text-gray-600 mt-1 flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                        {item.location}
+                        <span className="text-gray-300">·</span>
+                        <span className="truncate">{item.tags}</span>
+                      </p>
+                    ) : (
+                      item.duration && (
+                        <p className="text-sm text-gray-600 mt-1 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                          {item.duration}
+                          <span className="text-gray-300">·</span>
+                          <span>工作室实地录制</span>
+                        </p>
+                      )
+                    )}
                     {isPlaying && (
                       <div className="flex items-end gap-[3px] h-4 mt-2">
                         {[0, 1, 2, 3, 4].map(b => (
@@ -214,17 +315,63 @@ export default function FreeSoundsPage() {
                     )}
                   </div>
 
-                  <button
-                    onClick={() => setSelected(s)}
-                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-black hover:bg-black hover:text-white border border-black transition-colors flex-shrink-0"
-                  >
-                    故事
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  {hasStory && (
+                    <button
+                      onClick={() => setSelected(item)}
+                      className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-black hover:bg-black hover:text-white border border-black transition-colors flex-shrink-0"
+                    >
+                      故事
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               );
             })}
           </div>
+
+          {allItems.length === 0 && (
+            <div className="text-center py-20">
+              <p className="text-gray-400 text-sm">声音整理中，敬请期待。</p>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center mt-12">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1 px-4 py-2 border border-[#EEEEEE] text-sm hover:border-black/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>上一页</span>
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`w-10 h-10 text-sm transition-colors ${
+                      currentPage === page
+                        ? 'bg-black text-white'
+                        : 'border border-[#EEEEEE] text-gray-600 hover:border-black/40'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-1 px-4 py-2 border border-[#EEEEEE] text-sm hover:border-black/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <span>下一页</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -305,7 +452,9 @@ export default function FreeSoundsPage() {
             <div className="flex items-start justify-between p-6 border-b border-[#EEEEEE] sticky top-0 bg-white">
               <div>
                 <h2 className="font-serif text-2xl font-bold text-black">{selected.title}</h2>
-                <p className="text-gray-500 text-sm mt-1">{selected.titleEn} · {selected.location}</p>
+                <p className="text-gray-500 text-sm mt-1">
+                  {selected.titleEn} · {selected.kind === 'synth' ? selected.location : `${selected.duration} · 实录`}
+                </p>
               </div>
               <button onClick={() => setSelected(null)} className="p-2 hover:bg-gray-100 transition-colors">
                 <X className="w-5 h-5" />
@@ -314,38 +463,71 @@ export default function FreeSoundsPage() {
 
             <div className="p-6">
               <button
-                onClick={() => toggle(selected.id)}
+                onClick={() =>
+                  selected.kind === 'synth'
+                    ? toggle(selected.id)
+                    : toggleAudio(selected as Extract<SoundItem, { kind: 'audio' }>)
+                }
                 className={`w-full py-4 flex items-center justify-center gap-3 text-sm tracking-widest font-medium transition-colors mb-6 ${
-                  playingId === selected.id
+                  (selected.kind === 'synth' ? playingId === selected.id : audioPlayingId === selected.id)
                     ? 'bg-[#B54A32] text-white'
                     : 'bg-black text-white hover:bg-[#B54A32]'
                 }`}
               >
-                {playingId === selected.id ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                {playingId === selected.id ? '暂停播放' : '播放这段音景'}
+                {(selected.kind === 'synth' ? playingId === selected.id : audioPlayingId === selected.id)
+                  ? <Pause className="w-5 h-5" />
+                  : <Play className="w-5 h-5" />}
+                {(selected.kind === 'synth' ? playingId === selected.id : audioPlayingId === selected.id)
+                  ? '暂停播放'
+                  : selected.kind === 'synth' ? '播放这段音景' : '播放这段录音'}
                 <span className="text-xs opacity-70">∞ 循环</span>
               </button>
 
               <div className="space-y-5">
-                <p className="text-gray-800 leading-relaxed">{selected.desc}</p>
-                <p className="text-gray-500 text-sm leading-relaxed italic">{selected.descEn}</p>
+                {selected.kind === 'synth' ? (
+                  <>
+                    <p className="text-gray-800 leading-relaxed">{selected.desc}</p>
+                    <p className="text-gray-500 text-sm leading-relaxed italic">{selected.descEn}</p>
+                  </>
+                ) : (
+                  selected.description?.replace(/<[^>]*>/g, '').trim() && (
+                    <div
+                      className="text-gray-800 leading-relaxed [&_p]:mt-2"
+                      dangerouslySetInnerHTML={{ __html: selected.description }}
+                    />
+                  )
+                )}
 
                 <div className="border-t border-dashed border-[#DDDDDD]" />
 
-                <div>
-                  <p className="text-xs tracking-[0.25em] text-gray-400 mb-2">声音小记</p>
-                  <p className="text-gray-700 leading-relaxed">{selected.story}</p>
-                  <p className="text-gray-500 text-sm leading-relaxed mt-3">{selected.storyEn}</p>
-                </div>
+                {selected.kind === 'synth' ? (
+                  <div>
+                    <p className="text-xs tracking-[0.25em] text-gray-400 mb-2">声音小记</p>
+                    <p className="text-gray-700 leading-relaxed">{selected.story}</p>
+                    <p className="text-gray-500 text-sm leading-relaxed mt-3">{selected.storyEn}</p>
+                  </div>
+                ) : (
+                  selected.culturalStory?.replace(/<[^>]*>/g, '').trim() && (
+                    <div>
+                      <p className="text-xs tracking-[0.25em] text-gray-400 mb-2">声音小记</p>
+                      <div
+                        className="text-gray-700 leading-relaxed [&_p]:mt-2"
+                        dangerouslySetInnerHTML={{ __html: selected.culturalStory }}
+                      />
+                    </div>
+                  )
+                )}
 
-                <Link
-                  href={selected.product.href}
-                  onClick={() => stopScene()}
-                  className="block border border-black p-4 hover:bg-black hover:text-white transition-colors group"
-                >
-                  <p className="text-sm font-medium">🎁 {selected.product.label}</p>
-                  <p className="text-xs opacity-60 mt-1 group-hover:opacity-80">{selected.product.labelEn}</p>
-                </Link>
+                {selected.kind === 'synth' && (
+                  <Link
+                    href={selected.product.href}
+                    onClick={() => stopScene()}
+                    className="block border border-black p-4 hover:bg-black hover:text-white transition-colors group"
+                  >
+                    <p className="text-sm font-medium">🎁 {selected.product.label}</p>
+                    <p className="text-xs opacity-60 mt-1 group-hover:opacity-80">{selected.product.labelEn}</p>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
