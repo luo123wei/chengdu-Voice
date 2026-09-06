@@ -50,6 +50,7 @@ export default function Header() {
     { name: { en: 'Home', zh: '首页' }, href: '/' },
     { name: { en: 'Works', zh: '作品' }, href: '/shop' },
     { name: { en: 'Stories', zh: '故事' }, href: '/blog' },
+    { name: { en: 'Sounds', zh: '声音' }, href: '/free-sounds' },
     { name: { en: 'About', zh: '关于' }, href: '/about' },
   ];
 
