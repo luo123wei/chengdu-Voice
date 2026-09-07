@@ -45,10 +45,10 @@ export default function Footer() {
                 <Link href="/blog" className="text-gray-400 hover:text-primary transition-colors">Stories</Link>
               </li>
               <li>
-                <Link href="/about" className="text-gray-400 hover:text-primary transition-colors">About</Link>
+                <Link href="/free-sounds" className="text-gray-400 hover:text-primary transition-colors">Sounds</Link>
               </li>
               <li>
-                <Link href="/free-sounds" className="text-gray-400 hover:text-primary transition-colors">Free Sounds · 声音</Link>
+                <Link href="/about" className="text-gray-400 hover:text-primary transition-colors">About</Link>
               </li>
             </ul>
           </div>
