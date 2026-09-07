@@ -40,6 +40,7 @@ export interface Product {
   votesCount?: number;
   preorderEnd?: string;   // 预售截止时间(ISO,后台设置)
   onSaleAt?: string;      // 正式开售时间(ISO,后台设置)
+  videoUrl?: string;      // 产品视频链接(B站/YouTube/MP4直链)
 }
 
 export interface Order {

@@ -72,6 +72,7 @@ export default function AdminProducts() {
     votesCount: 0,
     preorderEndLocal: '',   // datetime-local 输入值
     onSaleAtLocal: '',
+    videoUrl: '',
   });
 
   const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts(false);
@@ -108,6 +109,7 @@ export default function AdminProducts() {
         votesCount: product.votesCount || 0,
         preorderEndLocal: isoToLocalInput(product.preorderEnd),
         onSaleAtLocal: isoToLocalInput(product.onSaleAt),
+        videoUrl: product.videoUrl || '',
       });
     } else {
       setEditingProduct(null);
@@ -134,6 +136,7 @@ export default function AdminProducts() {
         votesCount: 0,
         preorderEndLocal: '',
         onSaleAtLocal: '',
+        videoUrl: '',
       });
     }
     setIsModalOpen(true);
@@ -178,9 +181,10 @@ export default function AdminProducts() {
       culture: formData.culture,
       howToUse: formData.howToUse,
       status: formData.status,
-      votesCount: editingProduct?.votesCount ?? formData.votesCount ?? 0, // 保留真实票数,不被表单覆盖
+      votesCount: editingProduct?.votesCount ?? formData.votesCount ?? 0,
       preorderEnd,
       onSaleAt,
+      videoUrl: formData.videoUrl || undefined,
     } as Product;
 
     try {
@@ -583,6 +587,18 @@ export default function AdminProducts() {
                     className="hidden"
                   />
                 </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">产品视频链接</label>
+                <input
+                  type="text"
+                  value={formData.videoUrl}
+                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                  placeholder="B站/YouTube分享链接 或 .mp4 直链（可选）"
+                />
+                <p className="text-xs text-gray-400 mt-1">支持 Bilibili、YouTube 链接或 MP4 直链，留空则只显示图片</p>
               </div>
 
               <div>

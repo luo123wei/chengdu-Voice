@@ -64,6 +64,7 @@ function mapProduct(row: any): Product {
     votesCount: row.votes_count ? parseInt(row.votes_count) : 0,
     preorderEnd: row.preorder_end || undefined,
     onSaleAt: row.on_sale_at || undefined,
+    videoUrl: row.video_url || undefined,
   };
 }
 
@@ -164,6 +165,7 @@ export const db = {
         status: newProduct.status || 'on-sale',
         preorder_end: newProduct.preorderEnd || null,
         on_sale_at: newProduct.onSaleAt || null,
+        video_url: newProduct.videoUrl || null,
       }).select('*').single();
       if (error) {
         console.error('Failed to create product:', error);
@@ -195,6 +197,7 @@ export const db = {
       if (updates.status !== undefined) updateData.status = updates.status;
       if (updates.preorderEnd !== undefined) updateData.preorder_end = updates.preorderEnd || null;
       if (updates.onSaleAt !== undefined) updateData.on_sale_at = updates.onSaleAt || null;
+      if (updates.videoUrl !== undefined) updateData.video_url = updates.videoUrl || null;
 
       console.log('Update product:', id, 'with data:', updateData);
 

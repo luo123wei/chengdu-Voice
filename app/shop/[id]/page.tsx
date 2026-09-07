@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, BookOpen, Globe, ChefHat, FileText } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, BookOpen, Globe, ChefHat, FileText, Video } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,6 +10,26 @@ import { VoteButton, PreorderBlock } from '@/components/IntentButtons';
 import { productCategoryLabels } from '@/data/mockData';
 import { statusBadge } from '@/lib/productStatus';
 import { useProducts } from '@/hooks/useDataStore';
+
+// 从视频 URL 提取嵌入信息
+function getVideoEmbed(url: string): { type: 'iframe' | 'mp4'; src: string } | null {
+  if (!url) return null;
+  // Bilibili: 支持 b23.tv/短链、bilibili.com/video/BVxxx
+  const biliMatch = url.match(/bilibili\.com\/video\/(BV\w+)/) || url.match(/b23\.tv\/(\w+)/);
+  if (biliMatch) {
+    return { type: 'iframe', src: `https://player.bilibili.com/player.html?bvid=${biliMatch[1]}&high_quality=1&autoplay=0` };
+  }
+  // YouTube: 支持 youtu.be/xxx、youtube.com/watch?v=xxx
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([\w-]+)/);
+  if (ytMatch) {
+    return { type: 'iframe', src: `https://www.youtube.com/embed/${ytMatch[1]}` };
+  }
+  // MP4 直链
+  if (url.match(/^https?:\/\/.+\.(mp4|webm)(\?|$)/i)) {
+    return { type: 'mp4', src: url };
+  }
+  return null;
+}
 
 function formatRichText(text: string): string {
   if (!text) return '';
@@ -43,6 +63,8 @@ export default function ProductDetailPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [addedSuccess, setAddedSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState('story');
+  const [showVideo, setShowVideo] = useState(true);
+  const videoEmbed = product?.videoUrl ? getVideoEmbed(product.videoUrl) : null;
 
   if (!product) {
     return (
@@ -101,14 +123,70 @@ export default function ProductDetailPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div className="space-y-4">
-              <div className="relative rounded-xl overflow-hidden bg-cream">
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.nameEn}
-                  className="w-full h-80 sm:h-96 object-cover"
-                />
-              </div>
-              {product.images.length > 1 && (
+              {/* 有视频时显示视频播放器,否则显示主图;缩略图可切换回图片 */}
+              {videoEmbed && showVideo ? (
+                <div className="relative rounded-xl overflow-hidden bg-black" style={{ aspectRatio: '16/9' }}>
+                  {videoEmbed.type === 'iframe' ? (
+                    <iframe
+                      src={videoEmbed.src}
+                      className="w-full h-full"
+                      allowFullScreen
+                      scrolling="no"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
+                  ) : (
+                    <video
+                      src={videoEmbed.src}
+                      className="w-full h-full object-cover"
+                      controls
+                      playsInline
+                      muted
+                      loop
+                      autoPlay
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="relative rounded-xl overflow-hidden bg-cream">
+                  <img
+                    src={product.images[selectedImage]}
+                    alt={product.nameEn}
+                    className="w-full h-80 sm:h-96 object-cover"
+                  />
+                </div>
+              )}
+              {/* 视频与缩略图切换按钮 */}
+              {videoEmbed && (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowVideo(true)}
+                    className={`px-3 py-1 text-xs rounded-lg flex items-center gap-1 transition-colors ${
+                      showVideo ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    视频
+                  </button>
+                  {product.images.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => { setShowVideo(false); setSelectedImage(index); }}
+                      className={`w-20 h-20 rounded-lg overflow-hidden ${
+                        !showVideo && selectedImage === index ? 'ring-2 ring-primary' : ''
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`${product.nameEn} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* 无视频时只显示缩略图列表 */}
+              {!videoEmbed && product.images.length > 1 && (
                 <div className="flex gap-3">
                   {product.images.map((img, index) => (
                     <button
