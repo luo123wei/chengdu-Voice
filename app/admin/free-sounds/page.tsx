@@ -31,7 +31,7 @@ export default function AdminFreeSounds() {
   });
 
   const fetchSounds = async () => {
-    const res = await fetch('/api/free-sounds');
+    const res = await fetch('/api/free-sounds?limit=100&page=1');
     const data = await res.json();
     if (data.success) {
       setSounds(data.data);
