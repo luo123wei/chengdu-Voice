@@ -97,7 +97,7 @@ function ShopPageInner() {
 
       {/* 状态 Tabs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex border-b border-gray-200 overflow-x-auto">
+        <div className="flex border-b border-gray-200 overflow-x-auto overflow-y-hidden h-[57px]">
           {statusTabs.map((tab) => (
             <button
               key={tab.key}
