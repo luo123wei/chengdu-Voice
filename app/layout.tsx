@@ -20,41 +20,41 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.wor
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Chengdu Craft Studio | 成都造物 - Authentic Chengdu Culture & Products',
-    template: '%s | Chengdu Craft Studio',
+    default: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture - Authentic Chengdu Culture & Products',
+    template: '%s | Voice Culture',
   },
-  description: 'Chengdu Craft Studio 成都造物 — 一间成都的文创设计工作室。你投票决定下一件作品,预售登记,小批量手作,全球直邮。Everyday objects, designed in Chengdu.',
+  description: 'Voice Culture — Chengdu cultural gifts & souvenirs. You vote on what we make next, pre-order new pieces, shop small-batch crafts worldwide. Designed in Chengdu, shipped globally.',
   keywords: [
-    'Chengdu', '成都', '文创', '成都造物', 'Chengdu Craft Studio',
+    'Chengdu', '成都', 'cultural gifts', 'souvenirs', 'Voice Culture',
     'panda design', '熊猫周边', '文创设计工作室', 'design studio',
     'Chinese design', '中国设计', 'handmade craft', '手作',
     'stationery', 'home decor', 'designer toys', 'Chengdu design',
     'free Chengdu sounds', '成都声音', '白噪音'
   ],
-  authors: [{ name: 'Chengdu Craft Studio', url: siteUrl }],
-  creator: 'Chengdu Craft Studio',
-  publisher: 'Chengdu Craft Studio',
+  authors: [{ name: 'Voice Culture', url: siteUrl }],
+  creator: 'Voice Culture',
+  publisher: 'Voice Culture',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     url: siteUrl,
-    siteName: 'Chengdu Craft Studio | 成都造物',
-    title: 'Chengdu Craft Studio | 成都造物 — Everyday objects, designed in Chengdu',
-    description: 'A small craft design studio in Chengdu. Vote on what we make next, pre-order new pieces, shop small-batch crafts worldwide.',
+    siteName: 'Voice Culture',
+    title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture — Designed in Chengdu, shipped globally',
+    description: 'Chengdu cultural gifts & souvenirs. Vote on what we make next, pre-order new pieces, shop small-batch crafts worldwide.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Chengdu Craft Studio 成都造物 — Everyday objects, designed in Chengdu',
+        alt: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture — Designed in Chengdu, shipped globally',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chengdu Craft Studio | 成都造物',
+    title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture',
     description: 'Vote on what we make next. Small-batch crafts designed in Chengdu, shipped worldwide.',
     images: ['/og-image.jpg'],
   },
