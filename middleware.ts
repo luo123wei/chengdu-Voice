@@ -39,7 +39,5 @@ export const config = {
     '/account/:path*',
     '/verify-review/:path*',
     '/reviews-sketch/:path*',
-    '/sitemap.xml',
-    '/robots.txt',
   ],
 };
