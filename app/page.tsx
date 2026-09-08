@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SubscribeForm from '@/components/SubscribeForm';
 import ProductCard from '@/components/ProductCard';
+import HeroProductGrid from '@/components/HeroProductGrid';
 import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +38,16 @@ export default async function HomePage() {
 
   const voteProducts = products.filter(p => p.status === 'design');
   const onSaleProducts = products.filter(p => !p.status || p.status === 'on-sale').slice(0, 4);
-  const heroProduct = products.find(p => p.status === 'preorder') || products[0];
+  const preorderProducts = products.filter(p => p.status === 'preorder');
+
+  // Serialize product data for client component
+  const preorderData = preorderProducts.map(p => ({
+    id: p.id,
+    name: p.name,
+    nameEn: p.nameEn,
+    images: p.images,
+    status: p.status,
+  }));
 
   return (
     <div className="min-h-screen bg-white text-ink">
@@ -78,18 +88,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="relative">
-              {heroProduct && (
-                <img
-                  src={heroProduct.images[0]}
-                  alt={heroProduct.nameEn}
-                  className="w-full aspect-[4/3] object-cover"
-                />
-              )}
-              <div className="absolute left-4 bottom-4 bg-white border border-gray-200 px-3.5 py-2 text-xs">
-                ① 首款作品 · {heroProduct?.nameEn} {heroProduct?.name} · 预售中
-              </div>
-            </div>
+            <HeroProductGrid products={preorderData} />
           </div>
         </div>
       </section>
