@@ -56,6 +56,9 @@ export default async function HomePage() {
                 <br />
                 <span className="border-b-4 border-black pb-0.5">designed in Chengdu.</span>
               </h1>
+              <p className="text-base md:text-lg text-gray-700 font-medium mb-3">
+                Discover unique Chengdu gifts, cultural souvenirs and everyday objects inspired by life in Chengdu.
+              </p>
               <p className="text-base md:text-lg text-gray-500 max-w-lg mb-9">
                 我们是一间小型文创设计工作室,把成都的松弛与熊猫的可爱,做成你握在手里的日常物件。每一款,都先由你投票,再投入生产。
               </p>
