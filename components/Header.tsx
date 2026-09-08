@@ -140,10 +140,6 @@ export default function Header() {
                 </span>
               )}
             </button>
-            
-            <Link href="/admin" className="px-4 py-2 bg-secondary text-white rounded-lg font-medium hover:bg-secondary/90 transition-colors hidden sm:block">
-              Admin
-            </Link>
 
             <button
               className="md:hidden p-2 hover:bg-primary/10 rounded-lg transition-colors"
@@ -168,13 +164,6 @@ export default function Header() {
                 {link.name[language]}
               </Link>
             ))}
-            <Link
-              href="/admin"
-              className="block py-2 text-white bg-secondary rounded-lg text-center font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Admin
-            </Link>
           </nav>
         </div>
       )}

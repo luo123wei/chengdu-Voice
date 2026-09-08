@@ -70,7 +70,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400 text-sm">
           <p>2026 Chengdu Craft Studio 成都造物. All rights reserved.</p>
-          <span className="text-gray-500">Chengdu, Sichuan, China · 跨境直邮全球</span>
+          <span className="text-gray-500">Chengdu, Sichuan, China · 跨境直邮全球 · <Link href="/admin" className="text-gray-600 hover:text-gray-400 transition-colors">Admin</Link></span>
         </div>
       </div>
     </footer>
