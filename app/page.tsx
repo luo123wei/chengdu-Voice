@@ -12,22 +12,22 @@ export const dynamic = 'force-dynamic';
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
-  title: 'Chengdu Craft Studio | 成都造物 - Panda-themed Designer Crafts from Chengdu',
-  description: 'Everyday objects, designed in Chengdu. A small craft studio making panda-themed designer objects — vote for what we make next, pre-order, shop worldwide.',
-  keywords: ['Chengdu', 'panda', 'craft studio', 'designer crafts', '文创', 'cultural creative', 'cross-border e-commerce'],
+  title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture',
+  description: "Voice Culture creates small-batch objects inspired by Chengdu's culture, everyday life and visual language. From panda-inspired objects to Chengdu postcards and tea culture gifts, each piece is designed to offer a different way to remember the city.",
+  keywords: ['Chengdu', '成都', 'cultural gifts', 'souvenirs', 'Voice Culture', 'panda design', '熊猫周边', 'Chengdu gifts', 'Chengdu souvenirs', 'tea culture gifts', 'Chengdu postcards'],
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Chengdu Craft Studio | 成都造物',
-    description: 'Everyday objects, designed in Chengdu. Vote for what we make next.',
+    title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture',
+    description: "Small-batch objects inspired by Chengdu's culture, everyday life and visual language.",
     url: siteUrl,
-    siteName: 'Chengdu Craft Studio',
+    siteName: 'Voice Culture',
     type: 'website',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chengdu Craft Studio | 成都造物',
-    description: 'Everyday objects, designed in Chengdu.',
+    title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture',
+    description: "Small-batch objects inspired by Chengdu's culture, designed in Chengdu, shipped worldwide.",
     images: ['/og-image.jpg'],
   },
 };
