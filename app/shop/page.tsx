@@ -88,7 +88,7 @@ function ShopPageInner() {
           <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3">
             Chengdu Gifts &amp; Cultural Souvenirs
           </h1>
-          <p className="text-gray-600 text-[15px] md:text-base max-w-2xl mb-1">
+          <p className="text-gray-600 text-[15px] md:text-base max-w-2xl mb-8">
             Voice Culture creates small-batch objects inspired by Chengdu's culture, everyday life and visual language. From panda-inspired objects to Chengdu postcards and tea culture gifts, each piece is designed to offer a different way to remember the city.
           </p>
           <p className="text-gray-400 text-[13px]">投票中的概念 · 预售中的新作 · 已投产的在售款</p>
