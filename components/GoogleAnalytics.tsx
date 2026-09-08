@@ -1,39 +1,23 @@
-'use client';
-import { useEffect } from 'react';
+import Script from 'next/script';
 
-declare global {
-  interface Window {
-    dataLayer?: any[];
-  }
-}
+const GA_MEASUREMENT_ID = 'G-4FNBQGCK24';
 
 export default function GoogleAnalytics() {
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const savedSettings = localStorage.getItem('siteSettings');
-    if (savedSettings) {
-      try {
-        const settings = JSON.parse(savedSettings);
-        const gaMeasurementId = settings?.gaMeasurementId;
-        
-        if (gaMeasurementId && gaMeasurementId.startsWith('G-')) {
-          const script = document.createElement('script');
-          script.src = `https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`;
-          script.async = true;
-          document.head.appendChild(script);
-
+  return (
+    <>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
           window.dataLayer = window.dataLayer || [];
-          const gtag = (...args: any[]) => {
-            window.dataLayer?.push(args);
-          };
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
           gtag('js', new Date());
-          gtag('config', gaMeasurementId);
-        }
-      } catch (e) {
-        console.error('Failed to load Google Analytics:', e);
-      }
-    }
-  }, []);
-
-  return null;
+          gtag('config', '${GA_MEASUREMENT_ID}');
+        `}
+      </Script>
+    </>
+  );
 }
