@@ -8,6 +8,19 @@ import ProductCard from '@/components/ProductCard';
 import { productCategoryLabels } from '@/data/mockData';
 import { useProducts } from '@/hooks/useDataStore';
 import type { Product } from '@/data/mockData';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Chengdu Gifts & Souvenirs',
+  description: "Voice Culture creates small-batch objects inspired by Chengdu's culture, everyday life and visual language. From panda-inspired objects to Chengdu postcards and tea culture gifts, each piece is designed to offer a different way to remember the city.",
+  keywords: ['Chengdu gifts', 'Chengdu souvenirs', 'panda gifts', 'Chengdu cultural products', 'Chengdu postcards', 'tea culture gifts', 'Voice Culture'],
+  alternates: { canonical: '/shop' },
+  openGraph: {
+    title: 'Chengdu Gifts & Souvenirs | Voice Culture',
+    description: "Small-batch objects inspired by Chengdu's culture, everyday life and visual language.",
+    url: 'https://www.voiceculture.world/shop',
+  },
+};
 
 const ITEMS_PER_PAGE = 12;
 
@@ -85,10 +98,13 @@ function ShopPageInner() {
       {/* 页头 */}
       <section className="pt-28 pb-8 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-serif text-4xl font-bold mb-2">
-            Works <span className="text-xl text-gray-400 font-normal">作品</span>
+          <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3">
+            Chengdu Gifts &amp; Cultural Souvenirs
           </h1>
-          <p className="text-gray-500 text-[15px]">投票中的概念 · 预售中的新作 · 已投产的在售款</p>
+          <p className="text-gray-600 text-[15px] md:text-base max-w-2xl mb-1">
+            Voice Culture creates small-batch objects inspired by Chengdu's culture, everyday life and visual language. From panda-inspired objects to Chengdu postcards and tea culture gifts, each piece is designed to offer a different way to remember the city.
+          </p>
+          <p className="text-gray-400 text-[13px]">投票中的概念 · 预售中的新作 · 已投产的在售款</p>
         </div>
       </section>
 
