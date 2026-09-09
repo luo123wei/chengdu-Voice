@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, BookOpen, Globe, ChefHat, FileText, Video } from 'lucide-react';
 import Link from 'next/link';
@@ -72,6 +72,19 @@ export default function ProductDetailPage() {
   const [selectedSku, setSelectedSku] = useState<SKU | undefined>(undefined);
   const hasVariants = (product?.variants?.length || 0) > 1;
   const specs = product?.specs || (hasVariants ? inferSpecsFromVariants(product!.variants!) : undefined);
+
+  // 选中 SKU 的专属图片（如有）；图库 = SKU 图置顶 + 产品图（去重）
+  const skuImage = selectedSku?.images?.[0];
+  const galleryImages = useMemo(() => {
+    const imgs = product?.images || [];
+    if (skuImage && !imgs.includes(skuImage)) return [skuImage, ...imgs];
+    return imgs;
+  }, [product?.images, skuImage]);
+
+  // 切换 SKU 时主图回到第一张（即该 SKU 的专属图）
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [skuImage]);
   // 当前价格（优先 SKU 价格）
   const displayPrice = selectedSku?.price ?? product?.price ?? 0;
   const displayStock = hasVariants
@@ -178,7 +191,7 @@ export default function ProductDetailPage() {
               ) : (
                 <div className="relative rounded-xl overflow-hidden bg-cream aspect-[3/4]">
                   <img
-                    src={product.images[selectedImage]}
+                    src={galleryImages[selectedImage]}
                     alt={product.nameEn}
                     className="w-full h-full object-contain"
                   />
@@ -186,7 +199,7 @@ export default function ProductDetailPage() {
               )}
               {/* 视频与缩略图切换按钮 */}
               {videoEmbed && (
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <button
                     onClick={() => setShowVideo(true)}
                     className={`px-3 py-1 text-xs rounded-lg flex items-center gap-1 transition-colors ${
@@ -196,7 +209,7 @@ export default function ProductDetailPage() {
                     <Video className="w-3.5 h-3.5" />
                     视频
                   </button>
-                  {product.images.map((img, index) => (
+                  {galleryImages.map((img, index) => (
                     <button
                       key={index}
                       onClick={() => { setShowVideo(false); setSelectedImage(index); }}
@@ -214,9 +227,9 @@ export default function ProductDetailPage() {
                 </div>
               )}
               {/* 无视频时只显示缩略图列表 */}
-              {!videoEmbed && product.images.length > 1 && (
-                <div className="flex gap-3">
-                  {product.images.map((img, index) => (
+              {!videoEmbed && galleryImages.length > 1 && (
+                <div className="flex flex-wrap gap-3">
+                  {galleryImages.map((img, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}

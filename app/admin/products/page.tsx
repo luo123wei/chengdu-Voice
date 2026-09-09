@@ -313,6 +313,48 @@ export default function AdminProducts() {
     }));
   };
 
+  // SKU 专属图片上传（每个 SKU 一张，可选）
+  const [uploadingSkuIdx, setUploadingSkuIdx] = useState<number | null>(null);
+  const handleVariantImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingSkuIdx(index);
+      const { compressImageToFile } = await import('@/lib/imageUtils');
+      const compressedFile = await compressImageToFile(file, 1920);
+
+      const fd = new FormData();
+      fd.append('file', compressedFile);
+      const response = await fetch('/api/upload', { method: 'POST', body: fd });
+      const result = await response.json();
+
+      if (result.success) {
+        setFormData((prev) => ({
+          ...prev,
+          variants: prev.variants.map((v, i) =>
+            i === index ? { ...v, images: [result.url] } : v
+          ),
+        }));
+      } else {
+        alert(result.error || '上传失败');
+      }
+    } catch (error) {
+      alert('上传失败，请重试');
+    } finally {
+      setUploadingSkuIdx(null);
+      e.target.value = '';
+    }
+  };
+
+  const removeVariantImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.map((v, i) =>
+        i === index ? { ...v, images: [] } : v
+      ),
+    }));
+  };
+
   // 从 variants 自动推断 specs（颜色/尺寸/材质/包装的可选值集合）
   const inferSpecs = (variants: any[]) => {
     if (!variants?.length) return undefined;
@@ -775,6 +817,48 @@ export default function AdminProducts() {
                               placeholder="礼盒装"
                             />
                           </div>
+                        </div>
+
+                        {/* SKU 专属图片（可选） */}
+                        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-3">
+                          {variant.images?.[0] ? (
+                            <div className="relative shrink-0">
+                              <img
+                                src={variant.images[0]}
+                                alt={variant.name || 'SKU'}
+                                className="w-16 h-16 object-contain bg-cream rounded-lg border border-gray-200"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeVariantImage(idx)}
+                                className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs leading-none"
+                                title="移除图片"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="w-16 h-16 shrink-0 flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black hover:bg-gray-50 text-gray-400">
+                              {uploadingSkuIdx === idx ? (
+                                <span className="text-[10px]">上传中</span>
+                              ) : (
+                                <>
+                                  <Image className="w-4 h-4" />
+                                  <span className="text-[10px] mt-0.5">上传图片</span>
+                                </>
+                              )}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                disabled={uploadingSkuIdx !== null}
+                                onChange={(e) => handleVariantImageUpload(idx, e)}
+                              />
+                            </label>
+                          )}
+                          <p className="text-xs text-gray-400 leading-relaxed">
+                            SKU 专属图片（可选）。顾客在前台选中该规格时，主图会切换为此图；不上传则显示产品主图。
+                          </p>
                         </div>
                       </div>
                     ))}
