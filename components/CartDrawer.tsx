@@ -125,7 +125,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <img
                     src={item.image}
                     alt={item.nameEn}
-                    className="w-20 h-20 object-cover rounded-lg"
+                    className="w-20 h-20 object-contain bg-cream rounded-lg"
                   />
                   <div className="flex-1">
                     <h3 className="font-medium text-secondary">{item.nameEn}</h3>

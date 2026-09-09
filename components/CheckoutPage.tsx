@@ -460,7 +460,7 @@ export default function CheckoutPage() {
                     <img
                       src={item.image}
                       alt={item.nameEn}
-                      className="w-16 h-16 object-cover rounded-lg"
+                      className="w-16 h-16 object-contain bg-cream rounded-lg"
                     />
                     <div className="flex-1">
                       <p className="font-medium text-secondary">{item.nameEn}</p>

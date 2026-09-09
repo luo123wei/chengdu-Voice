@@ -25,12 +25,12 @@ export default function ProductCard({ product }: { product: Product }) {
     <div className="group bg-white border border-gray-200 hover:border-black transition-colors flex flex-col">
       <Link
         href={href}
-        className="block relative aspect-square overflow-hidden bg-cream"
+        className="block relative aspect-[3/4] overflow-hidden bg-cream"
       >
         <img
           src={product.images[0]}
           alt={product.nameEn}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
         />
         <span className={`absolute top-3 left-3 text-[11px] px-2.5 py-1 tracking-wide ${badge.cls}`}>
           {badge.label}

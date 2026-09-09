@@ -176,11 +176,11 @@ export default function ProductDetailPage() {
                   )}
                 </div>
               ) : (
-                <div className="relative rounded-xl overflow-hidden bg-cream">
+                <div className="relative rounded-xl overflow-hidden bg-cream aspect-[3/4]">
                   <img
                     src={product.images[selectedImage]}
                     alt={product.nameEn}
-                    className="w-full h-80 sm:h-96 object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               )}
@@ -200,14 +200,14 @@ export default function ProductDetailPage() {
                     <button
                       key={index}
                       onClick={() => { setShowVideo(false); setSelectedImage(index); }}
-                      className={`w-20 h-20 rounded-lg overflow-hidden ${
+                      className={`w-20 h-20 rounded-lg overflow-hidden bg-cream ${
                         !showVideo && selectedImage === index ? 'ring-2 ring-primary' : ''
                       }`}
                     >
                       <img
                         src={img}
                         alt={`${product.nameEn} ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </button>
                   ))}
@@ -220,14 +220,14 @@ export default function ProductDetailPage() {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-20 h-20 rounded-lg overflow-hidden ${
+                      className={`w-20 h-20 rounded-lg overflow-hidden bg-cream ${
                         selectedImage === index ? 'ring-2 ring-primary' : ''
                       }`}
                     >
                       <img
                         src={img}
                         alt={`${product.nameEn} ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </button>
                   ))}
