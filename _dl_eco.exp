@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+set timeout 300
+set server_ip "223.6.254.101"
+set ssh_pass "1234@Lwpj"
+
+puts "===== 1. 下载服务器的 ecosystem,看现在写的值对不对 ====="
+spawn scp -o StrictHostKeyChecking=no root@$server_ip:/var/www/geoscope/ecosystem.config.js /tmp/server_ecosystem.js
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}

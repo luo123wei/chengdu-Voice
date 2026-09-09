@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+set timeout 600
+set server_ip "223.6.254.101"
+set ssh_pass "1234@Lwpj"
+
+puts "===== 上传脚本 + 验证脚本 ====="
+spawn scp -o StrictHostKeyChecking=no \
+  /Users/lwpj/Documents/trae_projects/chengdu-voice/_server_fix_env.sh \
+  /Users/lwpj/Documents/trae_projects/chengdu-voice/_e2e_verify.js \
+  root@$server_ip:/tmp/
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+puts ""
+puts "===== 服务器执行修复脚本 ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "bash /tmp/_server_fix_env.sh 2>&1"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+puts ""
+puts "===== 执行 e2e 登录验证 ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "cd /var/www/geoscope && node /tmp/_e2e_verify.js 2>&1"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}

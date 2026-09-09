@@ -1,0 +1,76 @@
+#!/usr/bin/expect -f
+set timeout 300
+set server_ip "223.6.254.101"
+set ssh_pass "1234@Lwpj"
+
+puts "===== 1. 用 --update-env 重启(关键!) ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "cd /var/www/geoscope && pm2 restart all --update-env && sleep 3"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+puts ""
+puts "===== 2. 查看环境变量是否生效 ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "pm2 env 0 2>/dev/null | grep -E 'ADMIN_'"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+puts ""
+puts "===== 3. 服务器端完成 end-to-end 登录验证 ====="
+spawn scp -o StrictHostKeyChecking=no /Users/lwpj/Documents/trae_projects/chengdu-voice/_server_test_final.sh root@$server_ip:/tmp/test_login.sh
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+# 直接写服务器上的脚本
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "cat > /tmp/e2e_login.sh <<'XEOF'
+#!/bin/bash
+# end-to-end 真实验证登录
+echo '=== step1: 拿验证码 ==='
+HEADERS=\$(curl -s -D- -o /tmp/c.svg http://127.0.0.1:5001/api/auth/captcha)
+CID=\$(echo \"\$HEADERS\" | grep -i 'x-captcha-id:' | tr -d '\r' | sed -E 's/.*:\\s*//')
+echo 'captchaId:' \$CID
+
+echo '=== step2: 用 node 解密出答案(Next.js下和运行时环境一致) ==='
+cd /var/www/geoscope
+# 用NODE_OPTIONS不行,直接用next/server环境,我们让node直接读 .env.production
+ANSWER=\$(node <<'NE'
+require('fs');
+const fs=require('fs');
+const path=require('path');
+const env=fs.readFileSync('/var/www/geoscope/.env.production','utf8').split('\\n').reduce((o,l)=>{const [k,...r]=l.split('=');const v=r.join('=');if(k&&!k.startsWith('#')){process.env[k]=v;o[k]=v;}return o;},{});
+const HASH=process.env.ADMIN_PASSWORD_HASH;
+const EMAIL=process.env.ADMIN_EMAIL;
+const crypto=require('crypto');
+console.error('读取到 ADMIN_EMAIL:', EMAIL, 'ADMIN_PASSWORD_HASH:', !!HASH);
+const SECRET = crypto.createHash('sha256').update(HASH).digest('hex');
+const CID=process.argv[1] || '';
+try{
+  const b=Buffer.from(CID,'base64url');
+  const iv=b.subarray(0,12), tag=b.subarray(12,28), enc=b.subarray(28);
+  const d=crypto.createDecipheriv('aes-256-gcm', Buffer.from(SECRET,'hex'), iv);
+  d.setAuthTag(tag);
+  const s=Buffer.concat([d.update(enc), d.final()]).toString('utf8');
+  const ans=JSON.parse(s).a;
+  console.log(ans);
+}catch(e){console.error('解密失败',e.message);}
+NE
+\$CID
+)
+echo '验证码答案 =>' \"\$ANSWER\"
+
+echo '=== step3: 用真实邮箱 + 真实密码 + 真验证码登录 ==='
+curl -s -X POST http://127.0.0.1:5001/api/auth/login -H 'Content-Type: application/json' \
+  -d \"{\\\"email\\\":\\\"admin@geoscope.com\\\",\\\"password\\\":\\\"Ks8&fM3!wZdP#qR5v\\\",\\\"captcha\\\":\\\"\$ANSWER\\\",\\\"captchaId\\\":\\\"\$CID\\\"}\"
+echo
+XEOF
+bash /tmp/e2e_login.sh 2>&1
+"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}

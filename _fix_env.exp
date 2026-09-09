@@ -1,0 +1,92 @@
+#!/usr/bin/expect -f
+set timeout 300
+set server_ip "223.6.254.101"
+set ssh_pass "1234@Lwpj"
+
+puts "===== 1. 上传 ecosystem.config.js ====="
+spawn scp -o StrictHostKeyChecking=no /Users/lwpj/Documents/trae_projects/chengdu-sounds/ecosystem.config.js root@$server_ip:/var/www/geoscope/ecosystem.config.js
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+puts ""
+puts "===== 2. 用新配置删除并重新启动 ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "
+cd /var/www/geoscope
+pm2 delete geoscope-1 geoscope-2 2>/dev/null
+pm2 start ecosystem.config.js
+sleep 4
+echo '--- pm2 list ---'
+pm2 list | grep geoscope
+echo '--- 检查进程环境变量 ---'
+pm2 env 0 2>/dev/null | grep -E 'ADMIN_|CAPTCHA_SECRET'
+echo '--- 服务器上直接读.env确认内容正确 ---'
+grep ADMIN /var/www/geoscope/.env.production
+"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+puts ""
+puts "===== 3. 真实登录端到端测试 ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "
+cd /var/www/geoscope
+# 写脚本在node里加载.env.production,模拟真正运行时的解密
+cat > /tmp/e2e.js <<'NE'
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+const crypto = require('crypto');
+
+// 1. 加载.env.production(模拟PM2 env_file行为)
+fs.readFileSync('/var/www/geoscope/.env.production','utf8').split('\n').forEach(l=>{
+  const idx = l.indexOf('=');
+  if (idx>0 && !l.trim().startsWith('#')) {
+    process.env[l.substring(0,idx).trim()] = l.substring(idx+1).trim();
+  }
+});
+console.error('加载的 ADMIN_EMAIL:', process.env.ADMIN_EMAIL);
+console.error('加载的 ADMIN_PASSWORD_HASH 长度:', (process.env.ADMIN_PASSWORD_HASH||'').length);
+
+function req(method, path, body) {
+  return new Promise((res, rej) => {
+    const r = http.request({ hostname: '127.0.0.1', port: 5001, method, path, headers: body?{'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}:{} }, resp => {
+      let b = ''; resp.setEncoding('utf8'); resp.on('data', c => b += c); resp.on('end', () => res({ status: resp.statusCode, headers: resp.headers, body: b }));
+    });
+    r.on('error', rej);
+    if (body) r.write(body);
+    r.end();
+  });
+}
+
+(async function(){
+  // 2. 获取验证码
+  const r1 = await req('GET', '/api/auth/captcha');
+  const cid = r1.headers['x-captcha-id'];
+  console.error('captchaId:', cid);
+
+  // 3. 解密captchaId拿到答案
+  const SECRET = crypto.createHash('sha256').update(process.env.ADMIN_PASSWORD_HASH).digest('hex');
+  let answer;
+  try {
+    const b = Buffer.from(cid, 'base64url');
+    const d = crypto.createDecipheriv('aes-256-gcm', Buffer.from(SECRET,'hex'), b.subarray(0,12));
+    d.setAuthTag(b.subarray(12,28));
+    answer = JSON.parse(Buffer.concat([d.update(b.subarray(28)), d.final()]).toString('utf8')).a;
+  } catch(e) { console.error('解密失败',e.message); process.exit(1); }
+  console.error('验证码答案:', answer);
+
+  // 4. 真实登录
+  const r2 = await req('POST', '/api/auth/login', JSON.stringify({ email:'admin@geoscope.com', password:'Ks8&fM3!wZdP#qR5v', captcha: answer, captchaId: cid }));
+  console.log('登录结果 status:', r2.status);
+  console.log('登录结果 body:', r2.body);
+})();
+NE
+node /tmp/e2e.js 2>&1
+"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}

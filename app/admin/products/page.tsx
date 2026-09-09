@@ -73,6 +73,8 @@ export default function AdminProducts() {
     preorderEndLocal: '',   // datetime-local 输入值
     onSaleAtLocal: '',
     videoUrl: '',
+    variants: [] as any[],
+    specs: {} as any,
   });
 
   const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts(false);
@@ -110,6 +112,8 @@ export default function AdminProducts() {
         preorderEndLocal: isoToLocalInput(product.preorderEnd),
         onSaleAtLocal: isoToLocalInput(product.onSaleAt),
         videoUrl: product.videoUrl || '',
+        variants: product.variants || [],
+        specs: product.specs || {},
       });
     } else {
       setEditingProduct(null);
@@ -137,6 +141,8 @@ export default function AdminProducts() {
         preorderEndLocal: '',
         onSaleAtLocal: '',
         videoUrl: '',
+        variants: [],
+        specs: {},
       });
     }
     setIsModalOpen(true);
@@ -185,6 +191,8 @@ export default function AdminProducts() {
       preorderEnd,
       onSaleAt,
       videoUrl: formData.videoUrl || undefined,
+      variants: formData.variants?.length > 0 ? formData.variants : undefined,
+      specs: Object.keys(formData.specs || {}).length > 0 ? formData.specs : undefined,
     } as Product;
 
     try {

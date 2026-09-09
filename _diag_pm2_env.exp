@@ -1,0 +1,30 @@
+#!/usr/bin/expect -f
+set timeout 180
+set server_ip "223.6.254.101"
+set ssh_pass "1234@Lwpj"
+
+puts "===== 直接写 Node 调试脚本,让它作为 Next.js 的子进程加载.env ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "
+cd /var/www/geoscope
+cat > /tmp/diag_env.js <<'EOF'
+// 让 Next.js 自己的方式加载 env: 用 @next/env -> 但避免依赖,直接看 PM2 进程真实 env
+// 方法:直接访问 geoscope-1 进程的环境变量
+const fs = require('fs');
+const cp = require('child_process');
+const cpid = cp.execSync(\"pm2 pid geoscope-1\").toString().trim();
+console.log('geoscope-1 PID:', cpid);
+try {
+  const procEnv = fs.readFileSync('/proc/' + cpid + '/environ').toString().split('\\0').filter(x=>x.includes('ADMIN')||x.includes('CAPTCHA'));
+  console.log('进程真实环境变量(含ADMIN):');
+  procEnv.forEach(v => console.log('  ', v));
+} catch(e) {
+  console.log('无法读/proc,改用pm2 env命令:');
+  console.log(cp.execSync('pm2 env 0 2>/dev/null | head -40').toString());
+}
+EOF
+node /tmp/diag_env.js
+"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}

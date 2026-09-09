@@ -9,6 +9,17 @@ export default function ProductCard({ product }: { product: Product }) {
   const badge = statusBadge(product);
   const status = product.status || 'on-sale';
 
+  // 多 SKU 时显示价格区间
+  const hasVariants = (product.variants?.length || 0) > 1;
+  const displayPrice = (() => {
+    if (!hasVariants) return `$${product.price}`;
+    const prices = product.variants!.map(v => v.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    if (min === max) return `$${min}`;
+    return `$${min} - $${max}`;
+  })();
+
   return (
     <div className="group bg-white border border-gray-200 hover:border-black transition-colors flex flex-col">
       <Link
@@ -63,7 +74,7 @@ export default function ProductCard({ product }: { product: Product }) {
               </div>
             )}
             <div className="flex items-center justify-between gap-2">
-              <span className="font-serif text-lg font-bold text-black">${product.price}</span>
+              <span className="font-serif text-lg font-bold text-black">{displayPrice}{hasVariants && !displayPrice.includes('-') ? '' : hasVariants && displayPrice.includes('-') ? '' : ''}</span>
               <Link
                 href={`/shop/${product.id}`}
                 className="text-xs px-3 py-1.5 border border-black hover:bg-black hover:text-white transition-colors"

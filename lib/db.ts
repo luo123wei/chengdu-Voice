@@ -40,6 +40,27 @@ const defaultShippingRates: ShippingRate[] = [
 ];
 
 function mapProduct(row: any): Product {
+  // 多 SKU 映射
+  let variants: Product['variants'] | undefined;
+  if (row.variants) {
+    const raw = typeof row.variants === 'string' ? JSON.parse(row.variants) : row.variants;
+    variants = Array.isArray(raw) ? raw.map((v: any) => ({
+      id: String(v.id),
+      name: v.name || '',
+      skuId: v.sku_id,
+      price: parseFloat(v.price) || 0,
+      originalPrice: v.original_price ? parseFloat(v.original_price) : undefined,
+      stock: parseInt(v.stock) || 0,
+      images: Array.isArray(v.images) ? v.images : undefined,
+      attributes: v.attributes || {},
+    })) : undefined;
+  }
+  let specs: Product['specs'] | undefined;
+  if (row.specs) {
+    const raw = typeof row.specs === 'string' ? JSON.parse(row.specs) : row.specs;
+    specs = raw || undefined;
+  }
+
   return {
     id: String(row.id),
     name: row.name || '',
@@ -65,6 +86,8 @@ function mapProduct(row: any): Product {
     preorderEnd: row.preorder_end || undefined,
     onSaleAt: row.on_sale_at || undefined,
     videoUrl: row.video_url || undefined,
+    variants,
+    specs,
   };
 }
 
@@ -166,6 +189,8 @@ export const db = {
         preorder_end: newProduct.preorderEnd || null,
         on_sale_at: newProduct.onSaleAt || null,
         video_url: newProduct.videoUrl || null,
+        variants: newProduct.variants || null,
+        specs: newProduct.specs || null,
       }).select('*').single();
       if (error) {
         console.error('Failed to create product:', error);
@@ -198,6 +223,8 @@ export const db = {
       if (updates.preorderEnd !== undefined) updateData.preorder_end = updates.preorderEnd || null;
       if (updates.onSaleAt !== undefined) updateData.on_sale_at = updates.onSaleAt || null;
       if (updates.videoUrl !== undefined) updateData.video_url = updates.videoUrl || null;
+      if (updates.variants !== undefined) updateData.variants = updates.variants || null;
+      if (updates.specs !== undefined) updateData.specs = updates.specs || null;
 
       console.log('Update product:', id, 'with data:', updateData);
 

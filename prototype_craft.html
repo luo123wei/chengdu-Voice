@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>原型预览 · Chengdu Craft Studio 成都造物(文创工作室改版方向)</title>
+<style>
+  /* ===== 基础:黑白灰极简工作室风 ===== */
+  :root{
+    --black:#000;
+    --ink:#111;
+    --gray1:#666;
+    --gray2:#999;
+    --line:#eee;          /* 浅灰边框 */
+    --bg:#fff;
+    --bg-soft:#fafafa;
+    --accent:#B54A32;     /* 唯一克制点缀:赭红 */
+    --serif:Georgia,'Noto Serif SC','Songti SC',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  img{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px;}
+  .serif{font-family:var(--serif);}
+
+  /* ===== 顶部导航 ===== */
+  header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .logo-mark{width:36px;height:36px;background:var(--black);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:20px;font-weight:700;}
+  .logo-name{font-family:var(--serif);font-weight:700;font-size:17px;line-height:1.1;}
+  .logo-sub{font-size:11px;color:var(--gray2);}
+  .nav-links{display:flex;gap:32px;}
+  .nav-links button{font-size:14px;color:var(--ink);position:relative;padding:4px 0;}
+  .nav-links button:hover{color:var(--black);}
+  .nav-links button.active{font-weight:600;}
+  .nav-links button.active::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--black);}
+  .nav-right{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--gray1);}
+  .cart-ic{width:20px;height:20px;cursor:pointer;}
+
+  /* ===== 通用按钮 ===== */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 32px;font-size:14px;font-weight:500;transition:all .2s;border:1px solid var(--black);}
+  .btn-black{background:var(--black);color:#fff;}
+  .btn-black:hover{background:#333;}
+  .btn-ghost{background:transparent;color:var(--black);}
+  .btn-ghost:hover{background:var(--black);color:#fff;}
+  .btn[disabled]{background:var(--bg-soft);color:var(--gray2);border-color:var(--line);cursor:default;}
+  .btn-sm{padding:9px 18px;font-size:13px;width:100%;}
+
+  /* ===== 首页 Hero ===== */
+  .hero{padding:80px 0 72px;border-bottom:1px solid var(--line);}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;}
+  .hero-eyebrow{font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:var(--gray2);margin-bottom:24px;}
+  .hero h1{font-family:var(--serif);font-size:52px;line-height:1.2;font-weight:700;letter-spacing:-.01em;margin-bottom:24px;}
+  .hero h1 em{font-style:normal;border-bottom:3px solid var(--black);padding-bottom:2px;}
+  .hero p{font-size:17px;color:var(--gray1);max-width:440px;margin-bottom:36px;}
+  .hero-cta{display:flex;gap:16px;flex-wrap:wrap;}
+  .hero-img{position:relative;}
+  .hero-img img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+  .hero-img .tag{position:absolute;left:16px;bottom:16px;background:#fff;padding:8px 14px;font-size:12px;border:1px solid var(--line);}
+
+  /* ===== 理念条 ===== */
+  .manifesto{border-bottom:1px solid var(--line);}
+  .manifesto .wrap{display:grid;grid-template-columns:repeat(3,1fr);}
+  .manifesto .wrap > div{padding:36px 24px;text-align:center;border-right:1px solid var(--line);}
+  .manifesto .wrap > div:last-child{border-right:none;}
+  .manifesto .n{font-family:var(--serif);font-size:13px;color:var(--gray2);margin-bottom:8px;}
+  .manifesto .t{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:6px;}
+  .manifesto .d{font-size:13px;color:var(--gray1);}
+
+  /* ===== 区块标题 ===== */
+  .section{padding:72px 0;}
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;gap:16px;flex-wrap:wrap;}
+  .section-head h2{font-family:var(--serif);font-size:30px;font-weight:700;}
+  .section-head p{font-size:14px;color:var(--gray1);margin-top:6px;}
+  .link-more{font-size:13px;border-bottom:1px solid var(--black);padding-bottom:2px;cursor:pointer;}
+
+  /* ===== 产品卡片 ===== */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .card{border:1px solid var(--line);background:#fff;transition:border-color .2s;display:flex;flex-direction:column;cursor:pointer;}
+  .card:hover{border-color:var(--black);}
+  .card-img{position:relative;aspect-ratio:1;overflow:hidden;background:var(--bg-soft);}
+  .card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s;}
+  .card:hover .card-img img{transform:scale(1.04);}
+  .badge{position:absolute;top:12px;left:12px;font-size:11px;padding:4px 10px;letter-spacing:.05em;}
+  .badge-vote{background:#fff;color:var(--black);border:1px solid var(--black);}
+  .badge-pre{background:var(--black);color:#fff;}
+  .badge-sale{background:var(--bg-soft);color:var(--gray1);border:1px solid var(--line);}
+  .card-body{padding:16px;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .card-title{font-size:15px;font-weight:600;}
+  .card-sub{font-size:12px;color:var(--gray2);}
+  .card-desc{font-size:12.5px;color:var(--gray1);line-height:1.5;flex:1;}
+  .card-foot{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .price{font-family:var(--serif);font-size:18px;font-weight:700;}
+  .votes{font-size:13px;color:var(--gray1);}
+  .votes b{color:var(--black);font-family:var(--serif);font-size:17px;}
+
+  /* ===== 首页入口卡(作品/故事/关于) ===== */
+  .entries{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .entry{border:1px solid var(--line);padding:36px 28px;cursor:pointer;transition:all .2s;display:block;}
+  .entry:hover{border-color:var(--black);background:var(--bg-soft);}
+  .entry .ic{font-family:var(--serif);font-size:13px;color:var(--gray2);letter-spacing:.2em;margin-bottom:16px;}
+  .entry h3{font-family:var(--serif);font-size:22px;margin-bottom:8px;}
+  .entry p{font-size:13px;color:var(--gray1);margin-bottom:20px;}
+  .entry .go{font-size:13px;border-bottom:1px solid var(--black);padding-bottom:2px;}
+
+  /* ===== Shop 页 ===== */
+  .shop-head{padding:56px 0 32px;border-bottom:1px solid var(--line);}
+  .shop-head h1{font-family:var(--serif);font-size:40px;font-weight:700;margin-bottom:8px;}
+  .shop-head p{color:var(--gray1);font-size:15px;}
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--line);}
+  .tab{padding:16px 24px;font-size:14px;color:var(--gray1);border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;gap:8px;align-items:center;}
+  .tab .cnt{font-size:11px;background:var(--bg-soft);border:1px solid var(--line);padding:1px 8px;border-radius:20px;color:var(--gray1);}
+  .tab.active{color:var(--black);font-weight:600;border-bottom-color:var(--black);}
+  .tab.active .cnt{background:var(--black);color:#fff;border-color:var(--black);}
+  .chips{display:flex;gap:10px;padding:20px 0;flex-wrap:wrap;}
+  .chip{font-size:13px;padding:7px 16px;border:1px solid var(--line);color:var(--gray1);transition:all .15s;}
+  .chip.active,.chip:hover{border-color:var(--black);color:var(--black);}
+  .shop-grid{padding-bottom:72px;}
+
+  /* 预售邮箱条 */
+  .preorder-box{margin-top:8px;display:none;flex-direction:column;gap:8px;}
+  .preorder-box.show{display:flex;}
+  .preorder-box input{width:100%;padding:9px 12px;font-size:13px;border:1px solid var(--line);outline:none;font-family:inherit;}
+  .preorder-box input:focus{border-color:var(--black);}
+  .preorder-note{font-size:11px;color:var(--gray2);}
+
+  /* 预售时间信息(后台设置) */
+  .pre-meta{border-top:1px solid var(--line);margin-top:12px;padding-top:10px;display:flex;flex-direction:column;gap:5px;position:relative;}
+  .pre-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--gray1);}
+  .pre-row b{color:var(--ink);font-weight:600;}
+  .pre-row em{font-style:normal;color:var(--accent);margin-left:6px;}
+  .pre-gear{position:absolute;right:0;top:-2px;font-size:11px;color:var(--gray2);border-bottom:1px dashed var(--gray2);padding:0;}
+  .pre-gear:hover{color:var(--black);border-color:var(--black);}
+
+  /* 后台设置弹窗(原型演示) */
+  .modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:24px;}
+  .modal-mask.show{display:flex;}
+  .modal{background:#fff;padding:32px;width:100%;max-width:420px;}
+  .modal h3{font-family:var(--serif);font-size:18px;margin-bottom:4px;}
+  .modal-sub{font-size:12px;color:var(--gray2);margin-bottom:8px;}
+  .modal label{display:block;font-size:13px;margin:16px 0 0;color:var(--gray1);}
+  .modal input{width:100%;padding:10px;border:1px solid var(--line);font-family:inherit;font-size:14px;margin-top:6px;}
+  .modal input:focus{outline:none;border-color:var(--black);}
+  .modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;}
+  .modal-actions .btn{width:auto;padding:9px 22px;}
+
+  /* ===== 详情页(设计中状态) ===== */
+  .detail{padding:48px 0 80px;}
+  .back{font-size:13px;color:var(--gray1);cursor:pointer;margin-bottom:24px;display:inline-block;}
+  .back:hover{color:var(--black);}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;}
+  .detail-img img{width:100%;aspect-ratio:1;object-fit:cover;border:1px solid var(--line);}
+  .detail-badge{display:inline-block;font-size:12px;padding:5px 12px;border:1px solid var(--black);margin-bottom:16px;}
+  .detail h1{font-family:var(--serif);font-size:34px;font-weight:700;margin-bottom:4px;}
+  .detail .sub{font-size:14px;color:var(--gray2);margin-bottom:20px;}
+  .detail .desc{font-size:15px;color:var(--ink);margin-bottom:16px;}
+  .detail .story{font-size:13.5px;color:var(--gray1);border-left:2px solid var(--line);padding-left:16px;margin-bottom:28px;}
+  .vote-big{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;}
+  .vote-big b{font-family:var(--serif);font-size:40px;font-weight:700;}
+  .vote-big span{font-size:14px;color:var(--gray1);}
+  .vote-goal{font-size:12px;color:var(--gray2);margin-bottom:20px;}
+  .goal-bar{height:4px;background:var(--line);margin:8px 0 20px;}
+  .goal-bar i{display:block;height:100%;background:var(--black);}
+  .detail-note{font-size:12px;color:var(--gray2);text-align:center;margin-top:12px;}
+
+  /* ===== Footer ===== */
+  footer{background:var(--black);color:#fff;padding:56px 0 32px;}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:40px;}
+  footer .logo-mark{background:#fff;color:var(--black);}
+  footer .logo-name{color:#fff;}
+  footer .logo-sub{color:#888;}
+  .foot-desc{font-size:13px;color:#999;margin-top:16px;max-width:360px;}
+  .foot-col h4{font-size:13px;letter-spacing:.1em;margin-bottom:16px;color:#fff;}
+  .foot-col a{display:block;font-size:13px;color:#999;margin-bottom:10px;cursor:pointer;}
+  .foot-col a:hover{color:#fff;}
+  .foot-bottom{border-top:1px solid #222;padding-top:24px;font-size:12px;color:#666;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ===== 原型说明条(非站点内容,仅预览用) ===== */
+  .proto-note{background:var(--accent);color:#fff;font-size:12px;text-align:center;padding:8px 16px;}
+  .proto-note b{font-weight:600;}
+
+  @media(max-width:900px){
+    .hero-grid,.detail-grid{grid-template-columns:1fr;gap:32px;}
+    .hero h1{font-size:36px;}
+    .grid{grid-template-columns:repeat(2,1fr);}
+    .entries,.manifesto{grid-template-columns:1fr;}
+    .manifesto div{border-right:none;border-bottom:1px solid var(--line);}
+    .nav-links{display:none;}
+    .foot-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="proto-note"><b>原型预览</b> · 黑白灰极简工作室风 · 含首页 / Shop(投票·预售·在售三分区)/ 设计中详情页 · 按钮可点击交互,非最终代码</div>
+
+<!-- ===== 导航 ===== -->
+<header>
+  <div class="wrap nav">
+    <div class="logo" onclick="go('home')">
+      <div class="logo-mark">造</div>
+      <div>
+        <div class="logo-name">Chengdu Craft Studio</div>
+        <div class="logo-sub">成都造物</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <button id="nav-home" class="active" onclick="go('home')">Home 首页</button>
+      <button id="nav-shop" onclick="go('shop')">Works 作品</button>
+      <button onclick="alert('原型未包含:故事页(沿用现有 blog)')">Stories 故事</button>
+      <button onclick="alert('原型未包含:关于页(工作室故事)')">About 关于</button>
+    </nav>
+    <div class="nav-right">
+      <span>EN / 中</span>
+      <svg class="cart-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 首页 ================= -->
+<main id="view-home" class="view active">
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="hero-eyebrow">Chengdu Craft Studio · 成都造物</div>
+        <h1 class="serif">Everyday objects,<br><em>designed in Chengdu.</em></h1>
+        <p>我们是一间小型文创设计工作室,把成都的松弛与熊猫的可爱,做成你握在手里的日常物件。<br>每一款,都先由你投票,再投入生产。</p>
+        <div class="hero-cta">
+          <button class="btn btn-black" onclick="go('shop')">Explore Works 逛作品 →</button>
+          <button class="btn btn-ghost" onclick="go('shop');setTab('design')">Vote for Next 投票新品</button>
+        </div>
+      </div>
+      <div class="hero-img">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20product%20photography%2C%20a%20cute%20ceramic%20panda%20egg%20figurine%20on%20white%20pedestal%2C%20black%20and%20white%20porcelain%2C%20soft%20studio%20light%2C%20lots%20of%20negative%20space&image_size=landscape_16_9" alt="Panda Egg">
+        <div class="tag">① 首款作品 · Panda Egg 熊猫蛋仔 · 预售中</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="manifesto">
+    <div class="wrap">
+      <div><div class="n">01</div><div class="t">We design</div><div class="d">工作室原创设计,每件都有成都故事</div></div>
+      <div><div class="n">02</div><div class="t">You vote</div><div class="d">概念稿先展出,票数达标才开模生产</div></div>
+      <div><div class="n">03</div><div class="t">We make</div><div class="d">小批量手作,预售订单优先发货</div></div>
+    </div>
+  </section>
+
+  <!-- 新品投票 -->
+  <section class="section wrap">
+    <div class="section-head">
+      <div>
+        <h2 class="serif">What should we make next?</h2>
+        <p>下一款做什么,你说了算 · 投票达 500 票即开启预售</p>
+      </div>
+      <span class="link-more" onclick="go('shop');setTab('design')">查看全部投票 →</span>
+    </div>
+    <div class="grid" id="home-vote-grid"></div>
+  </section>
+
+  <!-- 三入口 -->
+  <section class="section wrap" style="padding-top:0;">
+    <div class="entries">
+      <a class="entry" onclick="go('shop')">
+        <div class="ic">WORKS</div>
+        <h3 class="serif">作品</h3>
+        <p>在售、预售与设计中的全部文创作品</p>
+        <span class="go">进入作品店 →</span>
+      </a>
+      <a class="entry" onclick="alert('原型未包含:故事页(沿用现有 blog 板块,文案将转为设计故事)')">
+        <div class="ic">STORIES</div>
+        <h3 class="serif">故事</h3>
+        <p>每件作品背后的设计草图、打样与成都灵感</p>
+        <span class="go">读设计故事 →</span>
+      </a>
+      <a class="entry" onclick="alert('原型未包含:关于页(工作室介绍与设计理念)')">
+        <div class="ic">ABOUT</div>
+        <h3 class="serif">关于</h3>
+        <p>一间成都的小工作室,和它的造物方法论</p>
+        <span class="go">了解我们 →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 在售精选 -->
+  <section class="section wrap" style="padding-top:0;">
+    <div class="section-head">
+      <div>
+        <h2 class="serif">In Stock Now</h2>
+        <p>已投产在售 · 跨境直邮全球</p>
+      </div>
+      <span class="link-more" onclick="go('shop');setTab('on-sale')">全部在售 →</span>
+    </div>
+    <div class="grid" id="home-sale-grid"></div>
+  </section>
+</main>
+
+<!-- ================= Shop 页 ================= -->
+<main id="view-shop" class="view">
+  <section class="shop-head">
+    <div class="wrap">
+      <h1 class="serif">Works <span style="font-size:20px;color:var(--gray2);">作品</span></h1>
+      <p>投票中的概念 · 预售中的新作 · 已投产的在售款</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab" data-tab="design" onclick="setTab('design')">投票中 · 设计中 <span class="cnt" id="cnt-design">0</span></button>
+      <button class="tab" data-tab="preorder" onclick="setTab('preorder')">预售 <span class="cnt" id="cnt-preorder">0</span></button>
+      <button class="tab active" data-tab="on-sale" onclick="setTab('on-sale')">在售 <span class="cnt" id="cnt-on-sale">0</span></button>
+    </div>
+    <div class="chips">
+      <button class="chip active" onclick="filterCat(this,'all')">All</button>
+      <button class="chip" onclick="filterCat(this,'stationery')">Stationery 文具纸品</button>
+      <button class="chip" onclick="filterCat(this,'home')">Home 家居生活</button>
+      <button class="chip" onclick="filterCat(this,'decor')">Decor 装饰摆件</button>
+      <button class="chip" onclick="filterCat(this,'toy')">Toys 玩偶潮玩</button>
+    </div>
+  </div>
+
+  <section class="wrap shop-grid">
+    <div class="grid" id="shop-grid"></div>
+  </section>
+</main>
+
+<!-- ================= 详情页(设计中状态示例) ================= -->
+<main id="view-detail" class="view">
+  <div class="wrap detail">
+    <span class="back" onclick="go('shop')">← Back to Works</span>
+    <div class="detail-grid">
+      <div class="detail-img">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20panda%20shaped%20bedside%20lantern%20lamp%2C%20warm%20glow%2C%20white%20and%20black%20design%2C%20product%20photo%20on%20beige%20background&image_size=square_hd" alt="Panda Moon Lantern">
+      </div>
+      <div>
+        <span class="detail-badge">DESIGN IN PROGRESS · 投票中</span>
+        <h1 class="serif">Panda Moon Lantern</h1>
+        <div class="sub">熊猫月灯 · 家居生活</div>
+        <p class="desc">一盏圆滚滚的熊猫小夜灯:灯罩是抱月的熊猫,开灯时暖光从"月亮"里漫出来,陪你熬夜也陪你入睡。</p>
+        <div class="story">设计笔记:打样到第 4 版,我们把耳朵从"立耳"改成了"垂耳"——成都的熊猫,松弛感最重要。材质暂定柔光硅胶 + 实木底座,投票达标后开模。</div>
+
+        <div class="vote-big"><b id="detail-votes">247</b><span>人想要</span></div>
+        <div class="goal-bar"><i style="width:49%"></i></div>
+        <div class="vote-goal">目标 500 票开启预售 · 还差 253 票</div>
+
+        <button class="btn btn-black" style="width:100%;" id="detail-vote-btn" onclick="vote('lantern',this)">🤍 我想要它 · I want this</button>
+        <div class="detail-note">无需付费 · 开票预售时我们会邮件提醒你 · 每人每款限投一票</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo" style="margin-bottom:4px;">
+          <div class="logo-mark">造</div>
+          <div><div class="logo-name">Chengdu Craft Studio</div><div class="logo-sub">成都造物</div></div>
+        </div>
+        <p class="foot-desc">一间成都的文创设计工作室。把成都的日常,做成你桌上的日常。Designed in Chengdu, shipped worldwide.</p>
+      </div>
+      <div class="foot-col">
+        <h4>SHOP</h4>
+        <a onclick="go('shop');setTab('design')">投票中</a>
+        <a onclick="go('shop');setTab('preorder')">预售</a>
+        <a onclick="go('shop');setTab('on-sale')">在售作品</a>
+      </div>
+      <div class="foot-col">
+        <h4>STUDIO</h4>
+        <a>关于我们</a>
+        <a>设计故事</a>
+        <a>联系合作</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Chengdu Craft Studio. All rights reserved.</span>
+      <span>Chengdu, Sichuan, China · 跨境直邮全球</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== 后台设置弹窗(原型演示,正式站在 /admin/products 编辑) ===== -->
+<div class="modal-mask" id="modal-mask" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 class="serif">预售时间设置</h3>
+    <p class="modal-sub">原型演示 · 正式站由管理员在后台「编辑产品」中设置</p>
+    <label>预售截止时间(截止后不再接受预订意向)
+      <input type="datetime-local" id="set-pre-end">
+    </label>
+    <label>开始销售时间(预售结束后正式开售)
+      <input type="datetime-local" id="set-on-sale">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-black" onclick="savePreSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 模拟产品数据 ===== */
+const DAYS = 24*60*60*1000;
+/* 预售时间(后台可设):默认预售截止=7天后,正式开售=14天后 */
+const PRE_END_DEFAULT = Date.now() + 7*DAYS;
+const ON_SALE_DEFAULT = Date.now() + 14*DAYS;
+const IMG = {
+  egg: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20minimalist%20ceramic%20panda%20egg%20figurine%2C%20white%20glazed%20porcelain%20with%20black%20panda%20face%2C%20product%20photo%20on%20light%20gray%20background%2C%20soft%20shadow&image_size=square_hd',
+  lantern: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20panda%20shaped%20bedside%20lantern%20lamp%2C%20warm%20glow%2C%20white%20and%20black%20design%2C%20product%20photo%20on%20beige%20background&image_size=square_hd',
+  ruler: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20bamboo%20ruler%20with%20engraved%20panda%20pattern%2C%20stationery%20product%20photo%20on%20white%20background&image_size=square_hd',
+  plush: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20lying%20flat%20lazy%20panda%20plush%20toy%2C%20black%20and%20white%20soft%20fabric%2C%20product%20photo%20on%20light%20gray%20background&image_size=square_hd',
+  bookmark: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=set%20of%20minimalist%20metal%20panda%20bookmarks%2C%20black%20and%20silver%2C%20stationery%20flat%20lay%20on%20white%20background&image_size=square_hd',
+  tote: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=natural%20canvas%20tote%20bag%20with%20minimalist%20black%20panda%20line%20art%20print%2C%20product%20photo%20on%20white%20background&image_size=square_hd',
+  postcard: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=set%20of%20minimalist%20Chengdu%20panda%20illustration%20postcards%2C%20black%20and%20white%20ink%20style%2C%20flat%20lay%20on%20white%20table&image_size=square_hd',
+  teapet: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=small%20cute%20ceramic%20panda%20tea%20pet%20figurine%2C%20glossy%20black%20and%20white%20glaze%2C%20product%20photo%20on%20light%20gray%20background&image_size=square_hd'
+};
+
+const PRODUCTS = [
+  { id:'egg',      en:'Panda Egg',            zh:'熊猫蛋仔',     cat:'decor',     status:'preorder', price:29.99, img:IMG.egg,
+    preorderEnd: PRE_END_DEFAULT, onSaleAt: ON_SALE_DEFAULT,
+    desc:'手作釉烧陶瓷蛋,剥开是一只熊猫。首批限量编号。' },
+  { id:'lantern',  en:'Panda Moon Lantern',   zh:'熊猫月灯',     cat:'home',      status:'design',   votes:247, img:IMG.lantern,
+    desc:'抱月熊猫小夜灯,暖光硅胶灯罩,投票达标开模。' },
+  { id:'ruler',    en:'Bamboo Joint Ruler',   zh:'竹节尺',       cat:'stationery',status:'design',   votes:183, img:IMG.ruler,
+    desc:'竹节造型黄铜书签尺,刻一只趴着的熊猫。' },
+  { id:'plush',    en:'Lazy Panda Plush',     zh:'躺平熊猫玩偶', cat:'toy',       status:'design',   votes:312, img:IMG.plush,
+    desc:'一个彻底躺平的熊猫,可以当抱枕也可以当情绪搭子。' },
+  { id:'bookmark', en:'Panda Bookmark Set',   zh:'熊猫书签套装', cat:'stationery',status:'on-sale',  price:12.99, img:IMG.bookmark,
+    desc:'四枚金属镂空熊猫书签,读书也要有成都节奏。' },
+  { id:'tote',     en:'Rong Cloud Tote',      zh:'蓉云帆布袋',   cat:'home',      status:'on-sale',  price:24.99, img:IMG.tote,
+    desc:'厚磅帆布,水墨熊猫线条,装电脑也装菜。' },
+  { id:'postcard', en:'Chengdu Postcard Set', zh:'成都明信片',   cat:'stationery',status:'on-sale',  price:15.99, img:IMG.postcard,
+    desc:'八张黑白水墨熊猫 × 成都地标,寄给想念的人。' },
+  { id:'teapet',   en:'Panda Tea Pet',        zh:'熊猫茶宠',     cat:'decor',     status:'on-sale',  price:19.99, img:IMG.teapet,
+    desc:'茶席上的小熊猫,浇热水会开心得变色(待定款)。' },
+];
+
+const voted = new Set();
+let currentTab = 'on-sale';
+let currentCat = 'all';
+
+/* ===== 视图切换 ===== */
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.getElementById('nav-home').classList.toggle('active', view==='home');
+  document.getElementById('nav-shop').classList.toggle('active', view==='shop'||view==='detail');
+  window.scrollTo({top:0});
+  if(view==='shop') renderShop();
+}
+
+/* ===== Shop tab / 分类 ===== */
+function setTab(tab){
+  currentTab = tab;
+  go('shop');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  renderShop();
+}
+function filterCat(btn,cat){
+  currentCat = cat;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderShop();
+}
+
+/* ===== 预售时间:统一判定(前台展示与按钮状态同源) ===== */
+function preorderState(p){
+  const now = Date.now();
+  if(now < p.preorderEnd) return 'open';       // 预售中,可登记
+  if(now < p.onSaleAt)   return 'waiting';     // 预售截止,等待开售
+  return 'onsale';                             // 已到开售时间
+}
+function fmtDate(ts){
+  const d = new Date(ts), z = n => String(n).padStart(2,'0');
+  return `${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;
+}
+function countdown(ts){
+  const ms = ts - Date.now();
+  if(ms <= 0) return '已截止';
+  const d = Math.floor(ms/DAYS), h = Math.floor(ms%DAYS/3600000);
+  return d > 0 ? `${d}天${h}小时` : `${h}小时`;
+}
+
+/* ===== 卡片渲染 ===== */
+function badgeHtml(p){
+  if(p.status==='design')  return '<span class="badge badge-vote">投票中 · VOTING</span>';
+  if(p.status==='preorder'){
+    return preorderState(p)==='waiting'
+      ? '<span class="badge badge-pre">待开售 · COMING SOON</span>'
+      : '<span class="badge badge-pre">预售 · PRE-ORDER</span>';
+  }
+  return '<span class="badge badge-sale">在售 · IN STOCK</span>';
+}
+function cardHtml(p){
+  let foot = '';
+  let extra = '';
+  if(p.status==='design'){
+    foot = `<div class="votes"><b id="votes-${p.id}">${p.votes}</b> 人想要</div>
+            <button class="btn btn-black btn-sm" id="btn-${p.id}" onclick="event.stopPropagation();vote('${p.id}',this)">🤍 想要</button>`;
+  }else if(p.status==='preorder'){
+    const st = preorderState(p);
+    if(st==='open'){
+      foot = `<div class="price serif">$${p.price}</div>
+              <button class="btn btn-black btn-sm" id="btn-${p.id}" onclick="event.stopPropagation();togglePre('${p.id}',this)">预订意向 · 剩${countdown(p.preorderEnd)}</button>`;
+      extra = `
+        <div class="preorder-box" id="pre-${p.id}" onclick="event.stopPropagation()">
+          <input type="email" placeholder="留邮箱,开售优先通知(可选)">
+          <button class="btn btn-black btn-sm" onclick="submitPre('${p.id}',this)">提交预订意向</button>
+          <span class="preorder-note">无需付费 · 可留空直接提交</span>
+        </div>
+        <div class="pre-meta">
+          <button class="pre-gear" onclick="event.stopPropagation();openPreSettings('${p.id}')">⚙ 后台设置</button>
+          <div class="pre-row"><span>预售截止</span><span><b>${fmtDate(p.preorderEnd)}</b><em>剩${countdown(p.preorderEnd)}</em></span></div>
+          <div class="pre-row"><span>正式开售</span><b>${fmtDate(p.onSaleAt)}</b></div>
+        </div>`;
+    }else if(st==='waiting'){
+      foot = `<div class="price serif">$${p.price}</div>
+              <button class="btn btn-sm" disabled>预售已截止</button>`;
+      extra = `
+        <div class="pre-meta">
+          <button class="pre-gear" onclick="event.stopPropagation();openPreSettings('${p.id}')">⚙ 后台设置</button>
+          <div class="pre-row"><span>预售截止</span><b>${fmtDate(p.preorderEnd)}</b></div>
+          <div class="pre-row"><span>正式开售</span><span><b>${fmtDate(p.onSaleAt)}</b><em>${countdown(p.onSaleAt)}</em></span></div>
+        </div>`;
+    }else{
+      foot = `<div class="price serif">$${p.price}</div>
+              <button class="btn btn-black btn-sm" onclick="event.stopPropagation();alert('原型演示:已开售,加入购物车')">已开售 · 加购</button>`;
+    }
+  }else{
+    foot = `<div class="price serif">$${p.price}</div>
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();alert('原型演示:加入购物车(正式站走现有结算流程)')">加入购物车</button>`;
+  }
+  return `
+    <div class="card" ${p.status==='design'?`onclick="go('detail')"`:''}>
+      <div class="card-img">${badgeHtml(p)}<img src="${p.img}" alt="${p.en}"></div>
+      <div class="card-body">
+        <div class="card-title">${p.en}</div>
+        <div class="card-sub">${p.zh}</div>
+        <div class="card-desc">${p.desc}</div>
+        <div class="card-foot">${foot}</div>
+        ${extra}
+      </div>
+    </div>`;
+}
+
+function renderShop(){
+  const list = PRODUCTS.filter(p=>p.status===currentTab && (currentCat==='all'||p.cat===currentCat));
+  document.getElementById('shop-grid').innerHTML = list.map(cardHtml).join('') ||
+    '<p style="color:var(--gray2);font-size:14px;grid-column:1/-1;padding:40px 0;">该分区暂无作品。</p>';
+  ['design','preorder','on-sale'].forEach(s=>{
+    document.getElementById('cnt-'+s).textContent = PRODUCTS.filter(p=>p.status===s).length;
+  });
+}
+function renderHome(){
+  document.getElementById('home-vote-grid').innerHTML = PRODUCTS.filter(p=>p.status==='design').map(cardHtml).join('');
+  document.getElementById('home-sale-grid').innerHTML = PRODUCTS.filter(p=>p.status==='on-sale').slice(0,4).map(cardHtml).join('');
+}
+
+/* ===== 投票交互(模拟) ===== */
+function vote(id, btn){
+  if(voted.has(id)) return;
+  voted.add(id);
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(p){ p.votes++; document.querySelectorAll('#votes-'+id).forEach(el=>el.textContent=p.votes); }
+  if(id==='lantern') document.getElementById('detail-votes').textContent = p ? p.votes : 248;
+  btn.textContent = '✓ 已想拥有';
+  btn.disabled = true;
+}
+function togglePre(id, btn){
+  const box = document.getElementById('pre-'+id);
+  const show = box.classList.toggle('show');
+  btn.textContent = show ? '收起' : `预订意向 · 剩${countdown(PRODUCTS.find(x=>x.id===id).preorderEnd)}`;
+}
+function submitPre(id, btn){
+  const input = btn.previousElementSibling;
+  if(input.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)){ alert('邮箱格式不对哦'); return; }
+  btn.parentElement.innerHTML = '<div style="font-size:13px;text-align:center;padding:6px 0;">✓ 已登记,开售时邮件通知你</div>';
+}
+
+/* ===== 后台设置预售时间(原型演示;正式站在 /admin/products 编辑表单) ===== */
+let settingsId = null;
+function toLocalInput(ts){
+  const d = new Date(ts);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // datetime-local 取本地时区
+  return d.toISOString().slice(0,16);
+}
+function openPreSettings(id){
+  settingsId = id;
+  const p = PRODUCTS.find(x=>x.id===id);
+  document.getElementById('set-pre-end').value = toLocalInput(p.preorderEnd);
+  document.getElementById('set-on-sale').value = toLocalInput(p.onSaleAt);
+  document.getElementById('modal-mask').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modal-mask').classList.remove('show');
+}
+function savePreSettings(){
+  const p = PRODUCTS.find(x=>x.id===settingsId);
+  const preEnd  = new Date(document.getElementById('set-pre-end').value).getTime();
+  const onSale  = new Date(document.getElementById('set-on-sale').value).getTime();
+  if(isNaN(preEnd) || isNaN(onSale)){ alert('请选择有效的时间'); return; }
+  if(onSale <= preEnd){ alert('开始销售时间必须晚于预售截止时间'); return; }
+  if(preEnd <= Date.now()){
+    if(!confirm('预售截止时间已早于当前时间,保存后该产品将显示为「待开售」,确定吗?')) return;
+  }
+  p.preorderEnd = preEnd;
+  p.onSaleAt = onSale;
+  closeModal();
+  renderHome();
+  renderShop();
+}
+
+renderHome();
+renderShop();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 300
+set server_ip "223.6.254.101"
+set ssh_pass "1234@Lwpj"
+
+puts "===== 上传 e2e 测试脚本 ====="
+spawn scp -o StrictHostKeyChecking=no /Users/lwpj/Documents/trae_projects/chengdu-voice/_e2e_verify.js root@$server_ip:/tmp/e2e_verify.js
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}
+
+puts ""
+puts "===== 等Next.js 启动完毕后执行 ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "sleep 5; echo '--- 先验证 login 路由HTTP可用 ---'; curl -s -o /dev/null -w 'HTTP %{http_code} /login\n' http://127.0.0.1:5001/login; echo '--- 执行 e2e ---'; cd /var/www/geoscope && node /tmp/e2e_verify.js 2>&1"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}

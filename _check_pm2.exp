@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 120
+set server_ip "223.6.254.101"
+set ssh_pass "1234@Lwpj"
+
+puts "===== 检查 PM2 进程启动信息 ====="
+spawn ssh -o StrictHostKeyChecking=no root@$server_ip "
+echo '--- pm2 show geoscope-1 ---'
+pm2 show geoscope-1 2>&1 | head -50
+echo '--- pm2 启动的 script/cwd/interpreter ---'
+pm2 jlist 2>/dev/null | node -e \"const d=require('fs').readFileSync('/dev/stdin','utf8');const a=JSON.parse(d);a.forEach(p=>{console.log(p.name,'exec_mode:',p.exec_mode,'cwd:',p.pm2_env?.pm_cwd,'script:',p.pm2_env?.pm_exec_path,'env_file:',p.pm2_env?.env_file||'none');console.log('  node args:',p.pm2_env?.node_args||'');});\" 2>&1
+echo '--- 是否存在 ecosystem.config.js ---'
+ls /var/www/geoscope/ecosystem* 2>/dev/null
+echo '--- .env 文件 ---'
+ls -la /var/www/geoscope/.env* 2>/dev/null
+echo '--- process.env 里是否有ADMIN_(直接调用5001的API内部打印日志) ---'
+"
+expect {
+    "password:" { send "$ssh_pass\r"; exp_continue }
+    eof { }
+}

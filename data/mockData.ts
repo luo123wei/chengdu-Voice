@@ -15,6 +15,23 @@ export interface BlogPost {
   scheduledAt?: string;
 }
 
+export interface SKU {
+  id: string;
+  name: string;                  // "白色 / S"
+  skuId?: string;                // 外部SKU编码（可选）
+  price: number;
+  originalPrice?: number;
+  stock: number;
+  images?: string[];             // SKU 专属图片（可选）
+  attributes: {
+    color?: string;
+    size?: string;
+    material?: string;
+    packaging?: string;
+    [key: string]: string | undefined;
+  };
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -41,6 +58,14 @@ export interface Product {
   preorderEnd?: string;   // 预售截止时间(ISO,后台设置)
   onSaleAt?: string;      // 正式开售时间(ISO,后台设置)
   videoUrl?: string;      // 产品视频链接(B站/YouTube/MP4直链)
+  // 多 SKU
+  variants?: SKU[];
+  specs?: {
+    colors?: string[];    // 可选颜色
+    sizes?: string[];     // 可选尺寸
+    materials?: string[]; // 可选材质
+    packagings?: string[];// 可选包装
+  };
 }
 
 export interface Order {

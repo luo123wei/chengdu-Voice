@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductReviews from '@/components/ProductReviews';
+import SkuSelector, { inferSpecsFromVariants } from '@/components/SkuSelector';
+import type { SKU } from '@/data/mockData';
 import { VoteButton, PreorderBlock } from '@/components/IntentButtons';
 import { productCategoryLabels } from '@/data/mockData';
 import { statusBadge } from '@/lib/productStatus';
@@ -65,6 +67,15 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState('story');
   const [showVideo, setShowVideo] = useState(true);
   const videoEmbed = product?.videoUrl ? getVideoEmbed(product.videoUrl) : null;
+  // SKU 相关
+  const [selectedSku, setSelectedSku] = useState<SKU | undefined>(undefined);
+  const hasVariants = (product?.variants?.length || 0) > 1;
+  const specs = product?.specs || (hasVariants ? inferSpecsFromVariants(product!.variants!) : undefined);
+  // 当前价格（优先 SKU 价格）
+  const displayPrice = selectedSku?.price ?? product?.price ?? 0;
+  const displayStock = hasVariants
+    ? (selectedSku?.stock !== undefined ? selectedSku.stock : Math.max(...(product?.variants?.map(v => v.stock) || [0])))
+    : (product?.stock ?? 0);
 
   if (!product) {
     return (
@@ -84,12 +95,28 @@ export default function ProductDetailPage() {
   }
 
   const handleAddToCart = async () => {
+    // 多 SKU 必须选中一个
+    if (hasVariants && !selectedSku) {
+      alert('请先选择规格');
+      return;
+    }
+    // 库存检查
+    if (displayStock === 0) {
+      alert('暂时缺货');
+      return;
+    }
     setIsAdding(true);
     try {
+      const body: any = { productId: product.id, quantity };
+      if (selectedSku) {
+        body.variantId = selectedSku.id;
+        body.skuName = selectedSku.name;
+        body.unitPrice = selectedSku.price;
+      }
       const res = await fetch('/api/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: product.id, quantity }),
+        body: JSON.stringify(body),
         credentials: 'include',
       });
       const data = await res.json();
@@ -290,8 +317,8 @@ export default function ProductDetailPage() {
               {/* ===== 在售:常规购买流程 ===== */}
               {(!product.status || product.status === 'on-sale') && (
                 <>
-                  <div className="flex items-center space-x-3 mb-6">
-                    <span className="text-3xl font-bold text-primary">${product.price}</span>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <span className="text-3xl font-bold text-primary">${displayPrice}</span>
                     {product.unit && product.unitType && (
                       <span className="text-lg text-gray-500">/ {product.unit}{product.unitType}</span>
                     )}
@@ -299,6 +326,18 @@ export default function ProductDetailPage() {
                       <span className="text-lg text-gray-400 line-through">${product.originalPrice}</span>
                     )}
                   </div>
+
+                  {/* SKU 选择器 */}
+                  {hasVariants && product.variants && (
+                    <div className="mb-6">
+                      <SkuSelector
+                        productId={product.id}
+                        variants={product.variants}
+                        specs={specs}
+                        onSelect={setSelectedSku}
+                      />
+                    </div>
+                  )}
 
                   <div className="bg-cream/50 rounded-xl p-6 mb-6">
                     <p className="text-gray-700 font-medium italic text-lg">
