@@ -8,6 +8,7 @@ import { statusBadge } from '@/lib/productStatus';
 export default function ProductCard({ product }: { product: Product }) {
   const badge = statusBadge(product);
   const status = product.status || 'on-sale';
+  const href = `/shop/${product.slug || product.id}`;
 
   // 多 SKU 时显示价格区间
   const hasVariants = (product.variants?.length || 0) > 1;
@@ -23,7 +24,7 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group bg-white border border-gray-200 hover:border-black transition-colors flex flex-col">
       <Link
-        href={`/shop/${product.id}`}
+        href={href}
         className="block relative aspect-square overflow-hidden bg-cream"
       >
         <img
@@ -37,7 +38,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="p-4 flex flex-col gap-1.5 flex-1">
-        <Link href={`/shop/${product.id}`}>
+        <Link href={href}>
           <h3 className="font-semibold text-sm text-gray-900 group-hover:text-black transition-colors line-clamp-1">
             {product.nameEn}
           </h3>
@@ -76,7 +77,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <div className="flex items-center justify-between gap-2">
               <span className="font-serif text-lg font-bold text-black">{displayPrice}{hasVariants && !displayPrice.includes('-') ? '' : hasVariants && displayPrice.includes('-') ? '' : ''}</span>
               <Link
-                href={`/shop/${product.id}`}
+                href={`/shop/${product.slug || product.id}`}
                 className="text-xs px-3 py-1.5 border border-black hover:bg-black hover:text-white transition-colors"
               >
                 加入购物车

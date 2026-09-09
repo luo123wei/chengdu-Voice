@@ -69,10 +69,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     // Fetch products
-    const { data: products, error: productError } = await supabase.from('products').select('id')
+    const { data: products, error: productError } = await supabase.from('products').select('id, slug')
     if (!productError && products) {
       productRoutes = products.map((product: any) => ({
-        url: `${siteUrl}/shop/${product.id}`,
+        url: `${siteUrl}/shop/${product.slug || product.id}`,
         lastModified: new Date(),
         changeFrequency: 'monthly' as const,
         priority: 0.8,

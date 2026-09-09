@@ -32,12 +32,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
   };
 
-  const updateQuantity = async (productId: string, quantity: number) => {
+  const updateQuantity = async (productId: string, quantity: number, variantId?: string) => {
     try {
       const res = await fetch('/api/cart', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, quantity }),
+        body: JSON.stringify({ productId, quantity, variantId }),
         credentials: 'include',
       });
       const data = await res.json();
@@ -50,12 +50,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
   };
 
-  const removeItem = async (productId: string) => {
+  const removeItem = async (productId: string, variantId?: string) => {
     try {
       const res = await fetch('/api/cart', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId }),
+        body: JSON.stringify({ productId, variantId }),
         credentials: 'include',
       });
       const data = await res.json();
@@ -130,26 +130,29 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <div className="flex-1">
                     <h3 className="font-medium text-secondary">{item.nameEn}</h3>
                     <p className="text-sm text-gray-500">{item.name}</p>
+                    {item.skuName && (
+                      <p className="text-xs text-gray-400 mt-0.5">{item.skuName}</p>
+                    )}
                     <p className="font-bold text-primary mt-1">${item.price.toFixed(2)}</p>
                     
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center border border-gray-200 rounded-lg">
                         <button
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.productId, item.quantity - 1, item.variantId)}
                           className="p-2 hover:bg-gray-100 transition-colors"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
                         <span className="px-4 py-2 font-medium">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.productId, item.quantity + 1, item.variantId)}
                           className="p-2 hover:bg-gray-100 transition-colors"
                         >
                           <Plus className="w-4 h-4" />
                         </button>
                       </div>
                       <button
-                        onClick={() => removeItem(item.productId)}
+                        onClick={() => removeItem(item.productId, item.variantId)}
                         className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500"
                       >
                         <Trash2 className="w-4 h-4" />

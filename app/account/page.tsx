@@ -4,8 +4,10 @@ import { Mail, Lock, Package, Clock, CheckCircle, Truck, ChevronRight, LogOut, A
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useProducts } from '@/hooks/useDataStore';
 
 export default function AccountPage() {
+  const { products } = useProducts();
   const [user, setUser] = useState<any>(null);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState('');
@@ -407,10 +409,12 @@ export default function AccountPage() {
                               感谢您的购买！请为商品写一条评价吧~
                             </p>
                             <div className="space-y-1.5">
-                              {order.items.map((item: any, idx: number) => (
+                              {order.items.map((item: any, idx: number) => {
+                                const prodSlug = products.find((p) => p.id === item.productId)?.slug || item.productId;
+                                return (
                                 <Link
                                   key={idx}
-                                  href={`/shop/${item.productId}#reviews`}
+                                  href={`/shop/${prodSlug}#reviews`}
                                   className="flex items-center justify-between w-full text-left px-3 py-2 bg-white rounded-lg hover:bg-amber-100 transition-colors"
                                 >
                                   <span className="text-sm text-gray-700 truncate max-w-[200px]">
@@ -421,7 +425,8 @@ export default function AccountPage() {
                                     去评价
                                   </span>
                                 </Link>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         )}

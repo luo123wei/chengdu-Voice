@@ -142,7 +142,7 @@ export default function BlogDetailPage() {
             
             {relatedProducts.length > 0 && (
               <Link
-                href={`/shop/${relatedProducts[0].id}`}
+                href={`/shop/${relatedProducts[0].slug || relatedProducts[0].id}`}
                 className="bg-white rounded-xl p-6 flex items-center gap-4 hover:shadow-lg transition-all group"
               >
                 <div className="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center group-hover:bg-gold group-hover:text-white transition-all">

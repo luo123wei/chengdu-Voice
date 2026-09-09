@@ -12,6 +12,8 @@ interface CartItem {
   quantity: number;
   image: string;
   type: 'physical' | 'digital';
+  variantId?: string;
+  skuName?: string;
 }
 
 export default function CheckoutPage() {
@@ -103,6 +105,7 @@ export default function CheckoutPage() {
         nameEn: item.nameEn,
         price: item.price,
         quantity: item.quantity,
+        skuName: item.skuName,
       }));
 
       await fetch('/api/orders/confirm', {
@@ -150,6 +153,8 @@ export default function CheckoutPage() {
           name: item.nameEn,
           quantity: item.quantity,
           price: item.price,
+          skuName: item.skuName,
+          variantId: item.variantId,
         })),
         totalAmount: total,
         status: 'pending',
@@ -451,7 +456,7 @@ export default function CheckoutPage() {
               
               <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2">
                 {cartItems.map((item) => (
-                  <div key={item.productId} className="flex items-center space-x-4">
+                  <div key={`${item.productId}-${item.variantId || ''}`} className="flex items-center space-x-4">
                     <img
                       src={item.image}
                       alt={item.nameEn}
@@ -459,6 +464,9 @@ export default function CheckoutPage() {
                     />
                     <div className="flex-1">
                       <p className="font-medium text-secondary">{item.nameEn}</p>
+                      {item.skuName && (
+                        <p className="text-xs text-gray-400">{item.skuName}</p>
+                      )}
                       <p className="text-xs text-gray-500 font-serif">{item.name}</p>
                       <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                     </div>

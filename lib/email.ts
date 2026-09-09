@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { db } from '@/lib/db';
 
 const resendApiKey = process.env.RESEND_API_KEY || '';
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
@@ -352,7 +353,15 @@ export async function sendReviewInvitationEmail(
   productName: string,
   productId: string
 ) {
-  const reviewLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'}/shop/${productId}#reviews`;
+  // 通过 productId 查询 slug，生成 SEO 友好的评价链接
+  let slug = productId;
+  try {
+    const product = await db.products.getById(productId);
+    if (product?.slug) slug = product.slug;
+  } catch (e) {
+    // 查询失败时回退到 productId，保证邮件可发送
+  }
+  const reviewLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'}/shop/${slug}#reviews`;
 
   return sendEmail({
     to: email,

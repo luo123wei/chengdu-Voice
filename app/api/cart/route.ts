@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import type { SKU } from '@/data/mockData';
 
 export async function GET(request: NextRequest) {
   const sessionId = request.cookies.get('sessionId')?.value;
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { productId, quantity } = await request.json();
+    const { productId, quantity, variantId, skuName, unitPrice } = await request.json();
     
     if (!productId || quantity <= 0) {
       return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
@@ -27,7 +28,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    if (product.stock < quantity) {
+    // 若指定了 SKU，校验并取 SKU 价格/库存
+    let selectedSku: SKU | undefined;
+    if (variantId && product.variants?.length) {
+      selectedSku = product.variants.find(v => v.id === variantId);
+      if (!selectedSku) {
+        return NextResponse.json({ error: 'SKU not found' }, { status: 404 });
+      }
+    }
+
+    const itemPrice = selectedSku ? selectedSku.price : (unitPrice ?? product.price);
+    const availableStock = selectedSku ? selectedSku.stock : product.stock;
+
+    if (availableStock < quantity) {
       return NextResponse.json({ error: 'Insufficient stock' }, { status: 400 });
     }
 
@@ -37,11 +50,14 @@ export async function POST(request: NextRequest) {
     }
 
     const cart = await db.cart.get(sessionId);
-    const existingItem = cart.items.find(item => item.productId === productId);
+    // 同一商品 + 同一 SKU 视为同一项
+    const existingItem = cart.items.find(
+      item => item.productId === productId && (item.variantId || '') === (variantId || '')
+    );
 
     if (existingItem) {
       const newQuantity = existingItem.quantity + quantity;
-      if (product.stock < newQuantity) {
+      if (availableStock < newQuantity) {
         return NextResponse.json({ error: 'Insufficient stock' }, { status: 400 });
       }
       existingItem.quantity = newQuantity;
@@ -50,10 +66,12 @@ export async function POST(request: NextRequest) {
         productId: product.id,
         name: product.name,
         nameEn: product.nameEn,
-        price: product.price,
+        price: itemPrice,
         quantity,
-        image: product.images[0],
+        image: selectedSku?.images?.[0] || product.images[0],
         type: product.type,
+        variantId: selectedSku ? selectedSku.id : undefined,
+        skuName: selectedSku ? (skuName || selectedSku.name) : undefined,
       });
     }
 
@@ -79,14 +97,16 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'No session' }, { status: 400 });
     }
 
-    const { productId, quantity } = await request.json();
+    const { productId, quantity, variantId } = await request.json();
     
     if (!productId) {
       return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
     }
 
     const cart = await db.cart.get(sessionId);
-    const itemIndex = cart.items.findIndex(item => item.productId === productId);
+    const itemIndex = cart.items.findIndex(
+      item => item.productId === productId && (item.variantId || '') === (variantId || '')
+    );
 
     if (itemIndex === -1) {
       return NextResponse.json({ error: 'Item not found in cart' }, { status: 404 });
@@ -95,9 +115,12 @@ export async function PUT(request: NextRequest) {
     if (quantity <= 0) {
       cart.items.splice(itemIndex, 1);
     } else {
+      // 库存校验（按 SKU）
       const products = await db.products.getAll();
       const product = products.find(p => p.id === productId);
-      if (product && product.stock < quantity) {
+      const sku = variantId ? product?.variants?.find(v => v.id === variantId) : undefined;
+      const stock = sku ? sku.stock : product?.stock ?? 0;
+      if (product && stock < quantity) {
         return NextResponse.json({ error: 'Insufficient stock' }, { status: 400 });
       }
       cart.items[itemIndex].quantity = quantity;
@@ -117,7 +140,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'No session' }, { status: 400 });
     }
 
-    const { productId } = await request.json();
+    const { productId, variantId } = await request.json();
     
     if (!productId) {
       return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
@@ -128,7 +151,9 @@ export async function DELETE(request: NextRequest) {
     if (productId === 'all') {
       cart.items = [];
     } else {
-      cart.items = cart.items.filter(item => item.productId !== productId);
+      cart.items = cart.items.filter(
+        item => !(item.productId === productId && (item.variantId || '') === (variantId || ''))
+      );
     }
     
     await db.cart.save(sessionId, cart);

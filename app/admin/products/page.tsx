@@ -4,6 +4,7 @@ import { Package, Plus, Edit, Trash2, Search, Filter, X, Save, Image } from 'luc
 import type { Product } from '@/data/mockData';
 import { useProducts } from '@/hooks/useDataStore';
 import RichTextEditor from '@/components/RichTextEditor';
+import { slugify, makeUniqueSlug } from '@/lib/slug';
 
 const categoryMap: Record<string, string> = {
   stationery: '文具纸品',
@@ -75,6 +76,7 @@ export default function AdminProducts() {
     videoUrl: '',
     variants: [] as any[],
     specs: {} as any,
+    slug: '',
   });
 
   const { products: productList, addProduct, updateProduct, deleteProduct } = useProducts(false);
@@ -114,6 +116,7 @@ export default function AdminProducts() {
         videoUrl: product.videoUrl || '',
         variants: product.variants || [],
         specs: product.specs || {},
+        slug: product.slug || '',
       });
     } else {
       setEditingProduct(null);
@@ -143,6 +146,7 @@ export default function AdminProducts() {
         videoUrl: '',
         variants: [],
         specs: {},
+        slug: '',
       });
     }
     setIsModalOpen(true);
@@ -177,9 +181,18 @@ export default function AdminProducts() {
       onSaleAt = new Date(onSale).toISOString();
     }
 
+    // slug: 空则自动从 nameEn 生成；重名自动加 -2
+    const existingSlugs = productList
+      .filter((p) => p.id !== editingProduct?.id && p.slug)
+      .map((p) => p.slug!);
+    let slug = formData.slug?.trim();
+    if (!slug) slug = slugify(formData.nameEn);
+    slug = makeUniqueSlug(slug, existingSlugs);
+
     const productData: Product = {
       id: editingProduct?.id || `prod-${Date.now()}`,
       ...formData,
+      slug,
       rating: parseFloat(formData.rating.toString()) || 0,
       unit: formData.unit === undefined || formData.unit === null || isNaN(formData.unit) ? undefined : formData.unit,
       unitType: formData.unitType || undefined,
@@ -192,7 +205,7 @@ export default function AdminProducts() {
       onSaleAt,
       videoUrl: formData.videoUrl || undefined,
       variants: formData.variants?.length > 0 ? formData.variants : undefined,
-      specs: Object.keys(formData.specs || {}).length > 0 ? formData.specs : undefined,
+      specs: inferSpecs(formData.variants || []),
     } as Product;
 
     try {
@@ -261,6 +274,67 @@ export default function AdminProducts() {
   };
 
   const commonTags = ['organic', 'premium', 'authentic', 'traditional', 'handmade', 'art', 'spicy', 'easy-cook', 'gift', 'cute', 'digital', 'audio'];
+
+  // ===== SKU 管理 =====
+  const addVariant = () => {
+    const newVariant = {
+      id: `sku-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name: '',
+      price: formData.price || 0,
+      stock: 0,
+      images: [] as string[],
+      attributes: {} as Record<string, string | undefined>,
+    };
+    setFormData((prev) => ({ ...prev, variants: [...prev.variants, newVariant] }));
+  };
+
+  const removeVariant = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateVariant = (index: number, field: string, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.map((v, i) => (i === index ? { ...v, [field]: value } : v)),
+    }));
+  };
+
+  const updateVariantAttr = (index: number, key: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.map((v, i) =>
+        i === index
+          ? { ...v, attributes: { ...v.attributes, [key]: value || undefined } }
+          : v
+      ),
+    }));
+  };
+
+  // 从 variants 自动推断 specs（颜色/尺寸/材质/包装的可选值集合）
+  const inferSpecs = (variants: any[]) => {
+    if (!variants?.length) return undefined;
+    const specs: any = {};
+    const dims: Record<string, Set<string>> = {
+      color: new Set(),
+      size: new Set(),
+      material: new Set(),
+      packaging: new Set(),
+    };
+    variants.forEach((v) => {
+      const attrs = (v.attributes || {}) as Record<string, string | undefined>;
+      Object.entries(attrs).forEach(([k, val]) => {
+        if (val && dims[k]) dims[k].add(val);
+      });
+    });
+    if (dims.color.size) specs.colors = Array.from(dims.color);
+    if (dims.size.size) specs.sizes = Array.from(dims.size);
+    if (dims.material.size) specs.materials = Array.from(dims.material);
+    if (dims.packaging.size) specs.packagings = Array.from(dims.packaging);
+    return Object.keys(specs).length ? specs : undefined;
+  };
 
   return (
     <div>
@@ -407,6 +481,26 @@ export default function AdminProducts() {
                     placeholder="例如：Mengding Mountain Tea"
                   />
                 </div>
+              </div>
+
+              {/* URL Slug */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  URL 标识（Slug，留空则自动从英文名生成）
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400">/shop/</span>
+                  <input
+                    type="text"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors text-sm"
+                    placeholder="mengding-mountain-tea"
+                  />
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  只能用英文、数字和连字符。不填则自动从英文名生成。
+                </p>
               </div>
 
               <div>
@@ -566,6 +660,124 @@ export default function AdminProducts() {
                       投票中产品不显示价格与购买按钮,前台展示票数与「我想要它」按钮。票数:
                       <b className="text-black ml-1">{editingProduct?.votesCount ?? 0}</b>
                     </p>
+                  </div>
+                )}
+              </div>
+
+              {/* ===== SKU / 规格管理 ===== */}
+              <div className="border border-gray-200 rounded-xl p-5 bg-gray-50">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">SKU / 多规格管理</label>
+                    <p className="text-xs text-gray-400 mt-1">
+                      为产品添加多个规格（颜色/尺寸/材质/包装），前台会显示规格选择器与价格区间。留空则为单规格产品。
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addVariant}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    添加 SKU
+                  </button>
+                </div>
+
+                {formData.variants.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-6">暂无 SKU，点击「添加 SKU」开始</p>
+                ) : (
+                  <div className="space-y-4">
+                    {formData.variants.map((variant: any, idx: number) => (
+                      <div key={variant.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-sm font-medium text-gray-600">SKU #{idx + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeVariant(idx)}
+                            className="text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid md:grid-cols-4 gap-3 mb-3">
+                          <div className="md:col-span-2">
+                            <label className="block text-xs text-gray-500 mb-1">SKU 名称（如 白色 / S）</label>
+                            <input
+                              type="text"
+                              value={variant.name || ''}
+                              onChange={(e) => updateVariant(idx, 'name', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+                              placeholder="白色 / S"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">价格 ($)</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={variant.price ?? 0}
+                              onChange={(e) => updateVariant(idx, 'price', parseFloat(e.target.value) || 0)}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">库存</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={variant.stock ?? 0}
+                              onChange={(e) => updateVariant(idx, 'stock', parseInt(e.target.value) || 0)}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-4 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">颜色 Color</label>
+                            <input
+                              type="text"
+                              value={variant.attributes?.color || ''}
+                              onChange={(e) => updateVariantAttr(idx, 'color', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+                              placeholder="白色"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">尺寸 Size</label>
+                            <input
+                              type="text"
+                              value={variant.attributes?.size || ''}
+                              onChange={(e) => updateVariantAttr(idx, 'size', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+                              placeholder="S"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">材质 Material</label>
+                            <input
+                              type="text"
+                              value={variant.attributes?.material || ''}
+                              onChange={(e) => updateVariantAttr(idx, 'material', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+                              placeholder="陶瓷"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">包装 Packaging</label>
+                            <input
+                              type="text"
+                              value={variant.attributes?.packaging || ''}
+                              onChange={(e) => updateVariantAttr(idx, 'packaging', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+                              placeholder="礼盒装"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

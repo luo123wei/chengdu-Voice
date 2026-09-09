@@ -34,6 +34,7 @@ export interface SKU {
 
 export interface Product {
   id: string;
+  slug?: string;              // SEO 友好 URL（如 panda-egg）
   name: string;
   nameEn: string;
   description: string;
@@ -88,6 +89,8 @@ export interface OrderItem {
   name: string;
   quantity: number;
   price: number;
+  skuName?: string;
+  variantId?: string;
 }
 
 export interface Review {
@@ -110,6 +113,8 @@ export interface CartItem {
   quantity: number;
   image: string;
   type: 'physical' | 'digital';
+  variantId?: string;   // 所选 SKU 的 id（多规格商品）
+  skuName?: string;     // SKU 名称，如 "白色 / S"
 }
 
 export interface Cart {

@@ -63,6 +63,7 @@ function mapProduct(row: any): Product {
 
   return {
     id: String(row.id),
+    slug: row.slug || undefined,
     name: row.name || '',
     nameEn: row.name_en || '',
     description: row.description || '',
@@ -163,10 +164,16 @@ export const db = {
       if (error || !data) return undefined;
       return mapProduct(data);
     },
+    getBySlug: async (slug: string): Promise<Product | undefined> => {
+      const { data, error } = await supabase.from('products').select('*').eq('slug', slug).single();
+      if (error || !data) return undefined;
+      return mapProduct(data);
+    },
     create: async (product: Omit<Product, 'id'>): Promise<Product> => {
       const newProduct: Product = { ...product, id: `prod-${Date.now()}` };
       const { data, error } = await supabase.from('products').insert({
         id: newProduct.id,
+        slug: newProduct.slug || null,
         name: newProduct.name,
         name_en: newProduct.nameEn,
         description: newProduct.description,
@@ -200,6 +207,7 @@ export const db = {
     },
     update: async (id: string, updates: Partial<Product>): Promise<Product | null> => {
       const updateData: any = {};
+      if (updates.slug !== undefined) updateData.slug = updates.slug || null;
       if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.nameEn !== undefined) updateData.name_en = updates.nameEn;
       if (updates.description !== undefined) updateData.description = updates.description;

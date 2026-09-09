@@ -18,12 +18,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     description: product.descriptionEn?.slice(0, 160) || `Designed in Chengdu: ${product.nameEn}. Small-batch craft, worldwide shipping.`,
     keywords: [product.nameEn, product.category, 'Chengdu', '成都', 'buy online', 'premium quality'],
     alternates: {
-      canonical: `/shop/${id}`,
+      canonical: `/shop/${product.slug || id}`,
     },
     openGraph: {
       title: product.nameEn,
       description: product.descriptionEn?.slice(0, 160) || `Buy authentic ${product.nameEn} from Chengdu, China.`,
-      url: `${siteUrl}/shop/${id}`,
+      url: `${siteUrl}/shop/${product.slug || id}`,
       type: 'article',
       images: product.images?.[0] ? [{ url: product.images[0] }] : [{ url: '/og-image.jpg' }],
       siteName: 'Chengdu Craft Studio',

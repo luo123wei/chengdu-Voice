@@ -59,7 +59,8 @@ function formatRichText(text: string): string {
 export default function ProductDetailPage() {
   const params = useParams();
   const { products } = useProducts();
-  const product = products.find((p) => p.id === params.id);
+  // 兼容两种查询：按 slug 优先，其次按 id
+  const product = products.find((p) => p.slug === params.id || p.id === params.id);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
