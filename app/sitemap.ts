@@ -1,5 +1,8 @@
 import type { MetadataRoute } from 'next'
 
+// 每次请求时动态生成，确保新增产品/博客及时出现在 sitemap 中
+export const dynamic = 'force-dynamic'
+
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
