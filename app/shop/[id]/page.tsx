@@ -85,11 +85,18 @@ export default function ProductDetailPage() {
   useEffect(() => {
     setSelectedImage(0);
   }, [skuImage]);
+
   // 当前价格（优先 SKU 价格）
   const displayPrice = selectedSku?.price ?? product?.price ?? 0;
   const displayStock = hasVariants
     ? (selectedSku?.stock !== undefined ? selectedSku.stock : Math.max(...(product?.variants?.map(v => v.stock) || [0])))
     : (product?.stock ?? 0);
+
+  // 切换 SKU 后购买数量不超过该 SKU 库存
+  useEffect(() => {
+    if (displayStock > 0 && quantity > displayStock) setQuantity(displayStock);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayStock]);
 
   if (!product) {
     return (
@@ -371,7 +378,7 @@ export default function ProductDetailPage() {
                         </button>
                         <span className="px-6 py-3 font-medium">{quantity}</span>
                         <button
-                          onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                          onClick={() => setQuantity(Math.min(displayStock || 1, quantity + 1))}
                           className="p-3 hover:bg-gray-100 transition-colors"
                         >
                           <Plus className="w-4 h-4" />
@@ -380,8 +387,8 @@ export default function ProductDetailPage() {
                     </div>
                     <div>
                       <span className="text-gray-600 mb-2 block">Stock</span>
-                      <span className={`font-medium ${product.stock > 10 ? 'text-green-600' : 'text-accent'}`}>
-                        {product.stock} in stock
+                      <span className={`font-medium ${displayStock === 0 ? 'text-red-500' : displayStock > 10 ? 'text-green-600' : 'text-accent'}`}>
+                        {displayStock === 0 ? 'Out of stock' : `${displayStock} in stock`}
                       </span>
                     </div>
                   </div>
@@ -408,7 +415,7 @@ export default function ProductDetailPage() {
                     ) : (
                       <>
                         <ShoppingCart className="w-6 h-6" />
-                        Add to Cart - ${(product.price * quantity).toFixed(2)}
+                        Add to Cart - ${(displayPrice * quantity).toFixed(2)}
                       </>
                     )}
                   </button>

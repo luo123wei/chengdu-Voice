@@ -28,7 +28,8 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
     // 找到第一个所有已选规格都匹配的 SKU
     return variants.find((sku) => {
       return Object.entries(selected).every(
-        ([key, val]) => sku.attributes[key] === val
+        ([key, val]) =>
+          key === '__name' ? sku.name === val : sku.attributes?.[key] === val
       );
     });
   }, [variants, selected]);
@@ -44,14 +45,22 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
 
   // 规格维度配置
   const dimensions = useMemo(() => {
-    if (!specs) return [];
     const dims: { key: string; label: string; values: string[] }[] = [];
-    if (specs.colors?.length) dims.push({ key: 'color', label: '颜色 Color', values: specs.colors });
-    if (specs.sizes?.length) dims.push({ key: 'size', label: '尺寸 Size', values: specs.sizes });
-    if (specs.materials?.length) dims.push({ key: 'material', label: '材质 Material', values: specs.materials });
-    if (specs.packagings?.length) dims.push({ key: 'packaging', label: '包装 Packaging', values: specs.packagings });
+    if (specs?.colors?.length) dims.push({ key: 'color', label: '颜色 Color', values: specs.colors });
+    if (specs?.sizes?.length) dims.push({ key: 'size', label: '尺寸 Size', values: specs.sizes });
+    if (specs?.materials?.length) dims.push({ key: 'material', label: '材质 Material', values: specs.materials });
+    if (specs?.packagings?.length) dims.push({ key: 'packaging', label: '包装 Packaging', values: specs.packagings });
+    // 兜底：SKU 没有填写颜色/尺寸等标准维度时，用 SKU 名称作为「款式」维度
+    if (dims.length === 0 && variants.length > 1) {
+      const names = variants.map((v) => v.name).filter(Boolean);
+      if (names.length) dims.push({ key: '__name', label: '款式 Style', values: names });
+    }
     return dims;
-  }, [specs]);
+  }, [specs, variants]);
+
+  // 维度值匹配（__name 维度按 SKU 名称匹配，其余按 attributes 匹配）
+  const skuMatchesDim = (sku: SKU, key: string, val: string) =>
+    key === '__name' ? sku.name === val : sku.attributes?.[key] === val;
 
   if (variants.length <= 1) return null;
 
@@ -84,9 +93,7 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
           <div className="flex flex-wrap gap-2">
             {dim.values.map((val) => {
               const isSelected = selected[dim.key] === val;
-              const sku = variants.find(
-                (v) => v.attributes[dim.key] === val
-              );
+              const sku = variants.find((v) => skuMatchesDim(v, dim.key, val));
               const outOfStock = sku && sku.stock === 0;
 
               return (
@@ -103,7 +110,7 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
                   }`}
                 >
                   {val}
-                  {sku && sku.price > 0 && (
+                  {sku && sku.price > 0 && dim.key !== '__name' && (
                     <span className="ml-1 opacity-70">+${(sku.price - (matchedSku?.price || sku.price)).toFixed(2)}</span>
                   )}
                 </button>
