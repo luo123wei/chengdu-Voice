@@ -73,13 +73,24 @@ export default function ProductDetailPage() {
   const hasVariants = (product?.variants?.length || 0) > 1;
   const specs = product?.specs || (hasVariants ? inferSpecsFromVariants(product!.variants!) : undefined);
 
-  // 选中 SKU 的专属图片（如有）；图库 = SKU 图置顶 + 产品图（去重）
+  // 选中 SKU 的专属图片（如有）
   const skuImage = selectedSku?.images?.[0];
+  // 图库 = 所有 SKU 专属图 + 产品图（去重），选中的 SKU 图置顶
   const galleryImages = useMemo(() => {
-    const imgs = product?.images || [];
-    if (skuImage && !imgs.includes(skuImage)) return [skuImage, ...imgs];
+    const imgs = [...(product?.images || [])];
+    // 加入所有 SKU 的专属图（去重）
+    (product?.variants || []).forEach((v) => {
+      const vi = v.images?.[0];
+      if (vi && !imgs.includes(vi)) imgs.push(vi);
+    });
+    // 选中的 SKU 图移到最前
+    if (skuImage) {
+      const idx = imgs.indexOf(skuImage);
+      if (idx > 0) { imgs.splice(idx, 1); imgs.unshift(skuImage); }
+      else if (idx === -1) imgs.unshift(skuImage);
+    }
     return imgs;
-  }, [product?.images, skuImage]);
+  }, [product?.images, product?.variants, skuImage]);
 
   // 切换 SKU 时主图回到第一张（即该 SKU 的专属图）
   useEffect(() => {
