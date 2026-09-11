@@ -1,13 +1,91 @@
 import { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { db } from '@/lib/db'
 
 export const metadata: Metadata = {
   title: 'Shipping Policy',
   description: 'Voice Culture shipping policy — worldwide delivery from Chengdu, China.',
 }
 
-export default function ShippingPolicyPage() {
+type RateRow = {
+  label: string
+  standard: string   // 格式化的显示字符串（单值或区间）
+  express: string
+}
+
+function groupRates(rates: { country: string; standard: number; express: number; freeThreshold: number }[]): RateRow[] {
+  const rows: RateRow[] = []
+  const euCountries = ['Germany', 'France', 'Italy', 'Spain']
+  const asiaCountries = ['Australia', 'New Zealand']
+
+  // 先处理合并分组
+  const grouped = new Set<string>()
+
+  // EU 四国合并
+  const euRates = rates.filter(r => euCountries.includes(r.country))
+  if (euRates.length) {
+    grouped.add('Germany'); grouped.add('France'); grouped.add('Italy'); grouped.add('Spain')
+    const stdVals = euRates.map(r => r.standard)
+    const expVals = euRates.map(r => r.express)
+    const fmt = (arr: number[]) => {
+      const min = Math.min(...arr), max = Math.max(...arr)
+      return min === max ? `$${min.toFixed(2)}` : `$${min.toFixed(2)}–$${max.toFixed(2)}`
+    }
+    rows.push({
+      label: 'EU (Germany, France, Italy, Spain)',
+      standard: fmt(stdVals),
+      express: fmt(expVals),
+    })
+  }
+
+  // Australia / New Zealand 合并
+  const anz = rates.filter(r => asiaCountries.includes(r.country))
+  if (anz.length) {
+    anz.forEach(r => grouped.add(r.country))
+    rows.push({
+      label: anz.length === 2 ? 'Australia / New Zealand' : anz[0].country,
+      standard: `$${anz[0].standard.toFixed(2)}`,
+      express: `$${anz[0].express.toFixed(2)}`,
+    })
+  }
+
+  // 单独国家：US / Canada / UK / Japan / Rest of World (Other)
+  const soloOrder = ['United States', 'Canada', 'United Kingdom', 'Japan', 'Other']
+  for (const name of soloOrder) {
+    const r = rates.find(x => x.country === name)
+    if (!r) continue
+    grouped.add(name)
+    rows.push({
+      label: name === 'Other' ? 'Rest of World' : name,
+      standard: `$${r.standard.toFixed(2)}`,
+      express: `$${r.express.toFixed(2)}`,
+    })
+  }
+
+  // 兜底：所有剩余未分组国家
+  for (const r of rates) {
+    if (!grouped.has(r.country)) {
+      rows.push({
+        label: r.country,
+        standard: `$${r.standard.toFixed(2)}`,
+        express: `$${r.express.toFixed(2)}`,
+      })
+    }
+  }
+
+  return rows
+}
+
+export default async function ShippingPolicyPage() {
+  const rates = await db.shippingRates.getAll()
+  const rows = groupRates(rates)
+
+  // 免邮门槛说明（取各地区阈值的范围）
+  const thresholds = rates.map(r => r.freeThreshold)
+  const minT = Math.min(...thresholds), maxT = Math.max(...thresholds)
+  const freeThresholdText = minT === maxT ? `$${minT.toFixed(2)}` : `$${minT.toFixed(2)}–$${maxT.toFixed(2)}`
+
   return (
     <>
       <Header />
@@ -27,7 +105,7 @@ export default function ShippingPolicyPage() {
             </ul>
             <p>Orders are not processed or shipped on weekends or Chinese public holidays.</p>
 
-            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">2. Shipping Methods &amp; Time</h2>
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">2. Shipping Rates</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border border-gray-200">
                 <thead>
@@ -38,20 +116,23 @@ export default function ShippingPolicyPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td className="border border-gray-200 px-4 py-2">United States</td><td className="border border-gray-200 px-4 py-2">$4.99</td><td className="border border-gray-200 px-4 py-2">$10.99</td></tr>
-                  <tr><td className="border border-gray-200 px-4 py-2">Canada</td><td className="border border-gray-200 px-4 py-2">$6.99</td><td className="border border-gray-200 px-4 py-2">$12.99</td></tr>
-                  <tr><td className="border border-gray-200 px-4 py-2">United Kingdom</td><td className="border border-gray-200 px-4 py-2">$5.99</td><td className="border border-gray-200 px-4 py-2">$11.99</td></tr>
-                  <tr><td className="border border-gray-200 px-4 py-2">EU (Germany, France, Italy, Spain)</td><td className="border border-gray-200 px-4 py-2">$5.99–$6.99</td><td className="border border-gray-200 px-4 py-2">$11.99–$12.99</td></tr>
-                  <tr><td className="border border-gray-200 px-4 py-2">Australia / New Zealand</td><td className="border border-gray-200 px-4 py-2">$7.99</td><td className="border border-gray-200 px-4 py-2">$14.99</td></tr>
-                  <tr><td className="border border-gray-200 px-4 py-2">Japan</td><td className="border border-gray-200 px-4 py-2">$5.99</td><td className="border border-gray-200 px-4 py-2">$11.99</td></tr>
-                  <tr><td className="border border-gray-200 px-4 py-2">Rest of World</td><td className="border border-gray-200 px-4 py-2">$9.99</td><td className="border border-gray-200 px-4 py-2">$18.99</td></tr>
+                  {rows.map((row, i) => (
+                    <tr key={i}>
+                      <td className="border border-gray-200 px-4 py-2">{row.label}</td>
+                      <td className="border border-gray-200 px-4 py-2">{row.standard}</td>
+                      <td className="border border-gray-200 px-4 py-2">{row.express}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Rates above match our live checkout pricing. Updated whenever shipping rates change.
+            </p>
             <p>Delivery times are estimates and not guaranteed. Actual transit time depends on the destination country&apos;s postal service and customs clearance.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">3. Free Shipping Threshold</h2>
-            <p>We offer <strong>free standard shipping</strong> when your order subtotal reaches the free-shipping threshold for your region (typically $49.99–$89.99 depending on destination). The threshold is displayed at checkout.</p>
+            <p>We offer <strong>free standard shipping</strong> when your order subtotal reaches the free-shipping threshold for your region — typically <strong>{freeThresholdText}</strong>. The exact threshold for your destination is displayed at checkout before you pay.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">4. Carriers We Use</h2>
             <p>Depending on destination and service level, we ship via China Post, DHL, FedEx, or local postal partners. You will receive a tracking number by email once your order ships.</p>
