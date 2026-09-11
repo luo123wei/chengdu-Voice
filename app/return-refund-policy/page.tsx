@@ -20,7 +20,7 @@ export default function ReturnRefundPolicyPage() {
             <p>We want you to love every piece you receive from Voice Culture. If something isn&apos;t right, here&apos;s how we handle returns and refunds.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">1. Return Window</h2>
-            <p>You may request a return within <strong>14 days</strong> of receiving your order. Items must be unused, in their original packaging, and in the same condition you received them.</p>
+            <p>You may request a return within <strong>30 days</strong> of receiving your order. Items must be unused, in their original packaging, and in the same condition you received them.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">2. Non-Returnable Items</h2>
             <p>The following items cannot be returned:</p>
