@@ -53,16 +53,28 @@ export default function TermsOfServicePage() {
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">7. Limitation of Liability</h2>
             <p>Voice Culture is not liable for any indirect, incidental, or consequential damages arising from your use of the Site or our products. Our total liability for any claim shall not exceed the amount you paid for the product in question.</p>
 
-            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">8. Third-Party Links</h2>
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">8. Disclaimer of Warranties</h2>
+            <p>The Site and all products are provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, whether express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, or non-infringement. We do not warrant that the Site will be uninterrupted, error-free, or free of harmful components. You use the Site at your own risk.</p>
+            <p>To the maximum extent permitted by law, Voice Culture disclaims all warranties. Applicable consumer protection laws in your jurisdiction may grant you rights that cannot be waived; these Terms do not affect those statutory rights.</p>
+
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">9. Force Majeure</h2>
+            <p>Voice Culture shall not be held liable for any delay or failure in performance caused by circumstances beyond our reasonable control, including but not limited to: natural disasters, epidemics or pandemics, war, terrorism, civil unrest, government actions or sanctions, labor disputes, transportation disruptions, customs holds, supplier failures, internet or telecommunications outages, or any other force majeure event. We will notify you of any such delay and resume performance as soon as reasonably possible.</p>
+
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">10. Dispute Resolution &amp; Arbitration</h2>
+            <p>Any dispute, claim, or controversy arising out of or relating to these Terms, the Site, or your order shall first be resolved through good-faith negotiation. You may submit a written complaint to <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>, and we will respond within 15 business days.</p>
+            <p>If the dispute remains unresolved after 30 days of negotiation, either party may submit the dispute to binding arbitration administered by the <strong>Hong Kong International Arbitration Centre (HKIAC)</strong> under the HKIAC Administered Arbitration Rules. The seat of arbitration shall be Hong Kong. The language of the arbitration shall be English. The number of arbitrators shall be one. Judgment upon the award may be entered in any court of competent jurisdiction.</p>
+            <p>Nothing in this section prevents either party from seeking injunctive or other equitable relief from a court of competent jurisdiction for intellectual property infringement or other urgent matters.</p>
+
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">11. Third-Party Links</h2>
             <p>Our Site may contain links to third-party websites. We are not responsible for the content or practices of these external sites.</p>
 
-            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">9. Governing Law</h2>
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">12. Governing Law</h2>
             <p>These Terms are governed by the laws of the People&apos;s Republic of China. Any disputes shall be resolved in the courts of Chengdu, Sichuan, unless otherwise required by mandatory local consumer protection laws.</p>
 
-            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">10. Changes to Terms</h2>
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">13. Changes to Terms</h2>
             <p>We may update these Terms at any time. Continued use of the Site after changes constitutes acceptance of the revised Terms.</p>
 
-            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">11. Contact</h2>
+            <h2 className="text-xl font-bold text-secondary mt-8 mb-3">14. Contact</h2>
             <p>For questions about these Terms, email <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>.</p>
           </div>
         </div>
