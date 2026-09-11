@@ -69,6 +69,17 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400 text-sm">
+          <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-2 mb-4">
+            <Link href="/shipping-policy" className="hover:text-primary transition-colors">Shipping Policy</Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/return-refund-policy" className="hover:text-primary transition-colors">Return &amp; Refund Policy</Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
+          </div>
           <p>2026 Chengdu Craft Studio 成都造物. All rights reserved.</p>
           <span className="text-gray-500">Chengdu, Sichuan, China · 跨境直邮全球 · <Link href="/admin" className="text-gray-600 hover:text-gray-400 transition-colors">Admin</Link></span>
         </div>
