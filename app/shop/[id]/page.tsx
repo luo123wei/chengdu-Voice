@@ -6,8 +6,9 @@ import ProductDetailClient from '@/components/ProductDetailClient';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const product = await db.products.getBySlug(params.id) || await db.products.getById(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const product = await db.products.getBySlug(id) || await db.products.getById(id);
   if (!product) {
     return { title: 'Product Not Found | Voice Culture' };
   }
@@ -36,8 +37,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = await db.products.getBySlug(params.id) || await db.products.getById(params.id);
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const product = await db.products.getBySlug(id) || await db.products.getById(id);
 
   if (!product) {
     notFound();
