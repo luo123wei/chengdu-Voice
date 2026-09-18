@@ -6,6 +6,16 @@ export const dynamic = 'force-dynamic';
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
 const BRAND_NAME = 'Voice Culture';
 
+// Google product category IDs（Google 标准分类）
+// https://www.google.com/basepages/producttype/taxonomy.en-US.txt
+const CATEGORY_MAP: Record<string, string> = {
+  'Wax Seal Stamp': 'Home & Garden > Decor',
+  'Panda Plush': 'Toys & Games > Toys > Plush Toys',
+  'Panda Egg': 'Home & Garden > Decor',
+  'Keychain': 'Apparel & Accessories > Accessories > Keychains',
+  'default': 'Home & Garden > Decor',
+};
+
 // XML escape helper
 function esc(str: string): string {
   return str
@@ -14,6 +24,25 @@ function esc(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
+}
+
+// 根据产品名称匹配 Google 分类
+function getGoogleCategory(nameEn: string): string {
+  for (const [key, cat] of Object.entries(CATEGORY_MAP)) {
+    if (key !== 'default' && nameEn.toLowerCase().includes(key.toLowerCase())) {
+      return cat;
+    }
+  }
+  return CATEGORY_MAP['default'];
+}
+
+// 优化标题：加关键词让 Google Shopping 搜索更容易命中
+function optimizeTitle(nameEn: string): string {
+  // 如果标题里没有 "Chengdu"，加上
+  if (!nameEn.toLowerCase().includes('chengdu')) {
+    return `Chengdu ${nameEn}`;
+  }
+  return nameEn;
 }
 
 export async function GET() {
@@ -33,7 +62,8 @@ export async function GET() {
     const description = esc(
       (p.descriptionEn || p.story || p.nameEn || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 400)
     );
-    const title = esc(p.nameEn);
+    const title = esc(optimizeTitle(p.nameEn));
+    const googleCategory = esc(getGoogleCategory(p.nameEn));
 
     const extras = [
       `<g:id>${esc(p.id)}</g:id>`,
@@ -42,6 +72,40 @@ export async function GET() {
       `<g:availability>${availability}</g:availability>`,
       `<g:condition>new</g:condition>`,
       `<g:image_link>${esc(mainImage)}</g:image_link>`,
+      `<g:google_product_category>${googleCategory}</g:google_product_category>`,
+      // 告诉 Google 这个是自有品牌小批量产品，没有 GTIN/MPN
+      `<g:identifier_exists>no</g:identifier_exists>`,
+      // 运费信息（和网站 Shipping Policy 一致）
+      `<g:shipping>`,
+      `  <g:country>US</g:country>`,
+      `  <g:service>Standard</g:service>`,
+      `  <g:price>5.99 USD</g:price>`,
+      `</g:shipping>`,
+      `<g:shipping>`,
+      `  <g:country>US</g:country>`,
+      `  <g:service>Express</g:service>`,
+      `  <g:price>18.99 USD</g:price>`,
+      `</g:shipping>`,
+      `<g:shipping>`,
+      `  <g:country>AU</g:country>`,
+      `  <g:service>Standard</g:service>`,
+      `  <g:price>6.99 USD</g:price>`,
+      `</g:shipping>`,
+      `<g:shipping>`,
+      `  <g:country>CA</g:country>`,
+      `  <g:service>Standard</g:service>`,
+      `  <g:price>5.99 USD</g:price>`,
+      `</g:shipping>`,
+      `<g:shipping>`,
+      `  <g:country>GB</g:country>`,
+      `  <g:service>Standard</g:service>`,
+      `  <g:price>6.99 USD</g:price>`,
+      `</g:shipping>`,
+      `<g:shipping>`,
+      `  <g:country>DE</g:country>`,
+      `  <g:service>Standard</g:service>`,
+      `  <g:price>5.99 USD</g:price>`,
+      `</g:shipping>`,
     ];
 
     if (p.images.length > 1) {
@@ -81,7 +145,7 @@ ${onSale.map(buildItem).join('\n')}
     status: 200,
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=1800, s-maxage=1800',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
     },
   });
 }
