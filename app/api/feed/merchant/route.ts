@@ -45,7 +45,9 @@ export async function GET() {
     ];
 
     if (p.images.length > 1) {
-      extras.push(`<g:additional_image_link>${esc(p.images.slice(1, 10).join('\n'))}</g:additional_image_link>`);
+      p.images.slice(1, 10).forEach((img) => {
+        extras.push(`<g:additional_image_link>${esc(img)}</g:additional_image_link>`);
+      });
     }
     if (p.tags?.length) {
       extras.push(`<g:product_type>${esc(p.tags.slice(0, 3).join(' > '))}</g:product_type>`);
@@ -71,9 +73,7 @@ export async function GET() {
     <link>${esc(SITE_URL)}</link>
     <description>Chengdu cultural gifts and souvenirs shipped worldwide</description>
     <lastBuildDate>${now}</lastBuildDate>
-    <g:items>
 ${onSale.map(buildItem).join('\n')}
-    </g:items>
   </channel>
 </rss>`;
 
