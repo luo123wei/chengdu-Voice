@@ -1,10 +1,7 @@
-// Redirect /merchant-feed.xml → /api/feed/merchant
-// 这样 Merchant Center 可以用干净的 URL
+import { NextResponse } from 'next/server';
+
+// 308 redirect /merchant-feed.xml → /api/feed/merchant
+// 让 Google Merchant Center 用干净 URL: https://www.voiceculture.world/merchant-feed.xml
 export function GET() {
-  return new Response(null, {
-    status: 308,
-    headers: {
-      Location: '/api/feed/merchant',
-    },
-  });
+  return NextResponse.redirect('/api/feed/merchant', 308);
 }
