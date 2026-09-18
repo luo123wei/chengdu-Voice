@@ -116,10 +116,9 @@ export async function GET() {
     if (p.tags?.length) {
       extras.push(`<g:product_type>${esc(p.tags.slice(0, 3).join(' > '))}</g:product_type>`);
     }
-    if (p.reviews > 0) {
-      extras.push(`<g:review_rating>${p.rating.toFixed(1)}</g:review_rating>`);
-      extras.push(`<g:review_count>${p.reviews}</g:review_count>`);
-    }
+    // 注意：商品评分/评论数不属于商品 Feed 字段（g:review_rating / g:review_count
+    // 不是 Content API 商品属性，会被 Merchant Center 标记为 unrecognized）。
+    // 星级评价需通过独立的 Product Ratings Feed 提交，属于后续进阶功能。
 
     return `    <item>
       <title>${title}</title>
