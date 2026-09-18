@@ -1,0 +1,32 @@
+name: Monthly Virtual Reviews Refresh
+
+on:
+  schedule:
+    # 每月 1 号 UTC 02:00（北京时间 10:00）
+    - cron: '0 2 1 * *'
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  refresh-reviews:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run monthly refresh
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/seed_virtual_reviews.js monthly
