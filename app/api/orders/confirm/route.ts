@@ -3,7 +3,7 @@ import { sendOrderConfirmationEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, customerName, orderNumber, items, total, shippingMethod } = await request.json();
+    const { email, customerName, orderNumber, items, total, shippingMethod, paid } = await request.json();
 
     if (!email || !customerName || !orderNumber || !items || !total) {
       return NextResponse.json(
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await sendOrderConfirmationEmail(email, customerName, orderNumber, items, total, shippingMethod);
+    await sendOrderConfirmationEmail(email, customerName, orderNumber, items, total, shippingMethod, Boolean(paid));
 
     return NextResponse.json({
       success: true,

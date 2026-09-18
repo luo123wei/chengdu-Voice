@@ -73,6 +73,7 @@ export async function sendOrderConfirmationEmail(
   items: { name: string; nameEn: string; price: number; quantity: number }[],
   total: number,
   shippingMethod: string,
+  paid = false,
   emailContent?: { subjectEn: string; bodyEn: string; subjectZh: string; bodyZh: string }
 ) {
   const itemsHtml = items.map(item => `
@@ -90,8 +91,40 @@ export async function sendOrderConfirmationEmail(
     </tr>
   `).join('');
 
-  const defaultSubjectEn = "We've Received Your Order - Chengdu Craft Studio";
-  const defaultBodyEn = `Dear ${customerName},
+  const shippingLabelEn = shippingMethod === 'digital'
+    ? 'Digital Delivery (no physical shipping)'
+    : shippingMethod === 'standard'
+      ? 'Standard Shipping (5-7 business days)'
+      : 'Express Shipping (2-3 business days)';
+  const shippingLabelZh = shippingMethod === 'digital'
+    ? '数字商品交付（无需实物配送）'
+    : shippingMethod === 'standard'
+      ? '标准配送（5-7个工作日）'
+      : '加急配送（2-3个工作日）';
+
+  const defaultSubjectEn = paid
+    ? 'Payment Received & Order Confirmed - Chengdu Craft Studio'
+    : "We've Received Your Order - Chengdu Craft Studio";
+  const defaultBodyEn = paid
+    ? `Dear ${customerName},
+
+Thank you for your order #${orderNumber}! Your PayPal payment of $${total.toFixed(2)} has been received successfully.
+
+**Order Summary:**
+${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+
+**Total Paid:** $${total.toFixed(2)}
+**Delivery:** ${shippingLabelEn}
+
+${shippingMethod === 'digital'
+      ? 'Your digital order will be delivered to this email address shortly.'
+      : 'We will prepare and ship your order within 24 hours. You will receive a shipping confirmation with tracking information once it is on the way.'}
+
+If you have any questions, please contact us at kylw02@outlook.com.
+
+Best regards,
+The Chengdu Craft Studio Team`
+    : `Dear ${customerName},
 
 Thank you for your order! We have received your order #${orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.
 
@@ -99,7 +132,7 @@ Thank you for your order! We have received your order #${orderNumber}. Our custo
 ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
 
 **Total:** $${total.toFixed(2)}
-**Shipping Method:** ${shippingMethod === 'standard' ? 'Standard Shipping (5-7 business days)' : 'Express Shipping (2-3 business days)'}
+**Shipping Method:** ${shippingLabelEn}
 
 **Payment is still pending.** We support PayPal, Payoneer and international wire transfer. Please wait for our email with payment instructions.
 
@@ -108,8 +141,29 @@ If you have any questions, please contact us at kylw02@outlook.com.
 Best regards,
 The Chengdu Craft Studio Team`;
 
-  const defaultSubjectZh = '我们已收到您的订单 - 成都造物';
-  const defaultBodyZh = `尊敬的 ${customerName}，
+  const defaultSubjectZh = paid
+    ? '付款已收到，订单确认 - 成都造物'
+    : '我们已收到您的订单 - 成都造物';
+  const defaultBodyZh = paid
+    ? `尊敬的 ${customerName}，
+
+感谢您的订单 #${orderNumber}！您通过 PayPal 支付的 $${total.toFixed(2)} 已成功到账。
+
+**订单摘要：**
+${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+
+**已付总额：** $${total.toFixed(2)}
+**交付方式：** ${shippingLabelZh}
+
+${shippingMethod === 'digital'
+      ? '您的数字商品将很快发送到此邮箱。'
+      : '我们将在 24 小时内备货并发货，发出后您会收到含物流单号的发货确认邮件。'}
+
+如有任何问题，请联系我们：kylw02@outlook.com。
+
+此致，
+成都造物团队`
+    : `尊敬的 ${customerName}，
 
 感谢您的订单！我们已收到您的订单 #${orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。
 
@@ -117,7 +171,7 @@ The Chengdu Craft Studio Team`;
 ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
 
 **订单总额：** $${total.toFixed(2)}
-**配送方式：** ${shippingMethod === 'standard' ? '标准配送（5-7个工作日）' : '加急配送（2-3个工作日）'}
+**配送方式：** ${shippingLabelZh}
 
 **付款尚未完成。** 我们支持 PayPal、Payoneer 和国际电汇。请等待我们发送付款说明的邮件。
 

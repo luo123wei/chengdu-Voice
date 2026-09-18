@@ -1,11 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 const clientId = process.env.PAYPAL_CLIENT_ID || '';
 const clientSecret = process.env.PAYPAL_CLIENT_SECRET || '';
 // 正式环境：api-m.paypal.com  沙箱环境：api-m.sandbox.paypal.com
 const PAYPAL_API_BASE = process.env.PAYPAL_MODE === 'sandbox'
   ? 'https://api-m.sandbox.paypal.com'
   : 'https://api-m.paypal.com';
+
+// 国家名 -> PayPal 需要的 ISO 3166-1 alpha-2 国家码
+const COUNTRY_CODES: Record<string, string> = {
+  'United States': 'US',
+  'Canada': 'CA',
+  'United Kingdom': 'GB',
+  'Germany': 'DE',
+  'France': 'FR',
+  'Italy': 'IT',
+  'Spain': 'ES',
+  'Australia': 'AU',
+  'Japan': 'JP',
+  'China': 'CN',
+  'Hong Kong': 'HK',
+  'Taiwan': 'TW',
+  'Singapore': 'SG',
+  'Malaysia': 'MY',
+  'Thailand': 'TH',
+  'South Korea': 'KR',
+  'Netherlands': 'NL',
+  'Belgium': 'BE',
+  'Switzerland': 'CH',
+  'Sweden': 'SE',
+  'Norway': 'NO',
+  'Denmark': 'DK',
+  'Finland': 'FI',
+  'Ireland': 'IE',
+  'Austria': 'AT',
+  'Portugal': 'PT',
+  'Poland': 'PL',
+  'Czech Republic': 'CZ',
+  'Greece': 'GR',
+  'New Zealand': 'NZ',
+  'Brazil': 'BR',
+  'Mexico': 'MX',
+  'India': 'IN',
+  'United Arab Emirates': 'AE',
+  'Saudi Arabia': 'SA',
+  'Israel': 'IL',
+  'Turkey': 'TR',
+};
+
+const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
 const getAccessToken = async () => {
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -18,81 +63,155 @@ const getAccessToken = async () => {
     body: 'grant_type=client_credentials',
   });
   const data = await response.json();
-  return data.access_token;
+  if (!response.ok || !data.access_token) {
+    console.error('PayPal access token error:', response.status, data);
+    throw new Error('PAYPAL_AUTH_FAILED');
+  }
+  return data.access_token as string;
 };
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, total, email, customerName, shippingMethod } = await request.json();
+    const body = await request.json();
+    const {
+      items,
+      shipping: shippingFromClient,
+      tax: taxFromClient,
+      total: totalFromClient,
+      email,
+      shippingAddress,
+    } = body;
 
-    if (!items || !total || !email) {
+    if (!Array.isArray(items) || items.length === 0 || !email) {
       return NextResponse.json(
         { error: '缺少必要参数' },
         { status: 400 }
       );
     }
 
-    const orderNumber = `ORD-${Date.now()}`;
-    const accessToken = await getAccessToken();
+    if (!clientId || !clientSecret || clientId === 'your_paypal_client_id_here') {
+      return NextResponse.json(
+        { error: 'PayPal 支付未配置，请联系客服' },
+        { status: 503 }
+      );
+    }
 
-    const paypalItems = items.map((item: { name: string; nameEn: string; price: number; quantity: number }) => ({
-      name: item.nameEn,
-      description: item.name,
-      quantity: item.quantity.toString(),
+    // 金额一律在服务端重新计算，防止前端金额被篡改
+    const itemTotal = round2(
+      items.reduce((sum: number, item: { price: number; quantity: number }) =>
+        sum + Number(item.price) * Number(item.quantity), 0)
+    );
+    const shipping = round2(Number(shippingFromClient) || 0);
+    const tax = round2(Number(taxFromClient) || 0);
+    const total = round2(itemTotal + shipping + tax);
+
+    if (totalFromClient != null && Math.abs(Number(totalFromClient) - total) > 0.01) {
+      console.error('PayPal amount mismatch:', { totalFromClient, itemTotal, shipping, tax, total });
+      return NextResponse.json(
+        { error: '订单金额校验失败，请刷新页面后重试' },
+        { status: 400 }
+      );
+    }
+
+    const hasPhysical = items.some((item: { type?: string }) => item.type !== 'digital');
+
+    const paypalItems = items.map((item: { name: string; nameEn: string; price: number; quantity: number; productId?: string }) => ({
+      name: String(item.nameEn || item.name).slice(0, 127),
+      description: item.name ? String(item.name).slice(0, 127) : undefined,
+      sku: item.productId ? String(item.productId).slice(0, 127) : undefined,
+      quantity: String(item.quantity),
       unit_amount: {
         currency_code: 'USD',
-        value: item.price.toFixed(2),
+        value: round2(Number(item.price)).toFixed(2),
       },
     }));
+
+    const breakdown: Record<string, { currency_code: string; value: string }> = {
+      item_total: { currency_code: 'USD', value: itemTotal.toFixed(2) },
+    };
+    if (shipping > 0) {
+      breakdown.shipping = { currency_code: 'USD', value: shipping.toFixed(2) };
+    }
+    if (tax > 0) {
+      breakdown.tax_total = { currency_code: 'USD', value: tax.toFixed(2) };
+    }
+
+    const orderNumber = `ORD-${Date.now()}`;
+
+    const purchaseUnit: Record<string, unknown> = {
+      reference_id: orderNumber,
+      description: `Chengdu Craft Studio Order ${orderNumber}`,
+      items: paypalItems,
+      amount: {
+        currency_code: 'USD',
+        value: total.toFixed(2),
+        breakdown,
+      },
+      custom_id: email,
+    };
+
+    // 实物商品：把买家填的收货地址带给 PayPal；纯数字商品：不需要收货地址
+    if (hasPhysical) {
+      const countryName: string = shippingAddress?.country || '';
+      const countryCode = shippingAddress?.countryCode || COUNTRY_CODES[countryName] || 'US';
+      purchaseUnit.shipping = {
+        name: {
+          full_name: String(shippingAddress?.fullName || '').slice(0, 127),
+        },
+        address: {
+          address_line_1: String(shippingAddress?.address || '').slice(0, 300),
+          admin_area_2: String(shippingAddress?.city || '').slice(0, 120),
+          postal_code: String(shippingAddress?.postalCode || '').slice(0, 60),
+          country_code: countryCode,
+        },
+      };
+    }
+
+    const accessToken = await getAccessToken();
 
     const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
+        'Prefer': 'return=representation',
       },
       body: JSON.stringify({
         intent: 'CAPTURE',
-        purchase_units: [
-          {
-            reference_id: orderNumber,
-            description: `Chengdu Craft Studio Order ${orderNumber}`,
-            items: paypalItems,
-            amount: {
-              currency_code: 'USD',
-              value: total.toFixed(2),
-              breakdown: {
-                item_total: {
-                  currency_code: 'USD',
-                  value: total.toFixed(2),
-                },
-              },
-            },
-          },
-        ],
+        purchase_units: [purchaseUnit],
         application_context: {
           brand_name: 'Chengdu Craft Studio',
           locale: 'en-US',
-          shipping_preference: 'SET_PROVIDED_ADDRESS',
+          shipping_preference: hasPhysical ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING',
           user_action: 'PAY_NOW',
-          return_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout?success=true`,
-          cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout?cancel=true`,
         },
       }),
     });
 
     const data = await response.json();
 
+    if (!response.ok) {
+      console.error('PayPal create order failed:', response.status, JSON.stringify(data, null, 2));
+      return NextResponse.json(
+        { error: 'PayPal 下单失败', details: data },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       orderId: data.id,
       orderNumber,
+      total,
       links: data.links,
     });
   } catch (error) {
     console.error('PayPal order creation error:', error);
+    const message = error instanceof Error && error.message === 'PAYPAL_AUTH_FAILED'
+      ? 'PayPal 凭证验证失败，请稍后再试或联系客服'
+      : '创建支付失败';
     return NextResponse.json(
-      { error: '创建支付失败' },
+      { error: message },
       { status: 500 }
     );
   }

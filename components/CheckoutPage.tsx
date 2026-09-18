@@ -1,8 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, CreditCard, MapPin, User, Truck, Shield, Check, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useShippingRates, useOrders } from '@/hooks/useDataStore';
+import PayPalCheckout from './PayPalCheckout';
+
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || '';
+const IS_SANDBOX = process.env.NEXT_PUBLIC_PAYPAL_MODE === 'sandbox';
 
 interface CartItem {
   productId: string;
@@ -37,6 +41,9 @@ export default function CheckoutPage() {
   const [emailSent, setEmailSent] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
+  const [paymentResult, setPaymentResult] = useState<'paid' | 'pending'>('pending');
+  const [showOtherMethods, setShowOtherMethods] = useState(false);
+  const paypalOrderNumberRef = useRef('');
 
   const { rates: shippingRates } = useShippingRates();
   const { addOrder } = useOrders();
@@ -98,7 +105,7 @@ export default function CheckoutPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const sendOrderConfirmation = async (newOrderNumber: string) => {
+  const sendOrderConfirmation = async (newOrderNumber: string, paid: boolean) => {
     try {
       const items = cartItems.map(item => ({
         name: item.name,
@@ -117,7 +124,8 @@ export default function CheckoutPage() {
           orderNumber: newOrderNumber,
           items,
           total,
-          shippingMethod: formData.shippingMethod,
+          shippingMethod: hasPhysicalProducts ? formData.shippingMethod : 'digital',
+          paid,
         }),
       });
 
@@ -127,13 +135,118 @@ export default function CheckoutPage() {
     }
   };
 
-  const handlePlaceOrder = async () => {
+  const validateForm = () => {
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
-      setError('Please fill in all personal information.');
-      return;
+      return 'Please fill in all personal information.';
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return 'Please enter a valid email address.';
     }
     if (hasPhysicalProducts && (!formData.address || !formData.city || !formData.country || !formData.postalCode)) {
-      setError('Please fill in all shipping address fields.');
+      return 'Please fill in all shipping address fields.';
+    }
+    return '';
+  };
+
+  // PayPal 按钮点击：先校验表单，再请求后端创建 PayPal 订单
+  const handleCreatePayPalOrder = async () => {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      throw new Error(validationError);
+    }
+    setError('');
+
+    const res = await fetch('/api/payment/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      body: JSON.stringify({
+        items: cartItems.map(item => ({
+          productId: item.productId,
+          name: item.name,
+          nameEn: item.nameEn,
+          price: item.price,
+          quantity: item.quantity,
+          type: item.type,
+        })),
+        subtotal,
+        shipping,
+        tax,
+        total,
+        email: formData.email,
+        customerName: `${formData.firstName} ${formData.lastName}`,
+        shippingMethod: hasPhysicalProducts ? formData.shippingMethod : 'digital',
+        shippingAddress: hasPhysicalProducts
+          ? {
+              fullName: `${formData.firstName} ${formData.lastName}`,
+              address: formData.address,
+              city: formData.city,
+              country: formData.country,
+              postalCode: formData.postalCode,
+            }
+          : undefined,
+      }),
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.orderId) {
+      const msg = json.error || 'Could not start PayPal checkout. Please try again.';
+      setError(msg);
+      throw new Error(msg);
+    }
+
+    paypalOrderNumberRef.current = json.orderNumber;
+    return { orderId: json.orderId as string, orderNumber: json.orderNumber as string };
+  };
+
+  // PayPal 弹窗付款成功且后端已 capture：落库 paid 订单 → 建用户 → 清购物车 → 发邮件
+  const handlePayPalPaid = async () => {
+    setIsProcessing(true);
+    setError('');
+    const orderNumber = paypalOrderNumberRef.current || `ORD-${Date.now()}`;
+    setCurrentOrderId(orderNumber);
+
+    try {
+      await addOrder({
+        customerName: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        country: formData.country,
+        items: cartItems.map(item => ({
+          productId: item.productId,
+          name: item.nameEn,
+          quantity: item.quantity,
+          price: item.price,
+          skuName: item.skuName,
+          variantId: item.variantId,
+        })),
+        totalAmount: total,
+        status: 'paid',
+        createdAt: new Date().toISOString(),
+      });
+
+      await createUserOnOrder(formData.email, `${formData.firstName} ${formData.lastName}`);
+      await clearCart();
+
+      setOrderNumber(orderNumber);
+      setPaymentResult('paid');
+      setIsSubmitted(true);
+
+      sendOrderConfirmation(orderNumber, true);
+    } catch (err) {
+      console.error('Failed to finalize paid order:', err);
+      // 钱已收但订单落库失败：提示用户联系客服，避免重复扣款
+      setError('Your payment was completed, but we could not save the order. Please contact kylw02@outlook.com with your PayPal receipt.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // 备选：Payoneer / 电汇等客服辅助结账（订单先挂 pending）
+  const handlePlaceOrder = async () => {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -144,7 +257,7 @@ export default function CheckoutPage() {
       const orderNumber = `ORD-${Date.now()}`;
       setCurrentOrderId(orderNumber);
 
-      addOrder({
+      await addOrder({
         customerName: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         country: formData.country,
@@ -165,10 +278,11 @@ export default function CheckoutPage() {
       await clearCart();
 
       setOrderNumber(orderNumber);
+      setPaymentResult('pending');
       setIsSubmitted(true);
 
       // 提交订单后立即发送通知邮件
-      sendOrderConfirmation(orderNumber);
+      sendOrderConfirmation(orderNumber, false);
     } catch (err) {
       console.error('Failed to place order:', err);
       setError('Failed to place order. Please try again.');
@@ -178,6 +292,14 @@ export default function CheckoutPage() {
   };
 
   const countries = shippingRates.map(r => r.country);
+
+  const isFormValid = Boolean(
+    formData.firstName &&
+    formData.lastName &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
+    formData.phone &&
+    (!hasPhysicalProducts || (formData.address && formData.city && formData.country && formData.postalCode))
+  );
 
   if (isLoadingCart) {
     return (
@@ -208,39 +330,77 @@ export default function CheckoutPage() {
   }
 
   if (isSubmitted) {
+    const isPaid = paymentResult === 'paid';
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Clock className="w-10 h-10 text-black" />
+          <div className={`w-20 h-20 ${isPaid ? 'bg-green-100' : 'bg-amber-100'} rounded-full flex items-center justify-center mx-auto mb-6`}>
+            {isPaid
+              ? <Check className="w-10 h-10 text-green-600" />
+              : <Clock className="w-10 h-10 text-black" />}
           </div>
-          <h1 className="text-3xl font-serif font-bold text-secondary mb-4">Order Submitted!</h1>
+          <h1 className="text-3xl font-serif font-bold text-secondary mb-4">
+            {isPaid ? 'Payment Successful!' : 'Order Submitted!'}
+          </h1>
           <p className="text-gray-600 mb-6">
-            Thank you! We have received your order.
+            {isPaid
+              ? 'Thank you! Your PayPal payment has been received.'
+              : 'Thank you! We have received your order.'}
           </p>
           <div className="bg-gray-50 rounded-xl p-6 mb-6">
             <p className="text-sm text-gray-500 mb-2">Order Number / 订单号</p>
             <p className="text-xl font-bold text-secondary">{orderNumber}</p>
           </div>
 
-          <div className="bg-gray-50 border border-amber-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
-            <h3 className="font-bold text-amber-900 mb-3">⚠️ Payment Pending / 待付款</h3>
-            <p className="text-amber-800 text-sm mb-3">
-              <strong>Step 1:</strong> Our customer service team will contact you via email within 24 hours to arrange payment details.
-            </p>
-            <p className="text-amber-800 text-sm mb-3">
-              <strong>Step 2:</strong> After confirming payment, we will ship your order within 24 hours.
-            </p>
-            <p className="text-amber-800 text-sm">
-              <strong>支持付款方式：</strong>PayPal · Payoneer · 国际电汇
-            </p>
-            <div className="mt-4 pt-4 border-t border-amber-200">
-              <p className="text-sm text-amber-900">
-                📧 <strong>Contact / 联系邮箱:</strong><br />
-                <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
-              </p>
+          {isPaid ? (
+            <div className="bg-gray-50 border border-green-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
+              <h3 className="font-bold text-green-900 mb-3">✅ Payment Received / 付款已收到</h3>
+              {hasPhysicalProducts ? (
+                <>
+                  <p className="text-green-800 text-sm mb-3">
+                    <strong>Step 1:</strong> We will prepare and ship your order within 24 hours.
+                  </p>
+                  <p className="text-green-800 text-sm mb-3">
+                    <strong>Step 2:</strong> You will receive a shipping confirmation email with tracking information.
+                  </p>
+                  <p className="text-green-800 text-sm">
+                    <strong>第一步：</strong>我们将在 24 小时内备货并发货。
+                  </p>
+                  <p className="text-green-800 text-sm mt-2">
+                    <strong>第二步：</strong>发货后您会收到含物流单号的确认邮件。
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-green-800 text-sm mb-3">
+                    Your digital order will be delivered to <strong>{formData.email}</strong> shortly.
+                  </p>
+                  <p className="text-green-800 text-sm">
+                    您的数字商品将很快发送至邮箱 <strong>{formData.email}</strong>，请注意查收。
+                  </p>
+                </>
+              )}
             </div>
-          </div>
+          ) : (
+            <div className="bg-gray-50 border border-amber-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
+              <h3 className="font-bold text-amber-900 mb-3">⚠️ Payment Pending / 待付款</h3>
+              <p className="text-amber-800 text-sm mb-3">
+                <strong>Step 1:</strong> Our customer service team will contact you via email within 24 hours to arrange payment details.
+              </p>
+              <p className="text-amber-800 text-sm mb-3">
+                <strong>Step 2:</strong> After confirming payment, we will ship your order within 24 hours.
+              </p>
+              <p className="text-amber-800 text-sm">
+                <strong>支持付款方式：</strong>PayPal · Payoneer · 国际电汇
+              </p>
+              <div className="mt-4 pt-4 border-t border-amber-200">
+                <p className="text-sm text-amber-900">
+                  📧 <strong>Contact / 联系邮箱:</strong><br />
+                  <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+                </p>
+              </div>
+            </div>
+          )}
 
           {!emailSent ? (
             <div className="flex items-center justify-center space-x-2 text-black mb-6">
@@ -255,13 +415,18 @@ export default function CheckoutPage() {
           )}
 
           <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left max-w-md mx-auto">
-            <p className="text-sm text-blue-800 font-bold mb-2">📦 Next Steps / 后续流程</p>
+            <p className="text-sm text-blue-800 font-bold mb-2">
+              {isPaid ? '📧 What Happens Next / 接下来' : '📦 Next Steps / 后续流程'}
+            </p>
             <p className="text-sm text-blue-600">
-              Please check your email inbox (and spam folder) for our message within 24 hours.
-              If you do not hear from us, please contact us directly.
+              {isPaid
+                ? 'Please check your email inbox (and spam folder) for the order confirmation.'
+                : 'Please check your email inbox (and spam folder) for our message within 24 hours. If you do not hear from us, please contact us directly.'}
             </p>
             <p className="text-sm text-blue-600 mt-2">
-              请在 24 小时内查收邮件（含垃圾箱）。如未收到请直接邮箱联系我们。
+              {isPaid
+                ? '请查收订单确认邮件（含垃圾箱）。'
+                : '请在 24 小时内查收邮件（含垃圾箱）。如未收到请直接邮箱联系我们。'}
             </p>
           </div>
 
@@ -517,10 +682,16 @@ export default function CheckoutPage() {
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-serif font-bold text-secondary mb-6 flex items-center">
+              <h2 className="text-xl font-serif font-bold text-secondary mb-4 flex items-center">
                 <CreditCard className="w-5 h-5 mr-2 text-primary" />
                 Payment / 付款方式
               </h2>
+
+              {IS_SANDBOX && PAYPAL_CLIENT_ID && (
+                <div className="mb-4 px-3 py-2 bg-amber-50 border border-amber-300 rounded-lg text-xs font-medium text-amber-800 text-center">
+                  SANDBOX / 沙箱测试模式 — No real charge
+                </div>
+              )}
 
               {error && (
                 <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-4">
@@ -528,46 +699,134 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <div className="mb-6 p-5 bg-gray-50 rounded-xl border border-amber-200">
-                <p className="text-amber-800 font-medium flex items-start">
-                  <Shield className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>
-                    <strong>Customer Service Assisted Checkout</strong><br />
-                    <span className="text-gray-800 text-sm">
-                      After placing your order, we will contact you via email within 24 hours to arrange payment.
-                      We support PayPal, Payoneer and international wire transfer.
-                    </span>
-                  </span>
-                </p>
-                <p className="mt-3 text-sm text-gray-800">
-                  <strong>提交订单后，客服将在 24 小时内通过邮件与您联系完成付款。</strong><br />
-                  支持：PayPal、Payoneer、国际电汇
-                </p>
-                <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
-                  <p className="text-amber-800">
-                    📧 <strong>Contact Email / 联系邮箱:</strong><br />
-                    <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
-                  </p>
-                </div>
-              </div>
+              {PAYPAL_CLIENT_ID ? (
+                <>
+                  {isProcessing && (
+                    <div className="flex items-center justify-center py-3 mb-4 text-black bg-gray-50 rounded-lg">
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Processing your payment...
+                    </div>
+                  )}
 
-              <button
-                onClick={handlePlaceOrder}
-                disabled={isProcessing}
-                className="w-full flex items-center justify-center px-6 py-4 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Submitting Order...
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-5 h-5 mr-2" />
-                    Place Order - ${total.toFixed(2)}
-                  </>
-                )}
-              </button>
+                  <PayPalCheckout
+                    createOrder={handleCreatePayPalOrder}
+                    onPaid={handlePayPalPaid}
+                    onError={setError}
+                    disabled={!isFormValid || isProcessing}
+                    disabledHint={
+                      hasPhysicalProducts
+                        ? 'Please complete your personal information and shipping address to enable PayPal.'
+                        : 'Please complete your personal information to enable PayPal.'
+                    }
+                  />
+
+                  <div className="relative my-5">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="px-3 bg-white text-xs text-gray-400 uppercase tracking-wide">
+                        Other payment methods
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowOtherMethods(v => !v)}
+                    className="w-full text-center text-sm text-gray-500 hover:text-primary transition-colors"
+                  >
+                    {showOtherMethods
+                      ? 'Hide other payment methods'
+                      : "Can't use PayPal? Pay via Payoneer / bank transfer"}
+                  </button>
+
+                  {showOtherMethods && (
+                    <div className="mt-4 p-5 bg-gray-50 rounded-xl border border-amber-200">
+                      <p className="text-amber-800 font-medium flex items-start">
+                        <Shield className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+                        <span>
+                          <strong>Customer Service Assisted Checkout</strong><br />
+                          <span className="text-gray-800 text-sm">
+                            After placing your order, we will contact you via email within 24 hours to arrange payment.
+                            We support PayPal, Payoneer and international wire transfer.
+                          </span>
+                        </span>
+                      </p>
+                      <p className="mt-3 text-sm text-gray-800">
+                        <strong>提交订单后，客服将在 24 小时内通过邮件与您联系完成付款。</strong><br />
+                        支持：PayPal、Payoneer、国际电汇
+                      </p>
+                      <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
+                        <p className="text-amber-800">
+                          📧 <strong>Contact Email / 联系邮箱:</strong><br />
+                          <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+                        </p>
+                      </div>
+                      <button
+                        onClick={handlePlaceOrder}
+                        disabled={isProcessing}
+                        className="mt-4 w-full flex items-center justify-center px-6 py-3 border border-primary text-primary rounded-xl font-medium hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Submitting Order...
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-5 h-5 mr-2" />
+                            Place Order - ${total.toFixed(2)}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="mb-6 p-5 bg-gray-50 rounded-xl border border-amber-200">
+                    <p className="text-amber-800 font-medium flex items-start">
+                      <Shield className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>
+                        <strong>Customer Service Assisted Checkout</strong><br />
+                        <span className="text-gray-800 text-sm">
+                          After placing your order, we will contact you via email within 24 hours to arrange payment.
+                          We support PayPal, Payoneer and international wire transfer.
+                        </span>
+                      </span>
+                    </p>
+                    <p className="mt-3 text-sm text-gray-800">
+                      <strong>提交订单后，客服将在 24 小时内通过邮件与您联系完成付款。</strong><br />
+                      支持：PayPal、Payoneer、国际电汇
+                    </p>
+                    <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
+                      <p className="text-amber-800">
+                        📧 <strong>Contact Email / 联系邮箱:</strong><br />
+                        <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handlePlaceOrder}
+                    disabled={isProcessing}
+                    className="w-full flex items-center justify-center px-6 py-4 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Submitting Order...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-5 h-5 mr-2" />
+                        Place Order - ${total.toFixed(2)}
+                      </>
+                    )}
+                  </button>
+                </>
+              )}
 
               <div className="mt-4 flex items-center justify-center text-gray-500 text-sm">
                 <Shield className="w-4 h-4 mr-1" />
