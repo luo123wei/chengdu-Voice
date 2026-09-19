@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
     const isValid = await Promise.race([verifyPromise, verifyTimeout]);
 
     if (!isValid) {
-      return NextResponse.json({ error: '验证码无效或已过期，请重新发送验证码' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid or expired code. Please request a new one.' }, { status: 401 });
     }
 
     // 获取或创建用户（3秒超时，超时返回临时用户）
@@ -150,6 +150,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, user });
   } catch (error: any) {
     console.error('Failed to verify code:', error);
-    return NextResponse.json({ error: '验证失败，请重试' }, { status: 500 });
+    return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 500 });
   }
 }

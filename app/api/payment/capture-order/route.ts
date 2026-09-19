@@ -33,14 +33,14 @@ export async function POST(request: NextRequest) {
 
     if (!orderId) {
       return NextResponse.json(
-        { error: '缺少订单ID' },
+        { error: 'Missing order ID' },
         { status: 400 }
       );
     }
 
     if (!clientId || !clientSecret || clientId === 'your_paypal_client_id_here') {
       return NextResponse.json(
-        { error: 'PayPal 支付未配置，请联系客服' },
+        { error: 'PayPal is not configured yet. Please contact support.' },
         { status: 503 }
       );
     }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok || data.status !== 'COMPLETED') {
       console.error('PayPal capture failed:', response.status, JSON.stringify(data, null, 2));
       return NextResponse.json(
-        { error: '支付未完成，请重试或联系客服', status: data.status, details: data },
+        { error: 'Payment was not completed. Please try again or contact support.', status: data.status, details: data },
         { status: 502 }
       );
     }
@@ -77,8 +77,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('PayPal capture error:', error);
     const message = error instanceof Error && error.message === 'PAYPAL_AUTH_FAILED'
-      ? 'PayPal 凭证验证失败，请稍后再试或联系客服'
-      : '支付捕获失败';
+      ? 'PayPal credential verification failed. Please try again later or contact support.'
+      : 'Payment capture failed';
     return NextResponse.json(
       { error: message },
       { status: 500 }

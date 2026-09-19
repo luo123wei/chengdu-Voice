@@ -53,7 +53,7 @@ export default function BlogPage() {
       <section className="pt-24 pb-12 bg-gradient-to-br from-secondary to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-serif font-bold text-white mb-4">Chengdu Encyclopedia</h1>
+            <h1 className="text-4xl font-serif font-bold text-white mb-4">Voice Culture Stories</h1>
             <p className="text-gray-300 max-w-2xl mx-auto text-lg">
               Discover Chengdu through sounds, stories and flavors. Your guide to experiencing the soul of Chengdu.
             </p>
@@ -178,7 +178,7 @@ export default function BlogPage() {
                   className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  <span>上一页</span>
+                  <span>Prev</span>
                 </button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -200,7 +200,7 @@ export default function BlogPage() {
                   disabled={currentPage === totalPages}
                   className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>下一页</span>
+                  <span>Next</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -209,7 +209,7 @@ export default function BlogPage() {
 
           {filteredPosts.length > 0 && totalPages > 1 && (
             <div className="text-center mt-4 text-sm text-gray-500">
-              显示 {startIndex + 1} - {Math.min(endIndex, filteredPosts.length)} 条，共 {filteredPosts.length} 条
+              Showing {startIndex + 1} - {Math.min(endIndex, filteredPosts.length)} of {filteredPosts.length}
             </div>
           )}
         </div>

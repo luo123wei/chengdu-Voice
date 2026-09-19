@@ -276,7 +276,7 @@ export default function AdminOrders() {
     // 预填默认内容
     if (selectedOrder) {
       setContactSubject(`Payment Instructions for Order ${selectedOrder.id}`);
-      setContactMessage(`Dear ${selectedOrder.customerName},\n\nThank you for your order #${selectedOrder.id}. To complete your payment, please use the payment link below.\n\nWe support PayPal, Payoneer and international wire transfer. If you have any questions, please reply to this email.\n\nBest regards,\nChengdu Craft Studio Team`);
+      setContactMessage(`Dear ${selectedOrder.customerName},\n\nThank you for your order #${selectedOrder.id}. To complete your payment, please use the payment link below.\n\nWe support PayPal, Payoneer and international wire transfer. If you have any questions, please reply to this email.\n\nBest regards,\nVoice Culture Team`);
     }
   };
 

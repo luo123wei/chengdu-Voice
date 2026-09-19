@@ -20,7 +20,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'productId is required' }, { status: 400 });
   }
 
-  const { data, error } = await db.supabase.from('reviews').select('*').eq('product_id', productId).order('date', { ascending: false });
+  // 未来日期的评论不对外展示（定时"生效"效果，同时兜底过滤生成器写入的未来日期数据）
+  const today = new Date().toISOString().split('T')[0];
+  const { data, error } = await db.supabase
+    .from('reviews')
+    .select('*')
+    .eq('product_id', productId)
+    .lte('date', today)
+    .order('date', { ascending: false });
   if (error) {
     return NextResponse.json({ reviews: [] });
   }

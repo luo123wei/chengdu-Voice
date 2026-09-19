@@ -44,12 +44,12 @@ export async function sendVerificationEmail(email: string, code: string) {
 
   return sendEmail({
     to: email,
-    subject: 'Your Login Verification Code - Chengdu Craft Studio',
+    subject: 'Your Login Verification Code - Voice Culture',
     text: `Your verification code is: ${code}\n\nThis code expires in 10 minutes.\n\nVisit ${appUrl} to complete your login.`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 24px; border-radius: 12px; text-align: center;">
-          <h2 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h2>
+          <h2 style="color: white; margin: 0; font-size: 24px;">Voice Culture</h2>
         </div>
         <div style="padding: 24px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <p style="color: #4a5568; margin: 0 0 16px;">Hello,</p>
@@ -59,7 +59,7 @@ export async function sendVerificationEmail(email: string, code: string) {
           </div>
           <p style="color: #4a5568; margin: 0 0 8px;">This code expires in 10 minutes.</p>
           <p style="color: #4a5568; margin: 0;">Visit <a href="${appUrl}" style="color: #8B4513;">${appUrl}</a> to complete your login.</p>
-          <p style="color: #718096; font-size: 12px; margin: 24px 0 0; text-align: center;">Chengdu Craft Studio | 成都造物</p>
+          <p style="color: #718096; font-size: 12px; margin: 24px 0 0; text-align: center;">Voice Culture</p>
         </div>
       </div>
     `,
@@ -80,7 +80,6 @@ export async function sendOrderConfirmationEmail(
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">
         <p style="font-weight: bold; color: #2d3748; margin: 0;">${item.nameEn}</p>
-        <p style="color: #718096; font-size: 14px; margin: 0;">${item.name}</p>
       </td>
       <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right;">
         <p style="color: #4a5568; margin: 0;">Qty: ${item.quantity}</p>
@@ -96,15 +95,9 @@ export async function sendOrderConfirmationEmail(
     : shippingMethod === 'standard'
       ? 'Standard Shipping (5-7 business days)'
       : 'Express Shipping (2-3 business days)';
-  const shippingLabelZh = shippingMethod === 'digital'
-    ? '数字商品交付（无需实物配送）'
-    : shippingMethod === 'standard'
-      ? '标准配送（5-7个工作日）'
-      : '加急配送（2-3个工作日）';
-
   const defaultSubjectEn = paid
-    ? 'Payment Received & Order Confirmed - Chengdu Craft Studio'
-    : "We've Received Your Order - Chengdu Craft Studio";
+    ? 'Payment Received & Order Confirmed - Voice Culture'
+    : "We've Received Your Order - Voice Culture";
   const defaultBodyEn = paid
     ? `Dear ${customerName},
 
@@ -123,7 +116,7 @@ ${shippingMethod === 'digital'
 If you have any questions, please contact us at kylw02@outlook.com.
 
 Best regards,
-The Chengdu Craft Studio Team`
+The Voice Culture Team`
     : `Dear ${customerName},
 
 Thank you for your order! We have received your order #${orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.
@@ -139,79 +132,38 @@ ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item
 If you have any questions, please contact us at kylw02@outlook.com.
 
 Best regards,
-The Chengdu Craft Studio Team`;
-
-  const defaultSubjectZh = paid
-    ? '付款已收到，订单确认 - 成都造物'
-    : '我们已收到您的订单 - 成都造物';
-  const defaultBodyZh = paid
-    ? `尊敬的 ${customerName}，
-
-感谢您的订单 #${orderNumber}！您通过 PayPal 支付的 $${total.toFixed(2)} 已成功到账。
-
-**订单摘要：**
-${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
-
-**已付总额：** $${total.toFixed(2)}
-**交付方式：** ${shippingLabelZh}
-
-${shippingMethod === 'digital'
-      ? '您的数字商品将很快发送到此邮箱。'
-      : '我们将在 24 小时内备货并发货，发出后您会收到含物流单号的发货确认邮件。'}
-
-如有任何问题，请联系我们：kylw02@outlook.com。
-
-此致，
-成都造物团队`
-    : `尊敬的 ${customerName}，
-
-感谢您的订单！我们已收到您的订单 #${orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。
-
-**订单摘要：**
-${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('\n')}
-
-**订单总额：** $${total.toFixed(2)}
-**配送方式：** ${shippingLabelZh}
-
-**付款尚未完成。** 我们支持 PayPal、Payoneer 和国际电汇。请等待我们发送付款说明的邮件。
-
-如有任何问题，请联系我们：kylw02@outlook.com。
-
-此致，
-成都造物团队`;
+The Voice Culture Team`;
 
   const subjectEn = emailContent?.subjectEn || defaultSubjectEn;
-  const subjectZh = emailContent?.subjectZh || defaultSubjectZh;
   const bodyEn = emailContent?.bodyEn || defaultBodyEn;
-  const bodyZh = emailContent?.bodyZh || defaultBodyZh;
 
   return sendEmail({
     to: email,
-    subject: `${subjectEn} | ${subjectZh}`,
+    subject: subjectEn,
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Voice Culture</h1>
           <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Experience the authentic voice of Chengdu</p>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
-          <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Order Confirmation / 订单确认</h2>
+          <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Order Confirmation</h2>
           <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-            <p style="color: #718096; font-size: 14px; margin-bottom: 10px;">Order Number / 订单号</p>
+            <p style="color: #718096; font-size: 14px; margin-bottom: 10px;">Order Number</p>
             <p style="font-size: 18px; font-weight: bold; color: #2d3748; margin: 0;">${orderNumber}</p>
           </div>
           <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
             <thead>
               <tr style="border-bottom: 2px solid #D4A574;">
-                <th style="text-align: left; padding: 10px; color: #2d3748;">Product / 商品</th>
-                <th style="text-align: right; padding: 10px; color: #2d3748;">Qty / 数量</th>
-                <th style="text-align: right; padding: 10px; color: #2d3748;">Price / 价格</th>
+                <th style="text-align: left; padding: 10px; color: #2d3748;">Product</th>
+                <th style="text-align: right; padding: 10px; color: #2d3748;">Qty</th>
+                <th style="text-align: right; padding: 10px; color: #2d3748;">Price</th>
               </tr>
             </thead>
             <tbody>${itemsHtml}</tbody>
             <tfoot>
               <tr>
-                <td colspan="2" style="text-align: right; padding: 15px; font-weight: bold; color: #2d3748;">Total / 总额</td>
+                <td colspan="2" style="text-align: right; padding: 15px; font-weight: bold; color: #2d3748;">Total</td>
                 <td style="text-align: right; padding: 15px; font-weight: bold; color: #D4A574; font-size: 18px;">$${total.toFixed(2)}</td>
               </tr>
             </tfoot>
@@ -221,15 +173,9 @@ ${items.map(item => `- ${item.name} x ${item.quantity} - $${(item.price * item.q
               ${bodyEn.split('\n').slice(-5).join('<br>')}
             </p>
           </div>
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
-            <p style="color: #4a5568; line-height: 1.6; margin: 0;">
-              ${bodyZh.split('\n').slice(-5).join('<br>')}
-            </p>
-          </div>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
-            此邮件由系统自动发送，请勿直接回复。<br>
             This email is automatically generated, please do not reply directly.<br>
-            Chengdu Craft Studio - 成都造物
+            Voice Culture
           </p>
         </div>
       </div>
@@ -245,34 +191,30 @@ export async function sendPaymentReceivedEmail(
 ) {
   return sendEmail({
     to: email,
-    subject: 'Payment Received - Your Order is Being Processed | 付款已收到 - 成都造物',
+    subject: 'Payment Received - Your Order is Being Processed',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
-          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Payment Received / 付款已收到</p>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Voice Culture</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Payment Received</p>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-            <p style="color: #155724; font-weight: bold; margin: 0;">✅ Payment Received / 付款已收到</p>
+            <p style="color: #155724; font-weight: bold; margin: 0;">✅ Payment Received</p>
           </div>
           <p style="color: #4a5568; line-height: 1.6; margin: 0 0 16px;">
             Dear ${customerName},<br><br>
             We have received your payment for order <strong>#${orderNumber}</strong>. Your order is now being processed and will be shipped within 24 hours.
           </p>
           <div style="background: white; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
-            <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">Order Number / 订单号</p>
+            <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">Order Number</p>
             <p style="font-size: 18px; font-weight: bold; color: #2d3748; margin: 0;">${orderNumber}</p>
             <p style="color: #D4A574; font-weight: bold; margin-top: 12px;">Total: $${total.toFixed(2)}</p>
           </div>
-          <p style="color: #4a5568; line-height: 1.6; margin: 0 0 16px;">
-            尊敬的 ${customerName}，<br><br>
-            我们已收到您订单 <strong>#${orderNumber}</strong> 的付款。您的订单正在处理中，将在 24 小时内发货。
-          </p>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
-            此邮件由系统自动发送，请勿直接回复。<br>
-            如有问题请联系：kylw02@outlook.com<br>
-            Chengdu Craft Studio - 成都造物
+            This email is automatically generated, please do not reply directly.<br>
+            Questions? Contact us at kylw02@outlook.com<br>
+            Voice Culture
           </p>
         </div>
       </div>
@@ -293,9 +235,9 @@ export async function sendCustomEmailToBuyer(
   const paymentSection = paymentLink
     ? `
       <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-        <p style="color: #856404; font-weight: bold; margin: 0 0 12px;">💳 Payment Link / 付款链接</p>
+        <p style="color: #856404; font-weight: bold; margin: 0 0 12px;">💳 Payment Link</p>
         <a href="${paymentLink}" style="display: inline-block; background: #8B4513; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 8px 0; word-break: break-all;">
-          Click to Pay / 点击付款
+          Click to Pay
         </a>
         <p style="color: #856404; font-size: 12px; margin-top: 8px; word-break: break-all;">${paymentLink}</p>
       </div>
@@ -306,12 +248,12 @@ export async function sendCustomEmailToBuyer(
 
   return sendEmail({
     to: email,
-    subject: `${subject} | 成都造物 - 订单 ${orderNumber}`,
+    subject: `${subject} - Order ${orderNumber}`,
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', 'PingFang SC', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
-          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Customer Service Message / 客服消息</p>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Voice Culture</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Customer Service Message</p>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <p style="color: #4a5568; margin: 0 0 16px;">Dear ${customerName},</p>
@@ -321,8 +263,7 @@ export async function sendCustomEmailToBuyer(
           ${paymentSection}
           <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
             <p style="color: #4a5568; line-height: 1.6; margin: 0;">
-              This message is regarding your order <strong>#${orderNumber}</strong>.<br>
-              此邮件关于您的订单 <strong>#${orderNumber}</strong>。
+              This message is regarding your order <strong>#${orderNumber}</strong>.
             </p>
             <p style="color: #718096; font-size: 12px; margin-top: 20px;">
               📧 Reply to this email or contact us at <a href="mailto:kylw02@outlook.com" style="color: #8B4513;">kylw02@outlook.com</a><br>
@@ -330,7 +271,7 @@ export async function sendCustomEmailToBuyer(
             </p>
           </div>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
-            Chengdu Craft Studio - 成都造物
+            Voice Culture
           </p>
         </div>
       </div>
@@ -343,14 +284,14 @@ export async function sendDownloadLinkEmail(email: string) {
 
   return sendEmail({
     to: email,
-    subject: 'Get Your Free Chengdu Sound Map - Chengdu Craft Studio',
+    subject: 'Get Your Free Chengdu Sound Map - Voice Culture',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Voice Culture</h1>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
-          <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Welcome to Chengdu Craft Studio!</h2>
+          <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Welcome to Voice Culture!</h2>
           <p style="color: #4a5568; line-height: 1.6; margin-bottom: 20px;">
             Thank you for subscribing! Click the button below to download your free Chengdu Sound Map white noise album.
           </p>
@@ -359,7 +300,7 @@ export async function sendDownloadLinkEmail(email: string) {
           </a>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             This email is automatically generated. Please do not reply directly.<br>
-            Chengdu Craft Studio - 成都造物
+            Voice Culture
           </p>
         </div>
       </div>
@@ -377,11 +318,11 @@ export async function sendReviewVerificationEmail(
 
   return sendEmail({
     to: email,
-    subject: 'Verify Your Review - Chengdu Craft Studio',
+    subject: 'Verify Your Review - Voice Culture',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Voice Culture</h1>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Hello ${nickname},</h2>
@@ -393,7 +334,7 @@ export async function sendReviewVerificationEmail(
           </a>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             This email is automatically generated. Please do not reply directly.<br>
-            Chengdu Craft Studio - 成都造物
+            Voice Culture
           </p>
         </div>
       </div>
@@ -419,11 +360,11 @@ export async function sendReviewInvitationEmail(
 
   return sendEmail({
     to: email,
-    subject: 'Share Your Review - Chengdu Craft Studio',
+    subject: 'Share Your Review - Voice Culture',
     html: `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #D4A574 100%); padding: 30px; border-radius: 12px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">Chengdu Craft Studio | 成都造物</h1>
+          <h1 style="color: white; margin: 0; font-size: 24px;">Voice Culture</h1>
         </div>
         <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
           <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Hello ${customerName},</h2>
@@ -435,7 +376,7 @@ export async function sendReviewInvitationEmail(
           </a>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             This email is automatically generated. Please do not reply directly.<br>
-            Chengdu Craft Studio - 成都造物
+            Voice Culture
           </p>
         </div>
       </div>

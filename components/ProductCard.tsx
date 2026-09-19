@@ -80,7 +80,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 href={`/shop/${product.slug || product.id}`}
                 className="text-xs px-3 py-1.5 border border-black hover:bg-black hover:text-white transition-colors"
               >
-                加入购物车
+                Add to Cart
               </Link>
             </div>
           </div>

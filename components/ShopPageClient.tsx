@@ -9,10 +9,10 @@ const ITEMS_PER_PAGE = 12;
 
 type StatusKey = 'design' | 'preorder' | 'on-sale';
 
-const statusTabs: { key: StatusKey; zh: string; en: string }[] = [
-  { key: 'design', zh: '投票中 · 设计中', en: 'Voting' },
-  { key: 'preorder', zh: '预售', en: 'Pre-order' },
-  { key: 'on-sale', zh: '在售', en: 'In Stock' },
+const statusTabs: { key: StatusKey; en: string }[] = [
+  { key: 'design', en: 'Voting' },
+  { key: 'preorder', en: 'Pre-order' },
+  { key: 'on-sale', en: 'In Stock' },
 ];
 
 const categories = ['stationery', 'home', 'decor', 'toy'] as const;
@@ -87,7 +87,7 @@ export default function ShopPageClient({
           <p className="text-gray-600 text-[15px] md:text-base max-w-2xl mb-8">
             Voice Culture creates small-batch objects inspired by Chengdu&apos;s culture, everyday life and visual language. From panda-inspired objects to Chengdu postcards and tea culture gifts, each piece is designed to offer a different way to remember the city.
           </p>
-          <p className="text-gray-400 text-[13px]">投票中的概念 · 预售中的新作 · 已投产的在售款</p>
+          <p className="text-gray-400 text-[13px]">Concepts in voting · new pre-orders · pieces now in stock</p>
         </div>
       </section>
 
@@ -104,7 +104,7 @@ export default function ShopPageClient({
                   : 'border-transparent text-gray-400 hover:text-black'
               }`}
             >
-              {tab.zh}
+              {tab.en}
               <span className={`text-[11px] px-2 py-0.5 rounded-full border ${
                 activeStatus === tab.key
                   ? 'bg-black text-white border-black'
@@ -122,7 +122,7 @@ export default function ShopPageClient({
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search products... 搜索作品"
+              placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); resetPagination(); }}
               className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black text-sm"
@@ -162,7 +162,7 @@ export default function ShopPageClient({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <span className="text-sm text-gray-500">
-              Showing {filteredProducts.length} products · 共 {filteredProducts.length} 件
+              Showing {filteredProducts.length} products
             </span>
             <div className="flex items-center gap-2">
               <span className="text-gray-500 text-sm">Sort by:</span>
@@ -187,7 +187,7 @@ export default function ShopPageClient({
 
           {filteredProducts.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-gray-400 text-sm">该分区暂无作品。No products in this section yet.</p>
+              <p className="text-gray-400 text-sm">No products in this section yet.</p>
             </div>
           )}
 
@@ -200,7 +200,7 @@ export default function ShopPageClient({
                   className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  <span>上一页</span>
+                  <span>Prev</span>
                 </button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -222,7 +222,7 @@ export default function ShopPageClient({
                   disabled={currentPage === totalPages}
                   className="flex items-center space-x-1 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>下一页</span>
+                  <span>Next</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

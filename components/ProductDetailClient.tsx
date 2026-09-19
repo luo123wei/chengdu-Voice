@@ -92,11 +92,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
   const handleAddToCart = async () => {
     if (hasVariants && !selectedSku) {
-      alert('请先选择规格');
+      alert('Please select an option first');
       return;
     }
     if (displayStock === 0) {
-      alert('暂时缺货');
+      alert('Out of stock');
       return;
     }
     setIsAdding(true);
@@ -185,7 +185,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     }`}
                   >
                     <Video className="w-3.5 h-3.5" />
-                    视频
+                    Video
                   </button>
                   {galleryImages.map((img, index) => (
                     <button
@@ -297,7 +297,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 <div className="mb-6">
                   <div className="flex items-center space-x-3 mb-4">
                     <span className="text-3xl font-bold text-primary">${product.price}</span>
-                    <span className="text-sm text-gray-400">预售价格 · Pre-order price</span>
+                    <span className="text-sm text-gray-400">Pre-order price</span>
                   </div>
                   <PreorderBlock product={product} />
                 </div>
@@ -511,13 +511,15 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         </div>
       </section>
 
-      <section className="mt-12">
-        <ProductReviews
-          productId={product.id}
-          productRating={product.rating}
-          productReviewsCount={product.reviews}
-        />
-      </section>
+      {(!product.status || product.status !== 'design') && (
+        <section className="mt-12">
+          <ProductReviews
+            productId={product.id}
+            productRating={product.rating}
+            productReviewsCount={product.reviews}
+          />
+        </section>
+      )}
 
       <Footer />
     </div>

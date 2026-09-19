@@ -89,7 +89,7 @@ export default function FreeSoundCarousel({ sounds }: FreeSoundCarouselProps) {
     return (
       <div className="text-center py-12 bg-cream rounded-xl">
         <Volume2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <p className="text-gray-500">暂无声音内容</p>
+        <p className="text-gray-500">No sounds yet</p>
       </div>
     );
   }

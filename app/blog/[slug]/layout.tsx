@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!blog) {
     return {
-      title: 'Story Not Found · 故事不存在',
+      title: 'Story Not Found',
     }
   }
 
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       type: 'article',
       publishedTime: blog.publishDate,
       images: blog.images?.[0] ? [{ url: blog.images[0] }] : [{ url: '/og-image.jpg' }],
-      siteName: 'Chengdu Craft Studio',
+      siteName: 'Voice Culture',
     },
     twitter: {
       card: 'summary_large_image',

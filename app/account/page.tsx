@@ -71,7 +71,7 @@ export default function AccountPage() {
       
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `服务器错误: ${res.status}`);
+        throw new Error(errorData.error || `Server error: ${res.status}`);
       }
       
       const data = await res.json();
@@ -80,16 +80,16 @@ export default function AccountPage() {
         setError('');
         setDebugCode(null);
       } else {
-        setError(data.error || '发送验证码失败');
+        setError(data.error || 'Failed to send verification code');
         if (data.debug_code) {
           setDebugCode(data.debug_code);
         }
       }
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        setError('请求超时，服务器可能正在重启。请等待1分钟后重试');
+        setError('Request timed out — the server may be restarting. Please wait a minute and try again.');
       } else {
-        setError(error.message || '发送验证码失败，请重试');
+        setError(error.message || 'Failed to send code. Please try again.');
       }
     } finally {
       setIsSending(false);
@@ -122,13 +122,13 @@ export default function AccountPage() {
         setUser(data.user);
         fetchOrders(data.user.email);
       } else {
-        setError(data.error || '验证码无效，请重试');
+        setError(data.error || 'Invalid code. Please try again.');
       }
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        setError('验证超时，服务器可能正在重启，请重试');
+        setError('Verification timed out — the server may be restarting. Please try again.');
       } else {
-        setError('验证失败，请重试');
+        setError('Verification failed. Please try again.');
       }
     } finally {
       setIsVerifying(false);
@@ -248,8 +248,8 @@ export default function AccountPage() {
                     {error}
                     {debugCode && (
                       <div className="mt-2 p-2 bg-yellow-50 text-yellow-800 rounded-lg text-xs">
-                        <strong>调试用验证码：</strong> {debugCode}
-                        <span className="block text-gray-500 mt-1">（邮件发送失败，但验证码已生成，可使用此码登录）</span>
+                        <strong>Debug code:</strong> {debugCode}
+                        <span className="block text-gray-500 mt-1">(Email delivery failed, but a code was generated — use it to sign in.)</span>
                       </div>
                     )}
                   </div>
@@ -257,7 +257,7 @@ export default function AccountPage() {
 
                 {sentCode && !error && (
                   <div className="p-3 bg-green-50 text-green-600 rounded-xl text-sm">
-                    ✓ 验证码已发送到你的邮箱，请查收
+                    ✓ Verification code sent — please check your inbox
                   </div>
                 )}
 
@@ -406,7 +406,7 @@ export default function AccountPage() {
                           <div className="mt-4 p-3 bg-gray-50 rounded-xl border border-amber-200">
                             <p className="text-xs text-gray-800 font-medium mb-2 flex items-center gap-1">
                               <Star className="w-3.5 h-3.5 fill-amber-500 text-black" />
-                              感谢您的购买！请为商品写一条评价吧~
+                              Thanks for your purchase! Leave a review:
                             </p>
                             <div className="space-y-1.5">
                               {order.items.map((item: any, idx: number) => {
@@ -422,7 +422,7 @@ export default function AccountPage() {
                                   </span>
                                   <span className="flex items-center gap-1 text-xs text-black font-medium whitespace-nowrap">
                                     <MessageSquarePlus className="w-3.5 h-3.5" />
-                                    去评价
+                                    Write review
                                   </span>
                                 </Link>
                                 );

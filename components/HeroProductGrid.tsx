@@ -25,7 +25,7 @@ export default function HeroProductGrid({ products }: { products: ProductData[] 
           className="w-full aspect-[3/4] object-contain"
         />
         <div className="absolute left-4 bottom-4 bg-white border border-gray-200 px-3.5 py-2 text-xs">
-          {activeIndex + 1 === 1 ? '① 首款作品' : `预售作品 ${activeIndex + 1}`} · {active.nameEn} {active.name} · 预售中
+          {activeIndex + 1 === 1 ? 'First piece' : `Pre-order piece ${activeIndex + 1}`} · {active.nameEn} · Pre-order now
         </div>
       </div>
 

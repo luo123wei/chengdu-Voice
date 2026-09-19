@@ -51,7 +51,7 @@ export function VoteButton({ productId, initialVotes = 0, size = 'card' }: {
     } catch {
       setVoted(false);
       setVotes(v => Math.max(0, v - 1));
-      alert('投票失败,请稍后重试');
+      alert('Vote failed. Please try again later.');
     }
   };
 
@@ -62,13 +62,13 @@ export function VoteButton({ productId, initialVotes = 0, size = 'card' }: {
       {big && (
         <div className="flex items-baseline gap-2 mb-1">
           <span className="font-serif text-4xl font-bold text-black">{votes}</span>
-          <span className="text-sm text-gray-500">人想要</span>
+          <span className="text-sm text-gray-500">want this</span>
         </div>
       )}
       <div className="flex items-center justify-between gap-3">
         {!big && (
           <span className="text-sm text-gray-500">
-            <b className="font-serif text-lg text-black">{votes}</b> 人想要
+            <b className="font-serif text-lg text-black">{votes}</b> want this
           </span>
         )}
         <button
@@ -80,12 +80,12 @@ export function VoteButton({ productId, initialVotes = 0, size = 'card' }: {
               : 'bg-black text-white hover:bg-gray-800'
           }`}
         >
-          {voted ? '✓ 已想拥有' : '🤍 我想要它'}
+          {voted ? '✓ Voted' : '🤍 I want this'}
         </button>
       </div>
       {big && (
         <p className="text-xs text-gray-400 text-center mt-3">
-          无需付费 · 开票预售时邮件提醒 · 每人每款限投一票
+          No payment needed · Email reminder when the pre-order opens · One vote per design
         </p>
       )}
     </div>
@@ -112,7 +112,7 @@ export function PreorderBlock({ product }: { product: Product }) {
   const submit = async () => {
     setError('');
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('邮箱格式不正确');
+      setError('Invalid email address');
       return;
     }
     setSubmitting(true);
@@ -131,7 +131,7 @@ export function PreorderBlock({ product }: { product: Product }) {
       if (!res.ok) throw new Error(data.error);
       setSubmitted(true);
     } catch (e: any) {
-      setError(e?.message || '提交失败,请稍后重试');
+      setError(e?.message || 'Submission failed. Please try again later.');
     } finally {
       setSubmitting(false);
     }
@@ -145,7 +145,7 @@ export function PreorderBlock({ product }: { product: Product }) {
             onClick={() => setOpen(!open)}
             className="w-full px-4 py-2 text-sm font-medium bg-black text-white border border-black hover:bg-gray-800 transition-all"
           >
-            {open ? '收起' : `预订意向 · 剩${countdown(product.preorderEnd, now)}`}
+            {open ? 'Collapse' : `Pre-order intent · ${countdown(product.preorderEnd, now)} left`}
           </button>
 
           {open && !submitted && (
@@ -154,7 +154,7 @@ export function PreorderBlock({ product }: { product: Product }) {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="留邮箱,开售优先通知(可选)"
+                placeholder="Email for priority notice when it opens (optional)"
                 className="w-full px-3 py-2 text-sm border border-gray-200 focus:outline-none focus:border-black"
               />
               <button
@@ -162,15 +162,15 @@ export function PreorderBlock({ product }: { product: Product }) {
                 disabled={submitting}
                 className="w-full px-4 py-2 text-sm font-medium bg-black text-white hover:bg-gray-800 disabled:opacity-50"
               >
-                {submitting ? '提交中…' : '提交预订意向'}
+                {submitting ? 'Submitting…' : 'Submit pre-order intent'}
               </button>
               {error && <span className="text-xs text-accent">{error}</span>}
-              <span className="text-xs text-gray-400">无需付费 · 可留空直接提交</span>
+              <span className="text-xs text-gray-400">No payment needed · You can submit without an email</span>
             </div>
           )}
           {open && submitted && (
             <div className="mt-2 text-sm text-center py-1.5 border border-black">
-              ✓ 已登记,开售时邮件通知你
+              ✓ Registered — we'll email you when it opens
             </div>
           )}
 
@@ -181,7 +181,7 @@ export function PreorderBlock({ product }: { product: Product }) {
       {state === 'waiting' && (
         <>
           <button disabled className="w-full px-4 py-2 text-sm font-medium bg-cream text-gray-400 border border-gray-200 cursor-default">
-            预售已截止
+            Pre-order closed
           </button>
           <PreorderMeta product={product} state={state} now={now} />
         </>
@@ -189,7 +189,7 @@ export function PreorderBlock({ product }: { product: Product }) {
 
       {state === 'onsale' && (
         <div className="text-sm text-gray-500 border-t border-gray-100 pt-2 mt-2">
-          已开售,可直接下单
+          Now on sale — order directly
         </div>
       )}
     </div>
@@ -200,14 +200,14 @@ function PreorderMeta({ product, state, now }: { product: Product; state: string
   return (
     <div className="border-t border-gray-100 mt-3 pt-2.5 flex flex-col gap-1.5">
       <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>预售截止</span>
+        <span>Pre-order ends</span>
         <span>
           <b className="text-gray-900 font-medium">{formatDate(product.preorderEnd)}</b>
-          {state === 'open' && <em className="not-italic text-accent ml-1.5">剩{countdown(product.preorderEnd, now)}</em>}
+          {state === 'open' && <em className="not-italic text-accent ml-1.5">{countdown(product.preorderEnd, now)} left</em>}
         </span>
       </div>
       <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>正式开售</span>
+        <span>On sale from</span>
         <span>
           <b className="text-gray-900 font-medium">{formatDate(product.onSaleAt)}</b>
           {state === 'waiting' && <em className="not-italic text-accent ml-1.5">{countdown(product.onSaleAt, now)}</em>}

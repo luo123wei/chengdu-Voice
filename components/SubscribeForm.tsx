@@ -35,7 +35,7 @@ export default function SubscribeForm() {
       {subscribed ? (
         <div className="flex items-center justify-center gap-2 text-green-300">
           <Check className="w-5 h-5" />
-          <span className="font-medium">订阅成功！请查收邮件获取下载链接</span>
+          <span className="font-medium">Subscribed! Check your inbox for the download link.</span>
         </div>
       ) : (
         <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4">
@@ -43,7 +43,7 @@ export default function SubscribeForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="请输入您的邮箱地址"
+            placeholder="Enter your email address"
             className="flex-1 px-6 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50"
             required
           />
@@ -52,7 +52,7 @@ export default function SubscribeForm() {
             disabled={submitting}
             className="px-8 py-3 bg-secondary text-white rounded-lg font-medium hover:bg-secondary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? '发送中...' : '免费订阅'}
+            {submitting ? 'Sending...' : 'Subscribe Free'}
           </button>
         </form>
       )}

@@ -9,12 +9,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   
   if (!product) {
     return {
-      title: 'Work Not Found · 作品不存在',
+      title: 'Work Not Found',
     }
   }
 
   return {
-    title: `${product.nameEn} · ${product.name}`,
+    title: `${product.nameEn} | Voice Culture`,
     description: product.descriptionEn?.slice(0, 160) || `Designed in Chengdu: ${product.nameEn}. Small-batch craft, worldwide shipping.`,
     keywords: [product.nameEn, product.category, 'Chengdu', '成都', 'buy online', 'premium quality'],
     alternates: {
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       url: `${siteUrl}/shop/${product.slug || id}`,
       type: 'article',
       images: product.images?.[0] ? [{ url: product.images[0] }] : [{ url: '/og-image.jpg' }],
-      siteName: 'Chengdu Craft Studio',
+      siteName: 'Voice Culture',
     },
     twitter: {
       card: 'summary_large_image',

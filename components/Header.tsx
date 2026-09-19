@@ -47,11 +47,11 @@ export default function Header() {
   };
 
   const navLinks = [
-    { name: { en: 'Home', zh: '首页' }, href: '/' },
-    { name: { en: 'Works', zh: '作品' }, href: '/shop' },
-    { name: { en: 'Stories', zh: '故事' }, href: '/blog' },
-    { name: { en: 'Sounds', zh: '声音' }, href: '/free-sounds' },
-    { name: { en: 'About', zh: '关于' }, href: '/about' },
+    { name: { en: 'Home', zh: 'Home' }, href: '/' },
+    { name: { en: 'Works', zh: 'Works' }, href: '/shop' },
+    { name: { en: 'Stories', zh: 'Stories' }, href: '/blog' },
+    { name: { en: 'Sounds', zh: 'Sounds' }, href: '/free-sounds' },
+    { name: { en: 'About', zh: 'About' }, href: '/about' },
   ];
 
   return (
@@ -60,11 +60,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <span className="text-white font-serif text-xl font-bold">造</span>
+              <span className="text-white font-serif text-xl font-bold">V</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-serif font-bold text-secondary leading-tight">Chengdu Craft Studio</span>
-              <span className="text-xs text-primary/80 font-serif hidden sm:block">成都造物</span>
+              <span className="text-lg font-serif font-bold text-secondary leading-tight">Voice Culture</span>
+              <span className="text-xs text-primary/80 font-serif hidden sm:block">Chengdu · China</span>
             </div>
           </Link>
 

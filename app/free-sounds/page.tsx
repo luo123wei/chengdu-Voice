@@ -105,20 +105,20 @@ export default function FreeSoundsPage() {
       {/* ===== Hero(黑) ===== */}
       <section className="bg-black text-white pt-28 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-xs tracking-[0.35em] text-gray-400 mb-6">FREE SOUNDSCAPES · 声音礼物</p>
+          <p className="text-xs tracking-[0.35em] text-gray-400 mb-6">FREE SOUNDSCAPES</p>
           <h1 className="font-serif text-4xl md:text-5xl font-bold leading-tight mb-5">
             Free Chengdu Sounds
-            <span className="block text-2xl md:text-3xl font-normal text-gray-300 mt-3">成都声音礼物</span>
+            <span className="block text-2xl md:text-3xl font-normal text-gray-300 mt-3">Soundscapes from Chengdu</span>
           </h1>
           <p className="text-gray-300 text-lg leading-relaxed max-w-2xl mx-auto mb-4">
-            工作室在成都街头录下的声音——茶馆、雨夜、竹林、夜市。
-            助眠、专注,或者单纯想念成都的时候,戴上耳机。
+            Sounds recorded on the streets of Chengdu — teahouses, rainy nights, bamboo groves, night markets.
+            For sleep, focus, or simply missing the city. Headphones on.
           </p>
           <p className="text-gray-500 text-sm">
             Ambient Chengdu soundscapes for sleep, focus and nostalgia.
           </p>
           <p className="mt-6 inline-block text-[11px] tracking-wider text-gray-500 border border-gray-700 px-3 py-1.5">
-            工作室实地录制 · FIELD RECORDINGS · NO ADS · FREE FOREVER
+            FIELD RECORDINGS · NO ADS · FREE FOREVER
           </p>
         </div>
       </section>
@@ -130,12 +130,12 @@ export default function FreeSoundsPage() {
             {loading ? (
               <div className="text-center py-20">
                 <div className="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-gray-400 text-sm">加载中...</p>
+                <p className="text-gray-400 text-sm">Loading...</p>
               </div>
             ) : pageItems.length === 0 ? (
               <div className="text-center py-20">
                 <Volume2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-400 text-sm">声音整理中，敬请期待。</p>
+                <p className="text-gray-400 text-sm">Sounds are being curated — check back soon.</p>
               </div>
             ) : (
               pageItems.map((item, i) => {
@@ -150,7 +150,7 @@ export default function FreeSoundsPage() {
                   >
                     <button
                       onClick={() => toggleAudio(item)}
-                      aria-label={isPlaying ? '暂停' : '播放'}
+                      aria-label={isPlaying ? 'Pause' : 'Play'}
                       className={`w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                         isPlaying ? 'bg-black scale-105' : 'bg-black hover:bg-[#B54A32]'
                       }`}
@@ -175,7 +175,7 @@ export default function FreeSoundsPage() {
                           <Clock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                           {item.duration}
                           <span className="text-gray-300">·</span>
-                          <span>工作室实地录制</span>
+                          <span>Field recording</span>
                         </p>
                       )}
                       {isPlaying && (
@@ -187,7 +187,7 @@ export default function FreeSoundsPage() {
                               style={{ height: `${40 + ((b * 17) % 60)}%`, animationDelay: `${b * 0.12}s` }}
                             />
                           ))}
-                          <span className="text-[11px] text-gray-400 ml-2">正在播放 · ∞ 无尽循环</span>
+                          <span className="text-[11px] text-gray-400 ml-2">Now playing · ∞ loop</span>
                         </div>
                       )}
                     </div>
@@ -197,7 +197,7 @@ export default function FreeSoundsPage() {
                         onClick={() => setSelected(item)}
                         className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-black hover:bg-black hover:text-white border border-black transition-colors flex-shrink-0"
                       >
-                        故事
+                        Story
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     )}
@@ -216,7 +216,7 @@ export default function FreeSoundsPage() {
                   className="flex items-center gap-1 px-4 py-2 border border-[#EEEEEE] text-sm hover:border-black/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  <span>上一页</span>
+                  <span>Prev</span>
                 </button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -238,7 +238,7 @@ export default function FreeSoundsPage() {
                   disabled={currentPage === totalPages}
                   className="flex items-center gap-1 px-4 py-2 border border-[#EEEEEE] text-sm hover:border-black/40 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <span>下一页</span>
+                  <span>Next</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -252,17 +252,17 @@ export default function FreeSoundsPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Volume2 className="w-8 h-8 mx-auto mb-5 stroke-[1.25]" />
           <h2 className="font-serif text-2xl md:text-3xl font-bold mb-3">
-            《成都声音地图》完整专辑 · 即将录制
+            "The Sound Map of Chengdu" — full album · coming soon
           </h2>
           <p className="text-gray-400 leading-relaxed mb-8">
-            我们正在成都街头录制真正的声音专辑——
-            茶馆、菜市、蝉鸣与麻将。留下邮箱,专辑上线时第一时间发给你;
-            同时你会收到新作投票与预售开启的通知,决定我们下一件做什么。
+            We&apos;re recording a real sound album on the streets of Chengdu — teahouses, markets,
+            cicadas and mahjong tiles. Leave your email and we&apos;ll send it to you the day it drops.
+            You&apos;ll also get voting and pre-order updates, and help decide what we make next.
           </p>
           {subscribed ? (
             <div className="flex items-center justify-center gap-2 text-white">
               <Check className="w-5 h-5" />
-              <span className="font-medium">已登记。专辑录好那天,我们写信给你。</span>
+              <span className="font-medium">Registered. We&apos;ll write to you the day the album is ready.</span>
             </div>
           ) : (
             <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
@@ -282,11 +282,11 @@ export default function FreeSoundsPage() {
                 disabled={submitting}
                 className="px-8 py-3 bg-white text-black font-medium hover:bg-[#B54A32] hover:text-white transition-colors disabled:opacity-50"
               >
-                {submitting ? '...' : '免费登记'}
+                {submitting ? '...' : 'Sign up free'}
               </button>
             </form>
           )}
-          <p className="text-xs text-gray-600 mt-4">不发广告,随时退订。</p>
+          <p className="text-xs text-gray-600 mt-4">No ads. Unsubscribe anytime.</p>
         </div>
       </section>
 
@@ -295,20 +295,20 @@ export default function FreeSoundsPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs tracking-[0.3em] text-gray-500 mb-3">FROM EARS TO DESK</p>
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-black mb-4">
-            听成都的声音,也把成都的日常带走
+            Listen to Chengdu — take its everyday life home
           </h2>
           <p className="text-gray-600 mb-8">
-            我们把这些声音记忆做成了桌上的小物件——由你投票决定下一件生产什么。
+            We turned these sound memories into small desk objects — you vote on what we make next.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/shop?tab=design" className="px-8 py-3 bg-black text-white text-sm tracking-widest hover:bg-[#B54A32] transition-colors">
-              去投票 · 决定下一件
+              Vote on the next piece
             </Link>
             <Link href="/shop" className="px-8 py-3 border border-black text-black text-sm tracking-widest hover:bg-black hover:text-white transition-colors">
-              看看在售作品
+              Shop in-stock works
             </Link>
             <Link href="/blog" className="px-8 py-3 text-black text-sm tracking-widest underline underline-offset-4 hover:text-[#B54A32] transition-colors">
-              设计故事
+              Design stories
             </Link>
           </div>
         </div>
@@ -325,7 +325,7 @@ export default function FreeSoundsPage() {
               <div>
                 <h2 className="font-serif text-2xl font-bold text-black">{selected.title}</h2>
                 <p className="text-gray-500 text-sm mt-1">
-                  {selected.titleEn} · {selected.duration} · 实录
+                  {selected.titleEn} · {selected.duration} · Field recording
                 </p>
               </div>
               <button onClick={() => setSelected(null)} className="p-2 hover:bg-gray-100 transition-colors">
@@ -343,8 +343,8 @@ export default function FreeSoundsPage() {
                 }`}
               >
                 {audioPlayingId === selected.id ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                {audioPlayingId === selected.id ? '暂停播放' : '播放这段录音'}
-                <span className="text-xs opacity-70">∞ 循环</span>
+                {audioPlayingId === selected.id ? 'Pause' : 'Play recording'}
+                <span className="text-xs opacity-70">∞ loop</span>
               </button>
 
               <div className="space-y-5">
@@ -359,7 +359,7 @@ export default function FreeSoundsPage() {
                   <>
                     <div className="border-t border-dashed border-[#DDDDDD]" />
                     <div>
-                      <p className="text-xs tracking-[0.25em] text-gray-400 mb-2">声音小记</p>
+                      <p className="text-xs tracking-[0.25em] text-gray-400 mb-2">Sound notes</p>
                       <div
                         className="text-gray-700 leading-relaxed [&_p]:mt-2"
                         dangerouslySetInnerHTML={{ __html: selected.culturalStory }}

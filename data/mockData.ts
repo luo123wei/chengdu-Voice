@@ -157,7 +157,7 @@ export const blogPosts: BlogPost[] = [
     images: [
       'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=designer%20desk%20with%20ceramic%20panda%20egg%20sketches%20and%20clay%20prototypes%2C%20black%20and%20white%20minimal%20workshop&image_size=landscape_16_9',
     ],
-    author: 'Chengdu Craft Studio',
+    author: 'Voice Culture',
     publishDate: '2026-08-28',
     views: 2341,
   },
@@ -172,7 +172,7 @@ export const blogPosts: BlogPost[] = [
     images: [
       'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimal%20design%20studio%20wall%20with%20panda%20product%20concept%20sketches%20pinned%2C%20black%20white%20style&image_size=landscape_16_9',
     ],
-    author: 'Chengdu Craft Studio',
+    author: 'Voice Culture',
     publishDate: '2026-08-20',
     views: 1892,
   },
@@ -187,7 +187,7 @@ export const blogPosts: BlogPost[] = [
     images: [
       'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=lazy%20giant%20panda%20lying%20on%20wooden%20platform%2C%20black%20and%20white%20minimal%20photography&image_size=landscape_16_9',
     ],
-    author: 'Chengdu Craft Studio',
+    author: 'Voice Culture',
     publishDate: '2026-08-12',
     views: 1567,
   },
@@ -227,7 +227,7 @@ export const products: Product[] = [
     votesCount: 0,
     preorderEnd: new Date(Date.now() + 7 * DAYS).toISOString(),
     onSaleAt: new Date(Date.now() + 14 * DAYS).toISOString(),
-    story: '第一款作品。我们想做一个"剥开有惊喜"的东西——蛋是最日常的食物,熊猫是成都最松弛的居民。',
+    story: 'Our first piece. We wanted something with a surprise inside — the egg is the most everyday food there is, and the panda is Chengdu\'s most laid-back resident.',
   },
   {
     id: 'panda-lantern',
@@ -245,7 +245,7 @@ export const products: Product[] = [
     tags: ['lamp', 'panda', 'cozy'],
     status: 'design',
     votesCount: 247,
-    story: '打样到第4版,我们把耳朵从"立耳"改成了"垂耳"——成都的熊猫,松弛感最重要。材质暂定柔光硅胶+实木底座。',
+    story: 'By prototype #4 we had changed the ears from upright to drooping — for Chengdu pandas, staying relaxed matters most. Material: soft-touch silicone on a solid wood base.',
   },
   {
     id: 'bamboo-ruler',
@@ -263,7 +263,7 @@ export const products: Product[] = [
     tags: ['brass', 'stationery'],
     status: 'design',
     votesCount: 183,
-    story: '成都是一座被竹子养着的城市。我们把竹节做成尺子,让"成都节奏"躺在你的书里。',
+    story: 'Chengdu is a city raised on bamboo. We turned a bamboo joint into a ruler, so a little "Chengdu rhythm" can rest inside your books.',
   },
   {
     id: 'lazy-panda-plush',
@@ -281,7 +281,7 @@ export const products: Product[] = [
     tags: ['plush', 'cute', 'gift'],
     status: 'design',
     votesCount: 312,
-    story: '成都熊猫基地里最受欢迎的不是最活泼的,而是躺得最平的那只。它教会我们:不努力,也很可爱。',
+    story: 'At the Chengdu panda base, the most beloved panda isn\'t the liveliest — it\'s the flattest. Its lesson: you don\'t have to try hard to be lovable.',
   },
   {
     id: 'panda-bookmark',

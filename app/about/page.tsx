@@ -24,9 +24,9 @@ export default function AboutPage() {
   }, []);
 
   const steps = [
-    { icon: PenTool, num: '01', title: 'We design', text: '工作室围绕成都的日常记忆画草图、打样,一只熊猫、一段竹节,都可能是下一件作品。' },
-    { icon: Vote, num: '02', title: 'You vote', text: '设计稿公开投票,票数最高的进入预售。你不只是顾客,也是产品策划。' },
-    { icon: Package, num: '03', title: 'We make', text: '预售达标后小批量制作,成都本地手工团队完成,成品直达你手边。' },
+    { icon: PenTool, num: '01', title: 'We design', text: 'The studio sketches and prototypes around everyday memories of Chengdu — a panda, a segment of bamboo, anything can become the next piece.' },
+    { icon: Vote, num: '02', title: 'You vote', text: 'Designs go to a public vote and the top-voted pieces move to pre-order. You are not just a customer — you are the product planner.' },
+    { icon: Package, num: '03', title: 'We make', text: 'Once a pre-order hits its goal, we produce in small batches with local Chengdu artisans and ship straight to you.' },
   ];
 
   return (
@@ -38,7 +38,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs tracking-[0.3em] text-gray-500 mb-6">ABOUT THE STUDIO</p>
           <h1 className="font-serif text-4xl md:text-5xl font-bold text-black leading-tight mb-6">
-            成都造物
+            Voice Culture
           </h1>
           <p className="font-serif italic text-lg md:text-xl text-gray-600">
             Everyday objects, designed in Chengdu.
@@ -52,7 +52,7 @@ export default function AboutPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="w-10 h-10 border-3 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-gray-500">加载中...</p>
+              <p className="text-gray-500">Loading...</p>
             </div>
           ) : aboutContent ? (
             <div
@@ -62,15 +62,16 @@ export default function AboutPage() {
           ) : (
             <div className="space-y-6 text-lg leading-loose text-gray-700">
               <p>
-                成都造物是一间独立文创设计工作室。我们相信,城市的气质不只在景点里,
-                也在盖碗茶冒出的热气、熊猫懒懒散散的午后、和竹匠手边一根磨亮的尺子上。
+                Voice Culture is an independent design studio based in Chengdu. We believe a city&apos;s
+                character lives not only in its landmarks, but in the steam rising from a bowl of
+                covered tea, in a lazy panda afternoon, and in the bamboo ruler worn smooth by a craftsman&apos;s hands.
               </p>
               <p>
-                我们把这些日常片段做成文具、家居和小摆件。每一件作品都从一张设计稿开始,
-                交给来到这里的你投票决定——得票最多的设计才会进入生产。
+                We turn these everyday moments into stationery, home goods and desk objects. Every piece
+                starts as a design draft and is put to a vote — only the designs with the most votes go into production.
               </p>
               <p>
-                小批量、慢制作,成都本地手工团队完成。愿你桌上的日常,也有一点成都。
+                Small batches, slow craft, made by local artisans in Chengdu. May your desk carry a little bit of Chengdu too.
               </p>
             </div>
           )}
@@ -98,8 +99,8 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-xs tracking-[0.3em] text-gray-500 mb-3">CONTACT</p>
-            <h2 className="font-serif text-3xl font-bold text-black mb-4">与我们联系</h2>
-            <p className="text-gray-600">合作、定制或单纯打个招呼,都欢迎来信。</p>
+            <h2 className="font-serif text-3xl font-bold text-black mb-4">Contact Us</h2>
+            <p className="text-gray-600">Collaborations, custom orders, or just to say hello — we&apos;d love to hear from you.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
@@ -107,14 +108,14 @@ export default function AboutPage() {
               <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-5 h-5 text-white" strokeWidth={1.5} />
               </div>
-              <h3 className="font-serif font-bold text-black text-lg mb-2">工作室</h3>
+              <h3 className="font-serif font-bold text-black text-lg mb-2">Studio</h3>
               <p className="text-gray-600 text-sm">Chengdu, Sichuan, China</p>
             </div>
             <div className="text-center p-8 border border-[#EEEEEE]">
               <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-5 h-5 text-white" strokeWidth={1.5} />
               </div>
-              <h3 className="font-serif font-bold text-black text-lg mb-2">邮箱</h3>
+              <h3 className="font-serif font-bold text-black text-lg mb-2">Email</h3>
               <p className="text-gray-600 text-sm">kylw02@outlook.com</p>
             </div>
           </div>
@@ -124,7 +125,7 @@ export default function AboutPage() {
               href="/shop?tab=design"
               className="inline-block px-8 py-3 bg-black text-white text-sm tracking-widest hover:bg-[#B54A32] transition-colors"
             >
-              去投票决定下一件作品
+              Vote on the next piece
             </Link>
           </div>
         </div>

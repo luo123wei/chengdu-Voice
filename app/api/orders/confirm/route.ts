@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !customerName || !orderNumber || !items || !total) {
       return NextResponse.json(
-        { error: '缺少必要参数' },
+        { error: 'Missing required parameters' },
         { status: 400 }
       );
     }
@@ -16,12 +16,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: '订单确认邮件已发送',
+      message: 'Order confirmation email sent',
     });
   } catch (error) {
     console.error('Order confirmation email error:', error);
     return NextResponse.json(
-      { error: '邮件发送失败' },
+      { error: 'Failed to send email' },
       { status: 500 }
     );
   }

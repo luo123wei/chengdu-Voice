@@ -24,21 +24,21 @@ export function formatDate(iso?: string): string {
 export function countdown(iso?: string, now: number = Date.now()): string {
   if (!iso) return '';
   const ms = new Date(iso).getTime() - now;
-  if (ms <= 0) return '已截止';
+  if (ms <= 0) return 'Closed';
   const days = Math.floor(ms / (24 * 60 * 60 * 1000));
   const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-  return days > 0 ? `${days}天${hours}小时` : `${hours}小时`;
+  return days > 0 ? `${days}d ${hours}h` : `${hours}h`;
 }
 
 // 产品生命周期徽章
 export function statusBadge(product: Product, now: number = Date.now()): { label: string; cls: string } {
   if (product.status === 'design') {
-    return { label: '投票中 · VOTING', cls: 'bg-white text-black border border-black' };
+    return { label: 'VOTING', cls: 'bg-white text-black border border-black' };
   }
   if (product.status === 'preorder') {
     return getPreorderState(product, now) === 'waiting'
-      ? { label: '待开售 · COMING SOON', cls: 'bg-black text-white' }
-      : { label: '预售 · PRE-ORDER', cls: 'bg-black text-white' };
+      ? { label: 'COMING SOON', cls: 'bg-black text-white' }
+      : { label: 'PRE-ORDER', cls: 'bg-black text-white' };
   }
-  return { label: '在售 · IN STOCK', cls: 'bg-cream text-gray-500 border border-gray-200' };
+  return { label: 'IN STOCK', cls: 'bg-cream text-gray-500 border border-gray-200' };
 }

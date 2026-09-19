@@ -9,11 +9,11 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-              <span className="text-black font-serif text-xl font-bold">造</span>
+              <span className="text-black font-serif text-xl font-bold">V</span>
             </div>
             <div>
-              <span className="text-xl font-serif font-bold">Chengdu Craft Studio</span>
-              <p className="text-sm text-gray-400 font-serif">成都造物</p>
+              <span className="text-xl font-serif font-bold">Voice Culture</span>
+              <p className="text-sm text-gray-400 font-serif">Chengdu Design Studio</p>
             </div>
           </div>
           <p className="text-gray-400 mb-4 max-w-md">
@@ -78,10 +78,12 @@ export default function Footer() {
             <span className="text-gray-600">·</span>
             <Link href="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
             <span className="text-gray-600">·</span>
+            <Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link>
+            <span className="text-gray-600">·</span>
             <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
           </div>
-          <p>2026 Chengdu Craft Studio 成都造物. All rights reserved.</p>
-          <span className="text-gray-500">Chengdu, Sichuan, China · 跨境直邮全球 · <Link href="/admin" className="text-gray-600 hover:text-gray-400 transition-colors">Admin</Link></span>
+          <p>© 2026 Voice Culture. All rights reserved.</p>
+          <span className="text-gray-500">Chengdu, Sichuan, China · Worldwide shipping · <Link href="/admin" className="text-gray-600 hover:text-gray-400 transition-colors">Admin</Link></span>
         </div>
       </div>
     </footer>

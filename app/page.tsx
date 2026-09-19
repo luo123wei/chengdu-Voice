@@ -59,7 +59,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
             <div>
               <div className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-6">
-                Chengdu Craft Studio · 成都造物
+                Voice Culture · Chengdu
               </div>
               <h1 className="font-serif text-4xl md:text-5xl lg:text-[52px] leading-[1.2] font-bold tracking-tight mb-6">
                 Everyday objects,
@@ -70,20 +70,20 @@ export default async function HomePage() {
                 Discover unique Chengdu gifts, cultural souvenirs and everyday objects inspired by life in Chengdu.
               </p>
               <p className="text-base md:text-lg text-gray-500 max-w-lg mb-9">
-                我们是一间小型文创设计工作室,把成都的松弛与熊猫的可爱,做成你握在手里的日常物件。每一款,都先由你投票,再投入生产。
+                We&apos;re a small design studio turning Chengdu&apos;s laid-back charm and panda cuteness into everyday objects you can hold. Every piece goes into production only after you vote for it.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/shop"
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-black text-white text-sm font-medium border border-black hover:bg-gray-800 transition-colors"
                 >
-                  Explore Works 逛作品 <ArrowRight className="w-4 h-4" />
+                  Explore Works <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
                   href="/shop?tab=design"
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black text-sm font-medium border border-black hover:bg-black hover:text-white transition-colors"
                 >
-                  Vote for Next 投票新品
+                  Vote for the Next Drop
                 </Link>
               </div>
             </div>
@@ -97,9 +97,9 @@ export default async function HomePage() {
       <section className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3">
           {[
-            { n: '01', t: 'We design', d: '工作室原创设计,每件都有成都故事' },
-            { n: '02', t: 'You vote', d: '概念稿先展出,票数达标才开模生产' },
-            { n: '03', t: 'We make', d: '小批量手作,预售订单优先发货' },
+            { n: '01', t: 'We design', d: 'Original studio designs — every piece carries a Chengdu story' },
+            { n: '02', t: 'You vote', d: 'Concepts go on display first; production starts once the votes are in' },
+            { n: '03', t: 'We make', d: 'Small-batch craftsmanship. Pre-orders ship first' },
           ].map((item, i) => (
             <div
               key={item.n}
@@ -119,10 +119,10 @@ export default async function HomePage() {
           <div className="flex items-end justify-between mb-9 gap-4 flex-wrap">
             <div>
               <h2 className="font-serif text-2xl md:text-3xl font-bold">What should we make next?</h2>
-              <p className="text-sm text-gray-500 mt-1.5">下一款做什么,你说了算 · 投票达标即开启预售</p>
+              <p className="text-sm text-gray-500 mt-1.5">You decide what we make next — when a concept hits its vote goal, the pre-order opens.</p>
             </div>
             <Link href="/shop?tab=design" className="text-[13px] border-b border-black pb-0.5 hover:text-gray-600">
-              查看全部投票 →
+              View all open votes →
             </Link>
           </div>
           {voteProducts.length > 0 ? (
@@ -130,7 +130,7 @@ export default async function HomePage() {
               {voteProducts.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
           ) : (
-            <p className="text-sm text-gray-400">暂无投票中的作品。</p>
+            <p className="text-sm text-gray-400">No open votes right now.</p>
           )}
         </div>
       </section>
@@ -141,21 +141,21 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link href="/shop" className="block border border-gray-200 p-9 hover:border-black hover:bg-cream transition-all group">
               <div className="font-serif text-[13px] text-gray-400 tracking-[0.2em] mb-4">WORKS</div>
-              <h3 className="font-serif text-2xl mb-2">作品</h3>
-              <p className="text-[13px] text-gray-500 mb-5">在售、预售与设计中的全部文创作品</p>
-              <span className="text-[13px] border-b border-black pb-0.5">进入作品店 →</span>
+              <h3 className="font-serif text-2xl mb-2">Works</h3>
+              <p className="text-[13px] text-gray-500 mb-5">Everything we make — in stock, on pre-order and in design</p>
+              <span className="text-[13px] border-b border-black pb-0.5">Shop all works →</span>
             </Link>
             <Link href="/blog" className="block border border-gray-200 p-9 hover:border-black hover:bg-cream transition-all group">
               <div className="font-serif text-[13px] text-gray-400 tracking-[0.2em] mb-4">STORIES</div>
-              <h3 className="font-serif text-2xl mb-2">故事</h3>
-              <p className="text-[13px] text-gray-500 mb-5">每件作品背后的设计草图、打样与成都灵感</p>
-              <span className="text-[13px] border-b border-black pb-0.5">读设计故事 →</span>
+              <h3 className="font-serif text-2xl mb-2">Stories</h3>
+              <p className="text-[13px] text-gray-500 mb-5">Sketches, prototypes and Chengdu inspiration behind every piece</p>
+              <span className="text-[13px] border-b border-black pb-0.5">Read the stories →</span>
             </Link>
             <Link href="/about" className="block border border-gray-200 p-9 hover:border-black hover:bg-cream transition-all group">
               <div className="font-serif text-[13px] text-gray-400 tracking-[0.2em] mb-4">ABOUT</div>
-              <h3 className="font-serif text-2xl mb-2">关于</h3>
-              <p className="text-[13px] text-gray-500 mb-5">一间成都的小工作室,和它的造物方法论</p>
-              <span className="text-[13px] border-b border-black pb-0.5">了解我们 →</span>
+              <h3 className="font-serif text-2xl mb-2">About</h3>
+              <p className="text-[13px] text-gray-500 mb-5">A small studio in Chengdu and how we make things</p>
+              <span className="text-[13px] border-b border-black pb-0.5">Get to know us →</span>
             </Link>
           </div>
         </div>
@@ -167,10 +167,10 @@ export default async function HomePage() {
           <div className="flex items-end justify-between mb-9 gap-4 flex-wrap">
             <div>
               <h2 className="font-serif text-2xl md:text-3xl font-bold">In Stock Now</h2>
-              <p className="text-sm text-gray-500 mt-1.5">已投产在售 · 跨境直邮全球</p>
+              <p className="text-sm text-gray-500 mt-1.5">In production · shipped worldwide from Chengdu</p>
             </div>
             <Link href="/shop?tab=on-sale" className="text-[13px] border-b border-black pb-0.5 hover:text-gray-600">
-              全部在售 →
+              Shop all in-stock →
             </Link>
           </div>
           {onSaleProducts.length > 0 && (
@@ -185,7 +185,7 @@ export default async function HomePage() {
       <section className="py-16 bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-white mb-4">
-            新作品开售,第一时间通知你
+            Be the first to know when new pieces drop
           </h2>
           <p className="text-white/60 text-sm md:text-base mb-8">
             Subscribe to get first access to pre-orders and new drops from the studio.

@@ -46,14 +46,14 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
   // 规格维度配置
   const dimensions = useMemo(() => {
     const dims: { key: string; label: string; values: string[] }[] = [];
-    if (specs?.colors?.length) dims.push({ key: 'color', label: '颜色 Color', values: specs.colors });
-    if (specs?.sizes?.length) dims.push({ key: 'size', label: '尺寸 Size', values: specs.sizes });
-    if (specs?.materials?.length) dims.push({ key: 'material', label: '材质 Material', values: specs.materials });
-    if (specs?.packagings?.length) dims.push({ key: 'packaging', label: '包装 Packaging', values: specs.packagings });
+    if (specs?.colors?.length) dims.push({ key: 'color', label: 'Color', values: specs.colors });
+    if (specs?.sizes?.length) dims.push({ key: 'size', label: 'Size', values: specs.sizes });
+    if (specs?.materials?.length) dims.push({ key: 'material', label: 'Material', values: specs.materials });
+    if (specs?.packagings?.length) dims.push({ key: 'packaging', label: 'Packaging', values: specs.packagings });
     // 兜底：SKU 没有填写颜色/尺寸等标准维度时，用 SKU 名称作为「款式」维度
     if (dims.length === 0 && variants.length > 1) {
       const names = variants.map((v) => v.name).filter(Boolean);
-      if (names.length) dims.push({ key: '__name', label: '款式 Style', values: names });
+      if (names.length) dims.push({ key: '__name', label: 'Style', values: names });
     }
     return dims;
   }, [specs, variants]);
@@ -125,15 +125,15 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
         {matchedSku ? (
           <>
             <span>
-              价格：<span className="font-semibold text-red-600">${matchedSku.price.toFixed(2)}</span>
+              Price: <span className="font-semibold text-red-600">${matchedSku.price.toFixed(2)}</span>
             </span>
             <span className={matchedSku.stock === 0 ? 'text-red-500' : 'text-gray-500'}>
-              {matchedSku.stock === 0 ? '暂时缺货' : `库存 ${matchedSku.stock}`}
+              {matchedSku.stock === 0 ? 'Out of stock' : `${matchedSku.stock} in stock`}
             </span>
           </>
         ) : (
           <span className="text-gray-400">
-            价格区间：{priceRange} · 请选择规格
+            Price range: {priceRange} · Please select options
           </span>
         )}
       </div>

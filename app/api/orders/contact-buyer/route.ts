@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     if (!orderId || !subject || !message) {
       return NextResponse.json(
-        { error: '缺少必要参数 (orderId, subject, message)' },
+        { error: 'Missing required parameters (orderId, subject, message)' },
         { status: 400 }
       );
     }
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const order = await db.orders.getById(orderId);
     if (!order) {
       return NextResponse.json(
-        { error: '订单不存在' },
+        { error: 'Order not found' },
         { status: 404 }
       );
     }
@@ -32,12 +32,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `邮件已发送至 ${order.email}`,
+      message: `Email sent to ${order.email}`,
     });
   } catch (error) {
     console.error('Contact buyer email error:', error);
     return NextResponse.json(
-      { error: '邮件发送失败' },
+      { error: 'Failed to send email' },
       { status: 500 }
     );
   }

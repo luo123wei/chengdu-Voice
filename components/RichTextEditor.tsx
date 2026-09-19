@@ -27,7 +27,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       TextStyle,
       Color,
       Placeholder.configure({
-        placeholder: placeholder || '在此输入内容...',
+        placeholder: placeholder || 'Type your content here...',
       }),
     ],
     content: value || '',
@@ -51,7 +51,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
   if (!editor) {
     return (
       <div className="border border-gray-200 rounded-lg p-4 min-h-[200px] bg-gray-50 flex items-center justify-center text-gray-400">
-        加载编辑器中...
+        Loading editor...
       </div>
     );
   }
@@ -61,83 +61,83 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
       icon: <Heading1 className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
       isActive: editor.isActive('heading', { level: 1 }),
-      title: '标题 1',
+      title: 'Heading 1',
     },
     {
       icon: <Heading2 className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
       isActive: editor.isActive('heading', { level: 2 }),
-      title: '标题 2',
+      title: 'Heading 2',
     },
     {
       icon: <Heading3 className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
       isActive: editor.isActive('heading', { level: 3 }),
-      title: '标题 3',
+      title: 'Heading 3',
     },
     { type: 'divider' },
     {
       icon: <Bold className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleBold().run(),
       isActive: editor.isActive('bold'),
-      title: '粗体',
+      title: 'Bold',
     },
     {
       icon: <Italic className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleItalic().run(),
       isActive: editor.isActive('italic'),
-      title: '斜体',
+      title: 'Italic',
     },
     { type: 'divider' },
     {
       icon: <List className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleBulletList().run(),
       isActive: editor.isActive('bulletList'),
-      title: '无序列表',
+      title: 'Bullet list',
     },
     {
       icon: <ListOrdered className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
       isActive: editor.isActive('orderedList'),
-      title: '有序列表',
+      title: 'Ordered list',
     },
     {
       icon: <Quote className="w-4 h-4" />,
       onClick: () => editor.chain().focus().toggleBlockquote().run(),
       isActive: editor.isActive('blockquote'),
-      title: '引用',
+      title: 'Quote',
     },
     { type: 'divider' },
     {
       icon: <Minus className="w-4 h-4" />,
       onClick: () => editor.chain().focus().setHorizontalRule().run(),
       isActive: false,
-      title: '分割线',
+      title: 'Divider',
     },
     { type: 'divider' },
     {
       icon: <Link className="w-4 h-4" />,
       onClick: () => {
-        const url = prompt('输入链接地址：');
+        const url = prompt('Enter link URL:');
         if (url) {
           editor.chain().focus().setLink({ href: url }).run();
         }
       },
       isActive: editor.isActive('link'),
-      title: '链接',
+      title: 'Link',
     },
     { type: 'divider' },
     {
       icon: <Undo className="w-4 h-4" />,
       onClick: () => editor.chain().focus().undo().run(),
       isActive: false,
-      title: '撤销',
+      title: 'Undo',
     },
     {
       icon: <Redo className="w-4 h-4" />,
       onClick: () => editor.chain().focus().redo().run(),
       isActive: false,
-      title: '重做',
+      title: 'Redo',
     },
   ];
 
@@ -167,7 +167,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         
         {/* 颜色选择器 */}
         <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300">
-          <span className="text-xs text-gray-500">颜色:</span>
+          <span className="text-xs text-gray-500">Color:</span>
           {colors.map((color) => (
             <button
               key={color}

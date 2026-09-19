@@ -96,7 +96,6 @@ DECLARE
   v_to_add INT;
   v_count INT;
   v_limit_date DATE;
-  v_email TEXT;
   v_rating DECIMAL;
   v_date DATE;
   v_review_id TEXT;
@@ -117,10 +116,6 @@ BEGIN
     v_to_add := 2 + FLOOR(RANDOM() * 3);
 
     FOR i IN 1..v_to_add LOOP
-      -- 从昵称池随机选
-      SELECT nickname INTO v_email FROM public.vr_nickname_pool ORDER BY RANDOM() LIMIT 1;
-      v_email := LOWER(REPLACE(v_email, '.', '_')) || '@example.com';
-
       -- rating: 85% 4.5-5.0，15% 4.0
       IF RANDOM() < 0.85 THEN
         v_rating := CASE WHEN RANDOM() < 0.65 THEN 5.0 ELSE 4.5 END;
@@ -128,25 +123,57 @@ BEGIN
         v_rating := 4.0;
       END IF;
 
-      -- 上月随机日期
+      -- 上月随机日期（0-27 天，恒在上月内，绝不产生未来日期）
       v_date := (DATE_TRUNC('month', v_limit_date) + (FLOOR(RANDOM() * 28))::INT)::DATE;
 
       v_review_id := 'vr-' || v_product.id || '-m-' || EXTRACT(EPOCH FROM NOW())::BIGINT || '-' || i;
 
+      -- 评论内容与昵称在同一条子查询里一次性配对，邮箱由昵称派生（保证一致）
+      -- 且优先选该产品尚未用过的昵称（避免同人同品重复评论）
       INSERT INTO reviews (id, product_id, nickname, email, rating, content, date, verified, verified_email)
       SELECT
         v_review_id,
         v_product.id,
-        nickname,
-        v_email,
+        src.nickname,
+        LOWER(src.nickname) || '@example.com',
         v_rating,
-        content,
+        src.content,
         v_date,
         TRUE,
         TRUE
-      FROM public.vr_comment_pool, public.vr_nickname_pool
-      ORDER BY RANDOM()
-      LIMIT 1;
+      FROM (
+        SELECT c.content, p.nickname
+        FROM public.vr_comment_pool c
+        CROSS JOIN public.vr_nickname_pool p
+        WHERE NOT EXISTS (
+          SELECT 1 FROM reviews r
+          WHERE r.product_id = v_product.id AND r.nickname = p.nickname AND r.id LIKE 'vr-%'
+        )
+        ORDER BY RANDOM()
+        LIMIT 1
+      ) src;
+
+      -- 兜底：昵称池已全部用满时，去掉去重条件再插一次
+      IF NOT FOUND THEN
+        INSERT INTO reviews (id, product_id, nickname, email, rating, content, date, verified, verified_email)
+        SELECT
+          v_review_id,
+          v_product.id,
+          src.nickname,
+          LOWER(src.nickname) || '@example.com',
+          v_rating,
+          src.content,
+          v_date,
+          TRUE,
+          TRUE
+        FROM (
+          SELECT c.content, p.nickname
+          FROM public.vr_comment_pool c
+          CROSS JOIN public.vr_nickname_pool p
+          ORDER BY RANDOM()
+          LIMIT 1
+        ) src;
+      END IF;
 
       added := added + 1;
     END LOOP;

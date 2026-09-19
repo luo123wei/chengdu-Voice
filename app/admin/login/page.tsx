@@ -49,8 +49,8 @@ export default function LoginPage() {
             <div className="w-16 h-16 mx-auto bg-gradient-to-br from-black to-amber-800 rounded-xl flex items-center justify-center mb-4">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">管理员登录</h1>
-            <p className="text-gray-500 mt-2">成都造物管理系统</p>
+            <h1 className="text-2xl font-bold text-gray-800">Admin Login</h1>
+            <p className="text-gray-500 mt-2">Voice Culture Admin</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -348,13 +348,13 @@ export default function CheckoutPage() {
               : 'Thank you! We have received your order.'}
           </p>
           <div className="bg-gray-50 rounded-xl p-6 mb-6">
-            <p className="text-sm text-gray-500 mb-2">Order Number / 订单号</p>
+            <p className="text-sm text-gray-500 mb-2">Order Number</p>
             <p className="text-xl font-bold text-secondary">{orderNumber}</p>
           </div>
 
           {isPaid ? (
             <div className="bg-gray-50 border border-green-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
-              <h3 className="font-bold text-green-900 mb-3">✅ Payment Received / 付款已收到</h3>
+              <h3 className="font-bold text-green-900 mb-3">✅ Payment Received</h3>
               {hasPhysicalProducts ? (
                 <>
                   <p className="text-green-800 text-sm mb-3">
@@ -363,39 +363,27 @@ export default function CheckoutPage() {
                   <p className="text-green-800 text-sm mb-3">
                     <strong>Step 2:</strong> You will receive a shipping confirmation email with tracking information.
                   </p>
-                  <p className="text-green-800 text-sm">
-                    <strong>第一步：</strong>我们将在 24 小时内备货并发货。
-                  </p>
-                  <p className="text-green-800 text-sm mt-2">
-                    <strong>第二步：</strong>发货后您会收到含物流单号的确认邮件。
-                  </p>
                 </>
               ) : (
                 <>
                   <p className="text-green-800 text-sm mb-3">
                     Your digital order will be delivered to <strong>{formData.email}</strong> shortly.
                   </p>
-                  <p className="text-green-800 text-sm">
-                    您的数字商品将很快发送至邮箱 <strong>{formData.email}</strong>，请注意查收。
-                  </p>
                 </>
               )}
             </div>
           ) : (
             <div className="bg-gray-50 border border-amber-200 rounded-xl p-6 mb-6 text-left max-w-lg mx-auto">
-              <h3 className="font-bold text-amber-900 mb-3">⚠️ Payment Pending / 待付款</h3>
+              <h3 className="font-bold text-amber-900 mb-3">⚠️ Payment Pending</h3>
               <p className="text-amber-800 text-sm mb-3">
                 <strong>Step 1:</strong> Our customer service team will contact you via email within 24 hours to arrange payment details.
               </p>
               <p className="text-amber-800 text-sm mb-3">
                 <strong>Step 2:</strong> After confirming payment, we will ship your order within 24 hours.
               </p>
-              <p className="text-amber-800 text-sm">
-                <strong>支持付款方式：</strong>PayPal · Payoneer · 国际电汇
-              </p>
               <div className="mt-4 pt-4 border-t border-amber-200">
                 <p className="text-sm text-amber-900">
-                  📧 <strong>Contact / 联系邮箱:</strong><br />
+                  📧 <strong>Contact Email:</strong><br />
                   <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
                 </p>
               </div>
@@ -416,17 +404,12 @@ export default function CheckoutPage() {
 
           <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left max-w-md mx-auto">
             <p className="text-sm text-blue-800 font-bold mb-2">
-              {isPaid ? '📧 What Happens Next / 接下来' : '📦 Next Steps / 后续流程'}
+              {isPaid ? '📧 What Happens Next' : '📦 Next Steps'}
             </p>
             <p className="text-sm text-blue-600">
               {isPaid
                 ? 'Please check your email inbox (and spam folder) for the order confirmation.'
                 : 'Please check your email inbox (and spam folder) for our message within 24 hours. If you do not hear from us, please contact us directly.'}
-            </p>
-            <p className="text-sm text-blue-600 mt-2">
-              {isPaid
-                ? '请查收订单确认邮件（含垃圾箱）。'
-                : '请在 24 小时内查收邮件（含垃圾箱）。如未收到请直接邮箱联系我们。'}
             </p>
           </div>
 
@@ -684,12 +667,12 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-serif font-bold text-secondary mb-4 flex items-center">
                 <CreditCard className="w-5 h-5 mr-2 text-primary" />
-                Payment / 付款方式
+                Payment
               </h2>
 
               {IS_SANDBOX && PAYPAL_CLIENT_ID && (
                 <div className="mb-4 px-3 py-2 bg-amber-50 border border-amber-300 rounded-lg text-xs font-medium text-amber-800 text-center">
-                  SANDBOX / 沙箱测试模式 — No real charge
+                  Sandbox mode — no real charge
                 </div>
               )}
 
@@ -753,13 +736,9 @@ export default function CheckoutPage() {
                           </span>
                         </span>
                       </p>
-                      <p className="mt-3 text-sm text-gray-800">
-                        <strong>提交订单后，客服将在 24 小时内通过邮件与您联系完成付款。</strong><br />
-                        支持：PayPal、Payoneer、国际电汇
-                      </p>
                       <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
                         <p className="text-amber-800">
-                          📧 <strong>Contact Email / 联系邮箱:</strong><br />
+                          📧 <strong>Contact Email:</strong><br />
                           <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
                         </p>
                       </div>
@@ -796,13 +775,9 @@ export default function CheckoutPage() {
                         </span>
                       </span>
                     </p>
-                    <p className="mt-3 text-sm text-gray-800">
-                      <strong>提交订单后，客服将在 24 小时内通过邮件与您联系完成付款。</strong><br />
-                      支持：PayPal、Payoneer、国际电汇
-                    </p>
                     <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
                       <p className="text-amber-800">
-                        📧 <strong>Contact Email / 联系邮箱:</strong><br />
+                        📧 <strong>Contact Email:</strong><br />
                         <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
                       </p>
                     </div>

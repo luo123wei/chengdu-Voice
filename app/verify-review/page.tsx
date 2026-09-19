@@ -53,8 +53,8 @@ function ReviewVerificationContent() {
               <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Loader2 className="w-10 h-10 text-black animate-spin" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-4">验证中...</h1>
-              <p className="text-gray-500">正在验证您的评价，请稍候</p>
+              <h1 className="text-2xl font-bold text-gray-800 mb-4">Verifying...</h1>
+              <p className="text-gray-500">We are verifying your review. Please wait a moment.</p>
             </div>
           )}
 
@@ -63,9 +63,9 @@ function ReviewVerificationContent() {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Check className="w-10 h-10 text-green-600" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-4">验证成功！</h1>
-              <p className="text-gray-500 mb-6">您的评价已正式发布，感谢您的反馈！</p>
-              <p className="text-sm text-gray-400">3秒后将自动跳转...</p>
+              <h1 className="text-2xl font-bold text-gray-800 mb-4">Review Verified!</h1>
+              <p className="text-gray-500 mb-6">Your review has been published. Thank you for your feedback!</p>
+              <p className="text-sm text-gray-400">Redirecting in 3 seconds...</p>
             </div>
           )}
 
@@ -76,13 +76,13 @@ function ReviewVerificationContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-4">验证失败</h1>
-              <p className="text-gray-500 mb-6">链接无效或已过期，请重新提交评价</p>
+              <h1 className="text-2xl font-bold text-gray-800 mb-4">Verification Failed</h1>
+              <p className="text-gray-500 mb-6">This link is invalid or has expired. Please submit your review again.</p>
               <button
                 onClick={() => router.push('/shop')}
                 className="px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
               >
-                返回商店
+                Back to Shop
               </button>
             </div>
           )}

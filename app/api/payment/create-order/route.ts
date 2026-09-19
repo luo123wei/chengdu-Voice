@@ -84,14 +84,14 @@ export async function POST(request: NextRequest) {
 
     if (!Array.isArray(items) || items.length === 0 || !email) {
       return NextResponse.json(
-        { error: '缺少必要参数' },
+        { error: 'Missing required parameters' },
         { status: 400 }
       );
     }
 
     if (!clientId || !clientSecret || clientId === 'your_paypal_client_id_here') {
       return NextResponse.json(
-        { error: 'PayPal 支付未配置，请联系客服' },
+        { error: 'PayPal is not configured yet. Please contact support.' },
         { status: 503 }
       );
     }
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     if (totalFromClient != null && Math.abs(Number(totalFromClient) - total) > 0.01) {
       console.error('PayPal amount mismatch:', { totalFromClient, itemTotal, shipping, tax, total });
       return NextResponse.json(
-        { error: '订单金额校验失败，请刷新页面后重试' },
+        { error: 'Order amount verification failed. Please refresh the page and try again.' },
         { status: 400 }
       );
     }
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     const paypalItems = items.map((item: { name: string; nameEn: string; price: number; quantity: number; productId?: string }) => ({
       name: String(item.nameEn || item.name).slice(0, 127),
-      description: item.name ? String(item.name).slice(0, 127) : undefined,
+      description: item.nameEn ? String(item.nameEn).slice(0, 127) : undefined,
       sku: item.productId ? String(item.productId).slice(0, 127) : undefined,
       quantity: String(item.quantity),
       unit_amount: {
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     const purchaseUnit: Record<string, unknown> = {
       reference_id: orderNumber,
-      description: `Chengdu Craft Studio Order ${orderNumber}`,
+      description: `Voice Culture Order ${orderNumber}`,
       items: paypalItems,
       amount: {
         currency_code: 'USD',
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
         intent: 'CAPTURE',
         purchase_units: [purchaseUnit],
         application_context: {
-          brand_name: 'Chengdu Craft Studio',
+          brand_name: 'Voice Culture',
           locale: 'en-US',
           shipping_preference: hasPhysical ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING',
           user_action: 'PAY_NOW',
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       console.error('PayPal create order failed:', response.status, JSON.stringify(data, null, 2));
       return NextResponse.json(
-        { error: 'PayPal 下单失败', details: data },
+        { error: 'Failed to create PayPal order', details: data },
         { status: 502 }
       );
     }
@@ -208,8 +208,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('PayPal order creation error:', error);
     const message = error instanceof Error && error.message === 'PAYPAL_AUTH_FAILED'
-      ? 'PayPal 凭证验证失败，请稍后再试或联系客服'
-      : '创建支付失败';
+      ? 'PayPal credential verification failed. Please try again later or contact support.'
+      : 'Failed to create payment';
     return NextResponse.json(
       { error: message },
       { status: 500 }

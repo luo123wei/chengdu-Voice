@@ -37,7 +37,5 @@ export const config = {
     '/free-sounds/:path*',
     '/checkout/:path*',
     '/account/:path*',
-    '/verify-review/:path*',
-    '/reviews-sketch/:path*',
   ],
 };
