@@ -25,11 +25,11 @@ export const metadata: Metadata = {
   },
   description: 'Voice Culture — Chengdu cultural gifts & souvenirs. You vote on what we make next, pre-order new pieces, shop small-batch crafts worldwide. Designed in Chengdu, shipped globally.',
   keywords: [
-    'Chengdu', '成都', 'cultural gifts', 'souvenirs', 'Voice Culture',
-    'panda design', '熊猫周边', '文创设计工作室', 'design studio',
-    'Chinese design', '中国设计', 'handmade craft', '手作',
+    'Chengdu', 'cultural gifts', 'souvenirs', 'Voice Culture',
+    'panda design', 'Chinese design studio', 'design studio',
+    'Chinese design', 'handmade craft', 'artisan gifts',
     'stationery', 'home decor', 'designer toys', 'Chengdu design',
-    'free Chengdu sounds', '成都声音', '白噪音'
+    'free Chengdu sounds', 'white noise', 'Chengdu gifts', 'Chengdu souvenirs'
   ],
   authors: [{ name: 'Voice Culture', url: siteUrl }],
   creator: 'Voice Culture',

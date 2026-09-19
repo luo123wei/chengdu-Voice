@@ -615,7 +615,6 @@ export default function CheckoutPage() {
                       {item.skuName && (
                         <p className="text-xs text-gray-400">{item.skuName}</p>
                       )}
-                      <p className="text-xs text-gray-500 font-serif">{item.name}</p>
                       <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                     </div>
                     <span className="font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</span>

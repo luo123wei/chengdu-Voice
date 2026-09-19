@@ -43,7 +43,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.nameEn}
           </h3>
         </Link>
-        <p className="text-xs text-gray-400">{product.name}</p>
+        <p className="text-xs text-gray-400">{product.nameEn || product.name}</p>
         <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 flex-1">
           {product.descriptionEn}
         </p>

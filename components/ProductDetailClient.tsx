@@ -263,7 +263,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               <h1 className="text-3xl sm:text-4xl font-bold text-secondary mb-2">
                 {product.nameEn}
               </h1>
-              <p className="text-lg text-gray-500 mb-4">{product.name}</p>
+              <p className="text-lg text-gray-500 mb-4">{product.nameEn || product.name}</p>
 
               {product.reviews > 0 && (
                 <div className="flex items-center space-x-3 mb-6">

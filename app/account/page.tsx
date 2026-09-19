@@ -391,7 +391,7 @@ export default function AccountPage() {
                         <div className="space-y-2 mb-4">
                           {order.items.map((item: any, index: number) => (
                             <div key={index} className="flex items-center justify-between">
-                              <span className="text-gray-600">{item.name} x {item.quantity}</span>
+                              <span className="text-gray-600">{item.nameEn || item.name} x {item.quantity}</span>
                               <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
                             </div>
                           ))}

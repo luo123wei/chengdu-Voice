@@ -129,7 +129,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   />
                   <div className="flex-1">
                     <h3 className="font-medium text-secondary">{item.nameEn}</h3>
-                    <p className="text-sm text-gray-500">{item.name}</p>
                     {item.skuName && (
                       <p className="text-xs text-gray-400 mt-0.5">{item.skuName}</p>
                     )}
