@@ -111,8 +111,25 @@ BEGIN
     SELECT id, slug, name_en FROM products
     WHERE status IS NULL OR status IN ('on-sale', 'preorder')
   LOOP
-    -- 每产品加 2-4 条
-    v_to_add := 2 + FLOOR(RANDOM() * 3);
+    -- 权重决定每次新增数量：热销品权重高、新品权重低
+    -- 同时参考该产品当前评论数，少的多补、多的跳过
+    SELECT COUNT(*) INTO v_count FROM reviews WHERE product_id = v_product.id;
+
+    -- 权重：panda-egg 热销 → 3-5；武士熊猫中等 → 1-3；火漆印章等新品 → 0-2
+    IF v_product.id = 'panda-egg' THEN
+      v_to_add := 3 + FLOOR(RANDOM() * 3);  -- 3-5
+    ELSIF v_product.id = 'prod-1788939200479' THEN
+      v_to_add := 1 + FLOOR(RANDOM() * 3);  -- 1-3
+    ELSIF v_product.id = 'prod-1788923642283' THEN
+      v_to_add := FLOOR(RANDOM() * 3);       -- 0-2（30% 概率本月不加）
+    ELSE
+      v_to_add := 1 + FLOOR(RANDOM() * 2);   -- 新品默认 1-2
+    END IF;
+
+    -- 已有 20+ 条的产品跳过本月（达到成熟态，没必要再加）
+    IF v_count >= 20 THEN
+      v_to_add := 0;
+    END IF;
 
     FOR i IN 1..v_to_add LOOP
       -- rating: 85% 4.5-5.0，15% 4.0
