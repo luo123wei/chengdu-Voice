@@ -76,6 +76,7 @@ export const metadata: Metadata = {
     'charset': 'UTF-8',
     'baidu-site-verification': 'your-baidu-verification-code',
     'msvalidate.01': '817C21E6CCB0018DC7884C88EBCAC36C',
+    'p:domain_verify': '14a1c5b56c3b44bf9fe36ae713c995b7',
   },
 }
 
