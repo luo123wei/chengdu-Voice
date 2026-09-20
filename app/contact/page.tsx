@@ -23,7 +23,7 @@ export default function ContactPage() {
                 <Mail className="w-5 h-5" />
               </div>
               <h3 className="font-bold text-secondary mb-1">Email</h3>
-              <a href="mailto:kylw02@outlook.com" className="text-sm text-primary hover:underline">kylw02@outlook.com</a>
+              <a href="mailto:hello@voiceculture.world" className="text-sm text-primary hover:underline">hello@voiceculture.world</a>
             </div>
 
             <div className="bg-cream/40 rounded-xl p-6 text-center">
@@ -45,7 +45,7 @@ export default function ContactPage() {
 
           <div className="bg-white border border-gray-200 rounded-xl p-8">
             <h2 className="text-xl font-bold text-secondary mb-6">Send Us a Message</h2>
-            <form action="mailto:kylw02@outlook.com" method="post" encType="text/plain" className="space-y-4">
+            <form action="mailto:hello@voiceculture.world" method="post" encType="text/plain" className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Name</label>

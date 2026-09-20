@@ -113,7 +113,7 @@ ${shippingMethod === 'digital'
       ? 'Your digital order will be delivered to this email address shortly.'
       : 'We will prepare and ship your order within 24 hours. You will receive a shipping confirmation with tracking information once it is on the way.'}
 
-If you have any questions, please contact us at kylw02@outlook.com.
+If you have any questions, please contact us at hello@voiceculture.world.
 
 Best regards,
 The Voice Culture Team`
@@ -129,7 +129,7 @@ ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item
 
 **Payment is still pending.** We support PayPal, Payoneer and international wire transfer. Please wait for our email with payment instructions.
 
-If you have any questions, please contact us at kylw02@outlook.com.
+If you have any questions, please contact us at hello@voiceculture.world.
 
 Best regards,
 The Voice Culture Team`;
@@ -213,7 +213,7 @@ export async function sendPaymentReceivedEmail(
           </div>
           <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
             This email is automatically generated, please do not reply directly.<br>
-            Questions? Contact us at kylw02@outlook.com<br>
+            Questions? Contact us at hello@voiceculture.world<br>
             Voice Culture
           </p>
         </div>
@@ -266,7 +266,7 @@ export async function sendCustomEmailToBuyer(
               This message is regarding your order <strong>#${orderNumber}</strong>.
             </p>
             <p style="color: #718096; font-size: 12px; margin-top: 20px;">
-              📧 Reply to this email or contact us at <a href="mailto:kylw02@outlook.com" style="color: #8B4513;">kylw02@outlook.com</a><br>
+              📧 Reply to this email or contact us at <a href="mailto:hello@voiceculture.world" style="color: #8B4513;">hello@voiceculture.world</a><br>
               Visit <a href="${appUrl}" style="color: #8B4513;">${appUrl}</a>
             </p>
           </div>

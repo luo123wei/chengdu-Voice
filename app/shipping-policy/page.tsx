@@ -145,13 +145,13 @@ export default async function ShippingPolicyPage() {
             <p>A tracking link will be emailed to you once your order ships. You can also track your package by logging into your account at <a href="/" className="text-primary underline">voiceculture.world</a> and viewing your order history.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">7. Lost or Delayed Packages</h2>
-            <p>If your package is significantly delayed (more than 30 days for standard, 15 days for express), please contact us at <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a> and we will open an inquiry with the carrier. If the carrier confirms the package is lost, we will issue a full refund or resend your order — your choice.</p>
+            <p>If your package is significantly delayed (more than 30 days for standard, 15 days for express), please contact us at <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a> and we will open an inquiry with the carrier. If the carrier confirms the package is lost, we will issue a full refund or resend your order — your choice.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">8. Shipping Restrictions</h2>
             <p>We currently do not ship to countries under UN or US trade embargoes. If your country is not available at checkout, please contact us and we will explore alternatives.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">9. Contact</h2>
-            <p>For any shipping questions, reach us at <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>.</p>
+            <p>For any shipping questions, reach us at <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</p>
           </div>
         </div>
       </div>

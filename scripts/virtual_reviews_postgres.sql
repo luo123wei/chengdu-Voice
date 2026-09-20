@@ -19,8 +19,8 @@
 --   DROP TABLE IF EXISTS public.vr_nickname_pool;
 -- ============================================================
 
--- 先确认 pg_cron 扩展已启用（Supabase 默认开启）
-CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- pg_cron 在本项目不可用，定时任务改用 Supabase Edge Function + cron-job.org
+-- CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 -- ============================================================
 -- 1. 评论内容池（通用文创英文好评，35 条）
@@ -40,9 +40,9 @@ INSERT INTO public.vr_comment_pool (content) VALUES
 ('Perfect gift for anyone who loves Chengdu, panda culture, or well-made craft objects. Would buy again.'),
 ('The craftsmanship is real. Small details you can feel make this worth every penny.'),
 ('Arrived quickly and in perfect condition. The colors and textures are exactly as shown. No surprises.'),
-('I wasn\'t sure at first but it\'s become one of my most-used items. Definitely recommend.'),
+('I wasn''t sure at first but it''s become one of my most-used items. Definitely recommend.'),
 ('A little piece of Chengdu that travels with you. Love the story and care behind this brand.'),
-('Great for daily use and for display. Feels like something you\'d keep for years.'),
+('Great for daily use and for display. Feels like something you''d keep for years.'),
 ('Solid quality, thoughtful design. This is how independent craft brands should be doing it.'),
 ('Bought one for myself and immediately ordered two more as gifts. That should tell you something.'),
 ('The texture and material have a nice feel to it. Not cheap, not overly fancy — just right.'),
@@ -50,18 +50,18 @@ INSERT INTO public.vr_comment_pool (content) VALUES
 ('Would absolutely order from Voice Culture again. The whole experience was a pleasure.'),
 ('This is going to be such a good gift. The recipient is going to love it — I can already tell.'),
 ('Came beautifully packaged. I barely wanted to open it myself before gifting. Quality present.'),
-('It\'s the kind of gift that doesn\'t feel like an afterthought. People remember receiving things like this.'),
+('It''s the kind of gift that doesn''t feel like an afterthought. People remember receiving things like this.'),
 ('Perfect for anyone who collects small cultural objects or just loves nice things on their desk.'),
 ('I gave this to a friend and they immediately started using it. Always a good sign.'),
 ('As a panda enthusiast, this did not disappoint. The panda details are on point, not generic.'),
 ('Chengdu pandas are the best pandas. This does them justice in design and quality.'),
 ('Minimal but warm. The aesthetic is exactly my taste — not too loud, not too plain.'),
 ('Clean lines, good proportions. Whoever designed this has an eye.'),
-('It\'s a design object, not just a product. I appreciate that Voice Culture puts thought into form.'),
+('It''s a design object, not just a product. I appreciate that Voice Culture puts thought into form.'),
 ('Feels like something MoMA would stock, but at a price normal people can actually afford.'),
 ('Arrived two days earlier than the estimate. That was a nice surprise.'),
-('The brand card that came with it is a nice touch. Feels like you\'re sharing a story, not just a thing.'),
-('I\'ve had it for a month now and it\'s holding up beautifully. No loose threads, no fading.'),
+('The brand card that came with it is a nice touch. Feels like you''re sharing a story, not just a thing.'),
+('I''ve had it for a month now and it''s holding up beautifully. No loose threads, no fading.'),
 ('The price is very fair for what you get. This would cost twice as much in a boutique.'),
 ('Shipping internationally was smooth. Customs was fast, no extra fees beyond what was quoted.'),
 ('I compared with three similar products online and this one was the clear winner on quality.'),
@@ -99,7 +99,6 @@ DECLARE
   v_rating DECIMAL;
   v_date DATE;
   v_review_id TEXT;
-  v_rid SERIAL;
 BEGIN
   added := 0;
   deleted := 0;
@@ -224,17 +223,10 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================
--- 5. 注册定时任务：每月 1 号 UTC 02:00（北京时间 10:00）
---    已存在则先删除再重建（安全幂等）
+-- 5. 定时任务通过 cron-job.org → Supabase Edge Function 触发
+--    （本项目 pg_cron 不可用，已在外部配置）
+--    Edge Function 调用: SELECT public.generate_monthly_virtual_reviews();
 -- ============================================================
-SELECT cron.unschedule('monthly-virtual-reviews');
-
-SELECT cron.schedule(
-  'monthly-virtual-reviews',
-  '0 2 1 * *',
-  'SELECT public.generate_monthly_virtual_reviews();'
-);
 
 -- 输出确认信息
 SELECT '✅ 全部完成' AS status;
-SELECT cron.jobid, jobname, schedule FROM cron.job WHERE jobname = 'monthly-virtual-reviews';

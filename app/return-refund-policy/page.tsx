@@ -32,7 +32,7 @@ export default function ReturnRefundPolicyPage() {
             </ul>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">3. How to Initiate a Return</h2>
-            <p>To start a return, email us at <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a> with your order number and the reason for return. We will reply within 48 hours with return instructions and our warehouse address in Chengdu, China.</p>
+            <p>To start a return, email us at <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a> with your order number and the reason for return. We will reply within 48 hours with return instructions and our warehouse address in Chengdu, China.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">4. Return Shipping Costs</h2>
             <ul className="list-disc pl-6 space-y-1">
@@ -54,7 +54,7 @@ export default function ReturnRefundPolicyPage() {
             <p>Orders can be cancelled free of charge before they ship. Once an order has been shipped, it cannot be cancelled and must follow the standard return process.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">9. Contact</h2>
-            <p>For any return or refund questions, reach us at <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>.</p>
+            <p>For any return or refund questions, reach us at <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</p>
           </div>
         </div>
       </div>

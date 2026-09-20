@@ -236,7 +236,7 @@ export default function CheckoutPage() {
     } catch (err) {
       console.error('Failed to finalize paid order:', err);
       // 钱已收但订单落库失败：提示用户联系客服，避免重复扣款
-      setError('Your payment was completed, but we could not save the order. Please contact kylw02@outlook.com with your PayPal receipt.');
+      setError('Your payment was completed, but we could not save the order. Please contact hello@voiceculture.world with your PayPal receipt.');
     } finally {
       setIsProcessing(false);
     }
@@ -384,7 +384,7 @@ export default function CheckoutPage() {
               <div className="mt-4 pt-4 border-t border-amber-200">
                 <p className="text-sm text-amber-900">
                   📧 <strong>Contact Email:</strong><br />
-                  <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+                  <a href="mailto:hello@voiceculture.world" className="text-primary hover:underline font-medium">hello@voiceculture.world</a>
                 </p>
               </div>
             </div>
@@ -738,7 +738,7 @@ export default function CheckoutPage() {
                       <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
                         <p className="text-amber-800">
                           📧 <strong>Contact Email:</strong><br />
-                          <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+                          <a href="mailto:hello@voiceculture.world" className="text-primary hover:underline font-medium">hello@voiceculture.world</a>
                         </p>
                       </div>
                       <button
@@ -777,7 +777,7 @@ export default function CheckoutPage() {
                     <div className="mt-3 p-3 bg-white/60 rounded-lg text-sm">
                       <p className="text-amber-800">
                         📧 <strong>Contact Email:</strong><br />
-                        <a href="mailto:kylw02@outlook.com" className="text-primary hover:underline font-medium">kylw02@outlook.com</a>
+                        <a href="mailto:hello@voiceculture.world" className="text-primary hover:underline font-medium">hello@voiceculture.world</a>
                       </p>
                     </div>
                   </div>

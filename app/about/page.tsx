@@ -116,7 +116,7 @@ export default function AboutPage() {
                 <Mail className="w-5 h-5 text-white" strokeWidth={1.5} />
               </div>
               <h3 className="font-serif font-bold text-black text-lg mb-2">Email</h3>
-              <p className="text-gray-600 text-sm">kylw02@outlook.com</p>
+              <p className="text-gray-600 text-sm">hello@voiceculture.world</p>
             </div>
           </div>
 

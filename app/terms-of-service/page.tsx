@@ -61,7 +61,7 @@ export default function TermsOfServicePage() {
             <p>Voice Culture shall not be held liable for any delay or failure in performance caused by circumstances beyond our reasonable control, including but not limited to: natural disasters, epidemics or pandemics, war, terrorism, civil unrest, government actions or sanctions, labor disputes, transportation disruptions, customs holds, supplier failures, internet or telecommunications outages, or any other force majeure event. We will notify you of any such delay and resume performance as soon as reasonably possible.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">10. Dispute Resolution &amp; Arbitration</h2>
-            <p>Any dispute, claim, or controversy arising out of or relating to these Terms, the Site, or your order shall first be resolved through good-faith negotiation. You may submit a written complaint to <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>, and we will respond within 15 business days.</p>
+            <p>Any dispute, claim, or controversy arising out of or relating to these Terms, the Site, or your order shall first be resolved through good-faith negotiation. You may submit a written complaint to <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>, and we will respond within 15 business days.</p>
             <p>If the dispute remains unresolved after 30 days of negotiation, either party may submit the dispute to binding arbitration administered by the <strong>Hong Kong International Arbitration Centre (HKIAC)</strong> under the HKIAC Administered Arbitration Rules. The seat of arbitration shall be Hong Kong. The language of the arbitration shall be English. The number of arbitrators shall be one. Judgment upon the award may be entered in any court of competent jurisdiction.</p>
             <p>Nothing in this section prevents either party from seeking injunctive or other equitable relief from a court of competent jurisdiction for intellectual property infringement or other urgent matters.</p>
 
@@ -75,7 +75,7 @@ export default function TermsOfServicePage() {
             <p>We may update these Terms at any time. Continued use of the Site after changes constitutes acceptance of the revised Terms.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">14. Contact</h2>
-            <p>For questions about these Terms, email <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>.</p>
+            <p>For questions about these Terms, email <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</p>
           </div>
         </div>
       </div>

@@ -15,14 +15,14 @@ const defaultSettings = {
   siteName: 'Voice Culture',
   siteDescription: 'Chengdu everyday objects, designed for your desk',
   downloadLink: process.env.NEXT_PUBLIC_DOWNLOAD_LINK || 'https://cdn.example.com/download.zip',
-  mailFrom: 'Voice Culture <kylw02@outlook.com>',
+  mailFrom: 'Voice Culture <hello@voiceculture.world>',
   appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   gaMeasurementId: '',
   bannerImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20design%20studio%20interior%20with%20panda%20ceramic%20crafts%20on%20white%20shelves%2C%20black%20and%20white%20photography&image_size=landscape_16_9',
   orderEmailSubjectEn: "We've Received Your Order - Voice Culture",
-  orderEmailBodyEn: 'Dear {customerName},\n\nThank you for your order! We have received your order #{orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.\n\nPayment is still pending. We support PayPal, Payoneer and international wire transfer.\n\nIf you have any questions, please contact us at kylw02@outlook.com.',
+  orderEmailBodyEn: 'Dear {customerName},\n\nThank you for your order! We have received your order #{orderNumber}. Our customer service team will contact you via email within 24 hours to arrange payment details.\n\nPayment is still pending. We support PayPal, Payoneer and international wire transfer.\n\nIf you have any questions, please contact us at hello@voiceculture.world.',
   orderEmailSubjectZh: '我们已收到您的订单 - 成都造物',
-  orderEmailBodyZh: '尊敬的 {customerName}，\n\n感谢您的订单！我们已收到您的订单 #{orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。\n\n付款尚未完成。我们支持 PayPal、Payoneer 和国际电汇。\n\n如有任何问题，请联系我们：kylw02@outlook.com。',
+  orderEmailBodyZh: '尊敬的 {customerName}，\n\n感谢您的订单！我们已收到您的订单 #{orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。\n\n付款尚未完成。我们支持 PayPal、Payoneer 和国际电汇。\n\n如有任何问题，请联系我们：hello@voiceculture.world。',
   aboutContent: '<h2>Everyday objects, designed in Chengdu.</h2><p>Voice Culture · a small design studio crafting gifts inspired by Chengdu.</p>',
 };
 

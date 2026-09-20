@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc pl-6 space-y-1">
               <li>For transfers to the United States, Google participates in the <strong>EU-U.S. Data Privacy Framework</strong> and provides Standard Contractual Clauses (SCCs).</li>
               <li>For other transfers, we rely on GDPR Article 49 (explicit consent) or Standard Contractual Clauses approved by the European Commission.</li>
-              <li>You may request a copy of the safeguards by contacting us at <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>.</li>
+              <li>You may request a copy of the safeguards by contacting us at <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</li>
             </ul>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">6. Data Sharing</h2>
@@ -77,7 +77,7 @@ export default function PrivacyPolicyPage() {
               <li>Opt out of marketing communications</li>
               <li>Object to or restrict data processing</li>
             </ul>
-            <p>To exercise these rights, email us at <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>.</p>
+            <p>To exercise these rights, email us at <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">9. Security</h2>
             <p>We use industry-standard security measures including HTTPS encryption, secure password hashing (PBKDF2), and access controls. However, no method of transmission over the internet is 100% secure.</p>
@@ -89,7 +89,7 @@ export default function PrivacyPolicyPage() {
             <p>We may update this policy from time to time. Changes will be posted on this page with an updated date.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">12. Contact</h2>
-            <p>For privacy questions or requests, email <a href="mailto:kylw02@outlook.com" className="text-primary underline">kylw02@outlook.com</a>.</p>
+            <p>For privacy questions or requests, email <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</p>
           </div>
         </div>
       </div>

@@ -88,7 +88,7 @@ const faqs = [
     q: 'How do I contact you?',
     a: (
       <p>
-        Email us anytime at <a href="mailto:kylw02@outlook.com" className="underline underline-offset-2 hover:text-gray-600">kylw02@outlook.com</a> —
+        Email us anytime at <a href="mailto:hello@voiceculture.world" className="underline underline-offset-2 hover:text-gray-600">hello@voiceculture.world</a> —
         the same address you&apos;ll find at the bottom of every page. We reply within 24 hours.
       </p>
     ),
