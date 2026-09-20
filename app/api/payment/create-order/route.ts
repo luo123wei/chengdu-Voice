@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkCoupon, redeemCoupon, releaseCoupon } from '@/lib/coupons';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,6 +72,8 @@ const getAccessToken = async () => {
 };
 
 export async function POST(request: NextRequest) {
+  let appliedCoupon = '';
+  let couponEmail = '';
   try {
     const body = await request.json();
     const {
@@ -80,6 +83,7 @@ export async function POST(request: NextRequest) {
       total: totalFromClient,
       email,
       shippingAddress,
+      couponCode,
     } = body;
 
     if (!Array.isArray(items) || items.length === 0 || !email) {
@@ -103,10 +107,23 @@ export async function POST(request: NextRequest) {
     );
     const shipping = round2(Number(shippingFromClient) || 0);
     const tax = round2(Number(taxFromClient) || 0);
-    const total = round2(itemTotal + shipping + tax);
+
+    // 折扣码在服务端重新校验：身份（订阅者）、是否已用、折扣金额全部以后端为准
+    let discount = 0;
+    if (couponCode) {
+      const check = await checkCoupon(couponCode, email, itemTotal);
+      if (!check.ok) {
+        return NextResponse.json({ error: check.message }, { status: 400 });
+      }
+      appliedCoupon = check.code;
+      couponEmail = email;
+      discount = check.discount;
+    }
+
+    const total = round2(itemTotal + shipping + tax - discount);
 
     if (totalFromClient != null && Math.abs(Number(totalFromClient) - total) > 0.01) {
-      console.error('PayPal amount mismatch:', { totalFromClient, itemTotal, shipping, tax, total });
+      console.error('PayPal amount mismatch:', { totalFromClient, itemTotal, shipping, tax, discount, total });
       return NextResponse.json(
         { error: 'Order amount verification failed. Please refresh the page and try again.' },
         { status: 400 }
@@ -135,8 +152,19 @@ export async function POST(request: NextRequest) {
     if (tax > 0) {
       breakdown.tax_total = { currency_code: 'USD', value: tax.toFixed(2) };
     }
+    if (discount > 0) {
+      breakdown.discount = { currency_code: 'USD', value: `-${discount.toFixed(2)}` };
+    }
 
     const orderNumber = `ORD-${Date.now()}`;
+
+    // 先核销折扣码（唯一约束防并发重复使用）；PayPal 下单失败则释放
+    if (appliedCoupon) {
+      const redemption = await redeemCoupon(appliedCoupon, email, orderNumber, discount);
+      if (!redemption.ok) {
+        return NextResponse.json({ error: redemption.message }, { status: 400 });
+      }
+    }
 
     const purchaseUnit: Record<string, unknown> = {
       reference_id: orderNumber,
@@ -192,6 +220,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       console.error('PayPal create order failed:', response.status, JSON.stringify(data, null, 2));
+      if (appliedCoupon) await releaseCoupon(appliedCoupon, couponEmail).catch(() => {});
       return NextResponse.json(
         { error: 'Failed to create PayPal order', details: data },
         { status: 502 }
@@ -206,6 +235,7 @@ export async function POST(request: NextRequest) {
       links: data.links,
     });
   } catch (error) {
+    if (appliedCoupon) await releaseCoupon(appliedCoupon, couponEmail).catch(() => {});
     console.error('PayPal order creation error:', error);
     const message = error instanceof Error && error.message === 'PAYPAL_AUTH_FAILED'
       ? 'PayPal credential verification failed. Please try again later or contact support.'

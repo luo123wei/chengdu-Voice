@@ -308,6 +308,44 @@ export async function sendDownloadLinkEmail(email: string) {
   });
 }
 
+export async function sendWelcomeDiscountEmail(email: string) {
+  const shopLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'}/shop`;
+
+  return sendEmail({
+    to: email,
+    subject: 'Your 10% Welcome Code - Voice Culture',
+    html: `
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
+        <div style="background: #000; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <h1 style="color: #D4A574; margin: 0; font-size: 24px; letter-spacing: 1px;">VOICE CULTURE</h1>
+        </div>
+        <div style="padding: 30px; background: #f8f9fa; border-radius: 0 0 12px 12px;">
+          <h2 style="color: #2d3748; font-size: 20px; margin-bottom: 20px;">Welcome to the studio.</h2>
+          <p style="color: #4a5568; line-height: 1.6; margin-bottom: 12px;">
+            Thanks for subscribing. Here is your welcome gift:
+          </p>
+          <div style="text-align: center; margin: 24px 0;">
+            <div style="display: inline-block; border: 2px dashed #D4A574; border-radius: 8px; padding: 16px 36px;">
+              <span style="font-size: 26px; font-weight: bold; letter-spacing: 3px; color: #000;">WELCOME10</span>
+            </div>
+            <p style="color: #718096; font-size: 13px; margin: 10px 0 0;">10% off your first order &middot; one use per customer</p>
+          </div>
+          <p style="color: #4a5568; line-height: 1.6; margin-bottom: 20px;">
+            Enter the code at checkout. You will also be first to vote on new designs and get access to limited pre-orders.
+          </p>
+          <a href="${shopLink}" style="display: inline-block; background: #000; color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 0 0 20px;">
+            Browse the Shop
+          </a>
+          <p style="color: #718096; font-size: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
+            This email is automatically generated. Please do not reply directly.<br>
+            Voice Culture &middot; Chengdu, China
+          </p>
+        </div>
+      </div>
+    `,
+  });
+}
+
 export async function sendReviewVerificationEmail(
   email: string,
   nickname: string,

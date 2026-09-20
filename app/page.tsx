@@ -185,10 +185,10 @@ export default async function HomePage() {
       <section className="py-16 bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-serif text-2xl md:text-3xl font-bold text-white mb-4">
-            Be the first to know when new pieces drop
+            Get 10% off your first order
           </h2>
           <p className="text-white/60 text-sm md:text-base mb-8">
-            Subscribe to get first access to pre-orders and new drops from the studio.
+            Join the studio list for your welcome code, plus votes on new designs and early pre-order access.
           </p>
           <SubscribeForm />
         </div>
