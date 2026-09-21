@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkCoupon } from '@/lib/coupons';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,4 +65,89 @@ export async function GET() {
   }
 
   return NextResponse.json(result, { headers: { 'Cache-Control': 'no-store' } });
+}
+
+// POST: 模拟 create-order 的关键步骤，定位崩溃点
+export async function POST(request: Request) {
+  const steps: Record<string, unknown> = {};
+  try {
+    steps.import = 'ok';
+
+    const body = await request.json().catch(() => ({}));
+    const email = body.email || 'diag@test.com';
+    const items = body.items || [{ name: 'Test', price: 9.99, quantity: 1, type: 'digital' }];
+
+    steps.bodyParsed = { email, itemsCount: items.length };
+
+    // 步骤1: 计算金额
+    const itemTotal = Math.round((9.99 * 1 + Number.EPSILON) * 100) / 100;
+    steps.itemTotal = itemTotal;
+
+    // 步骤2: checkCoupon（没有折扣码应该直接跳过）
+    steps.checkCouponNoCode = 'skip (no code)';
+
+    // 步骤3: 测试 checkCoupon 调数据库
+    try {
+      const r = await checkCoupon('WELCOME10', email, itemTotal);
+      steps.checkCouponWELCOME10 = r.ok ? 'ok' : `rejected: ${r.message}`;
+    } catch (e) {
+      steps.checkCouponWELCOME10 = `CRASH: ${e instanceof Error ? e.message : String(e)}`;
+    }
+
+    // 步骤4: PayPal 认证
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+    const tokenRes = await fetch(`${base}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: `Basic ${auth}` },
+      body: 'grant_type=client_credentials',
+      signal: AbortSignal.timeout(15000),
+    });
+    const tokenData = await tokenRes.json();
+    steps.paypalAuth = tokenRes.status;
+
+    if (!tokenData.access_token) {
+      steps.error = 'No access token';
+      return NextResponse.json(steps, { headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    // 步骤5: 创建订单（最小化）
+    const orderRes = await fetch(`${base}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${tokenData.access_token}`,
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify({
+        intent: 'CAPTURE',
+        purchase_units: [{
+          reference_id: `DIAG-${Date.now()}`,
+          description: 'Voice Culture Diag',
+          amount: { currency_code: 'USD', value: '9.99' },
+        }],
+        application_context: {
+          brand_name: 'Voice Culture',
+          locale: 'en-US',
+          shipping_preference: 'NO_SHIPPING',
+          user_action: 'PAY_NOW',
+        },
+      }),
+      signal: AbortSignal.timeout(20000),
+    });
+    const orderData = await orderRes.json();
+    steps.createOrderStatus = orderRes.status;
+    steps.createOrderOk = orderRes.ok;
+    if (orderRes.ok) {
+      steps.orderId = orderData.id;
+    } else {
+      steps.paypalError = JSON.stringify(orderData).slice(0, 300);
+    }
+
+    steps.result = 'ALL STEPS PASSED';
+    return NextResponse.json(steps, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (e) {
+    steps.finalCrash = e instanceof Error ? e.message : String(e);
+    steps.stack = e instanceof Error ? e.stack?.slice(0, 300) : undefined;
+    return NextResponse.json(steps, { status: 500, headers: { 'Cache-Control': 'no-store' } });
+  }
 }
