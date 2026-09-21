@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   // 2. 返回所有已发布的 premium 声音
   const { data: sounds, error } = await supabase
     .from('free_sounds')
-    .select('id, slug, title, title_en, duration, audio, description, category')
+    .select('id, slug, title, title_en, duration, audio, description')
     .eq('is_premium', true)
     .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`)
     .order('created_at', { ascending: true });

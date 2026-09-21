@@ -10,7 +10,6 @@ interface PremiumSound {
   title_en?: string;
   duration?: string;
   audio: string;
-  category?: string;
   description?: string;
 }
 
@@ -48,14 +47,25 @@ export default function CheckoutSuccess() {
       .finally(() => setLoading(false));
   }, []);
 
-  // 按 category 分组
+  // 按 slug 前缀（01-/02-...）归类，否则平铺
   const grouped = sounds.reduce<Record<string, PremiumSound[]>>((acc, s) => {
-    const cat = s.category || 'Other';
+    const m = s.slug.match(/^(\d{2})-/);
+    const cat = m ? m[1] : 'xx';
     (acc[cat] ||= []).push(s);
     return acc;
   }, {});
+  const labelForGroup = (key: string) => {
+    const map: Record<string, string> = {
+      '01': 'Sichuan Opera',
+      '02': 'Dialect & Speech',
+      '03': 'Teahouse & Food',
+      '04': 'Daily Life & Culture',
+      '05': 'Soundscapes & Urban',
+    };
+    return map[key] || 'All Tracks';
+  };
 
-  const totalMB = sounds.reduce((sum, s) => sum + 2.5, 0); // 估算每条约 2.5MB
+  const totalMB = sounds.reduce((sum) => sum + 2.5, 0);
 
   return (
     <div className="min-h-screen bg-white pt-10 pb-16">
@@ -106,13 +116,9 @@ export default function CheckoutSuccess() {
                   {sounds.length} tracks &middot; ~{totalMB.toFixed(0)} MB total &middot; MP3 320kbps
                 </p>
               </div>
-              <a
-                href={sounds[0].audio}
-                download
-                className="px-5 py-2.5 bg-black text-white rounded-lg text-sm font-medium hover:bg-black/80 transition-colors whitespace-nowrap"
-              >
-                Download All ({sounds.length})
-              </a>
+              <span className="text-xs text-gray-400 border border-gray-200 rounded-full px-3 py-1">
+                Tap each track to download
+              </span>
             </div>
 
             {/* Tracks by category */}
@@ -120,7 +126,7 @@ export default function CheckoutSuccess() {
               {Object.entries(grouped).map(([cat, list]) => (
                 <div key={cat}>
                   <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-                    {cat.replace(/^\d+-/, '').replace(/-/g, ' ')} ({list.length})
+                    {labelForGroup(cat)} ({list.length})
                   </h2>
                   <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden">
                     {list.map((s) => (
