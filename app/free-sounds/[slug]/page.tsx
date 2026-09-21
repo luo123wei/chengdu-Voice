@@ -29,8 +29,9 @@ export async function generateStaticParams() {
     .map((s: SoundDetail) => ({ slug: s.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const sound = await getSound(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const sound = await getSound(slug);
   if (!sound) return { title: 'Sound Not Found — Voice Culture' };
   const desc = sound.culturalStory
     ? sound.culturalStory.replace(/<[^>]+>/g, '').slice(0, 140)
@@ -75,8 +76,9 @@ async function getSound(slug: string): Promise<SoundDetail | null> {
   }
 }
 
-export default async function SoundDetailPage({ params }: { params: { slug: string } }) {
-  const sound = await getSound(params.slug);
+export default async function SoundDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const sound = await getSound(slug);
   if (!sound) notFound();
 
   const ldJson = {
