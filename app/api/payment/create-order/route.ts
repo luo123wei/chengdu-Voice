@@ -221,9 +221,13 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       console.error('PayPal create order failed:', response.status, JSON.stringify(data, null, 2));
       if (appliedCoupon) await releaseCoupon(appliedCoupon, couponEmail).catch(() => {});
+      const paypalIssue = data?.details?.[0]?.issue || '';
+      const friendlyMsg = paypalIssue === 'PAYEE_ACCOUNT_RESTRICTED'
+        ? 'Our PayPal account is temporarily restricted. Please try again in a few hours or contact hello@voiceculture.world.'
+        : 'Payment service is temporarily unavailable. Please try again.';
       return NextResponse.json(
-        { error: 'Failed to create PayPal order', details: data },
-        { status: 502 }
+        { error: friendlyMsg, paypalIssue, details: data },
+        { status: 500 }
       );
     }
 

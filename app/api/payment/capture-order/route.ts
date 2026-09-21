@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       console.error('PayPal capture failed:', response.status, JSON.stringify(data, null, 2));
       return NextResponse.json(
         { error: 'Payment was not completed. Please try again or contact support.', status: data.status, details: data },
-        { status: 502 }
+        { status: 500 }
       );
     }
 
