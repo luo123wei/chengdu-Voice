@@ -11,3 +11,4 @@ yarn-error.log*
 
 # 博客真实图片源文件（已上传 Supabase，无需入库）
 blog-images/
+source-audio/

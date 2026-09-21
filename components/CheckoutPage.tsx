@@ -254,6 +254,7 @@ export default function CheckoutPage() {
     setError('');
     const orderNumber = paypalOrderNumberRef.current || `ORD-${Date.now()}`;
     setCurrentOrderId(orderNumber);
+    const hasDigitalProducts = cartItems.some(item => item.type === 'digital');
 
     try {
       await addOrder({
@@ -273,6 +274,27 @@ export default function CheckoutPage() {
         createdAt: new Date().toISOString(),
       });
 
+      // Route A: 数字商品付款成功后立即授权下载
+      if (hasDigitalProducts) {
+        try {
+          for (const item of cartItems) {
+            if (item.type === 'digital') {
+              await fetch('/api/orders/mark-digital', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+                body: JSON.stringify({
+                  email: formData.email,
+                  orderNumber,
+                  albumSlug: item.productId.includes('album') ? 'chengdu-sound-map' : item.productId,
+                }),
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('mark-digital failed (non-fatal):', e);
+        }
+      }
+
       await createUserOnOrder(formData.email, `${formData.firstName} ${formData.lastName}`);
       await clearCart();
 
@@ -281,9 +303,17 @@ export default function CheckoutPage() {
       setIsSubmitted(true);
 
       sendOrderConfirmation(orderNumber, true);
+
+      // Route A: 数字商品跳转到 success+download 页
+      if (hasDigitalProducts) {
+        const params = new URLSearchParams({
+          orderNumber,
+          email: formData.email,
+        });
+        window.location.href = `/checkout/success?${params.toString()}`;
+      }
     } catch (err) {
       console.error('Failed to finalize paid order:', err);
-      // 钱已收但订单落库失败：提示用户联系客服，避免重复扣款
       setError('Your payment was completed, but we could not save the order. Please contact hello@voiceculture.world with your PayPal receipt.');
     } finally {
       setIsProcessing(false);

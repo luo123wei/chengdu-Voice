@@ -32,11 +32,19 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '6');
     const offset = (page - 1) * limit;
 
-    const countResult = await supabase.from('free_sounds').select('id', { count: 'exact' });
+    const nowIso = new Date().toISOString();
+
+    // 公开 API 只返回已发布的：无 scheduled_at 或 scheduled_at <= now
+    const countResult = await supabase
+      .from('free_sounds')
+      .select('id', { count: 'exact' })
+      .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`);
     const total = countResult.count || 0;
 
-    const { data, error } = await supabase.from('free_sounds')
+    const { data, error } = await supabase
+      .from('free_sounds')
       .select('*')
+      .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -52,6 +60,8 @@ export async function GET(request: NextRequest) {
       duration: row.duration,
       audio: row.audio,
       culturalStory: row.cultural_story || '',
+      slug: row.slug || null,
+      isPremium: row.is_premium || false,
       created_at: row.created_at,
     }));
     return NextResponse.json({

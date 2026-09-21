@@ -77,15 +77,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let blogRoutes: MetadataRoute.Sitemap = []
   let productRoutes: MetadataRoute.Sitemap = []
+  let soundRoutes: MetadataRoute.Sitemap = []
 
   try {
     const { createClient } = await import('@supabase/supabase-js')
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
     const supabase = createClient(supabaseUrl, supabaseKey)
+    const nowIso = new Date().toISOString()
 
-    // Fetch blogs
-    const { data: blogs, error: blogError } = await supabase.from('blogs').select('id, slug, publish_date')
+    // Fetch blogs (已发布)
+    const { data: blogs, error: blogError } = await supabase.from('blogs').select('id, slug, publish_date, scheduled_at')
+      .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`)
     if (!blogError && blogs) {
       blogRoutes = blogs.map((blog: any) => ({
         url: `${siteUrl}/blog/${blog.slug || blog.id}`,
@@ -106,12 +109,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))
     }
 
-    console.log(`[Sitemap] Generated ${blogRoutes.length} blog URLs and ${productRoutes.length} product URLs`)
+    // Fetch sounds (已发布且有 slug)
+    const { data: sounds, error: soundError } = await supabase.from('free_sounds').select('slug, created_at')
+      .not('slug', 'is', null)
+      .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`)
+    if (!soundError && sounds) {
+      soundRoutes = sounds.map((s: any) => ({
+        url: `${siteUrl}/free-sounds/${s.slug}`,
+        lastModified: new Date(s.created_at || new Date()),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      }))
+    }
+
+    console.log(`[Sitemap] Generated ${blogRoutes.length} blog URLs, ${productRoutes.length} product URLs, ${soundRoutes.length} sound URLs`)
   } catch (error) {
     console.error('[Sitemap] Error fetching dynamic data:', error)
   }
 
-  const result = [...staticRoutes, ...blogRoutes, ...productRoutes]
+  const result = [...staticRoutes, ...blogRoutes, ...productRoutes, ...soundRoutes]
   console.log(`[Sitemap] Total URLs: ${result.length}`)
   return result
 }
