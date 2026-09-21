@@ -127,17 +127,42 @@ export default async function SoundDetailPage({ params }: { params: Promise<{ sl
             </div>
           )}
 
-          {/* Audio Player */}
-          <div className="bg-[#FAFAFA] border border-gray-200 rounded-xl p-6 mb-10">
-            <audio
-              controls
-              preload="metadata"
-              className="w-full [&::-webkit-media-controls-panel]:bg-white"
-              src={sound.audio}
-            >
-              Your browser does not support audio playback.
-            </audio>
-          </div>
+          {/* Audio Player — or locked CTA for premium */}
+          {sound.isPremium ? (
+            <div className="bg-black text-white border border-gray-200 rounded-xl p-8 mb-10 text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 mb-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <h3 className="font-serif text-xl font-bold text-white mb-2">
+                Part of the Chengdu Sound Library
+              </h3>
+              <p className="text-white/60 text-sm mb-5 max-w-md mx-auto">
+                45 field recordings captured across Chengdu — teahouses, opera houses, dialect, markets.
+                Unlock every track with one purchase.
+              </p>
+              <Link
+                href="/shop/chengdu-sound-map"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-black rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Get the Album — $9.99 →
+              </Link>
+              <p className="text-white/40 text-xs mt-4">One-time purchase · 62 tracks · MP3 320kbps · Forever yours</p>
+            </div>
+          ) : (
+            <div className="bg-[#FAFAFA] border border-gray-200 rounded-xl p-6 mb-10">
+              <audio
+                controls
+                preload="metadata"
+                className="w-full [&::-webkit-media-controls-panel]:bg-white"
+                src={sound.audio}
+              >
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+          )}
 
           {/* Description */}
           {sound.description && (

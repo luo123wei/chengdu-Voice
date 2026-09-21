@@ -34,17 +34,19 @@ export async function GET(request: NextRequest) {
 
     const nowIso = new Date().toISOString();
 
-    // 公开 API 只返回已发布的：无 scheduled_at 或 scheduled_at <= now
+    // 公开 API 只返回已发布且免费的：无 scheduled_at 或 scheduled_at <= now，且 is_premium != true
     const countResult = await supabase
       .from('free_sounds')
       .select('id', { count: 'exact' })
-      .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`);
+      .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`)
+      .or(`is_premium.is.false,is_premium.is.null`);
     const total = countResult.count || 0;
 
     const { data, error } = await supabase
       .from('free_sounds')
       .select('*')
       .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`)
+      .or(`is_premium.is.false,is_premium.is.null`)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
