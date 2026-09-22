@@ -1,19 +1,26 @@
 import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { db } from '@/lib/db';
 import { categoryLabels } from '@/data/mockData';
 
 export const dynamic = 'force-dynamic';
 
 async function getPublishedBlogs(): Promise<any[]> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    console.error('[BlogPage] Missing Supabase env vars');
+    return [];
+  }
+  const supabase = createClient(url, key);
   try {
-    const { data, error } = await db.supabase
+    const { data, error } = await supabase
       .from('blogs')
       .select('*')
       .order('publish_date', { ascending: false });
     if (error || !data) {
-      console.error('[BlogPage] supabase query failed:', error);
+      console.error('[BlogPage] query failed:', error);
       return [];
     }
     const now = new Date();

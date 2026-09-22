@@ -1,33 +1,51 @@
 import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { db } from '@/lib/db';
 import { categoryLabels } from '@/data/mockData';
-import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
+function makeSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return createClient(url || '', key || '');
+}
+
+async function getBlogBySlug(slug: string): Promise<any | null> {
+  const supabase = makeSupabase();
+  const { data, error } = await supabase
+    .from('blogs')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle();
+  if (error) {
+    console.error('[BlogDetail] query error:', error);
+    return null;
+  }
+  return data;
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-  const blog = await db.blogs.getBySlug(slug);
+  const blog = await getBlogBySlug(slug);
 
   if (!blog) {
     return { title: 'Post Not Found' };
   }
 
-  // Strip HTML tags from content for description
-  const textOnly = (blog.contentEn || blog.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  const desc = textOnly.slice(0, 160) || blog.titleEn || blog.title;
+  const textOnly = (blog.content_en || blog.contentEn || blog.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const desc = textOnly.slice(0, 160) || blog.title_en || blog.titleEn || blog.title;
 
   return {
-    title: blog.titleEn || blog.title,
+    title: blog.title_en || blog.titleEn || blog.title,
     description: desc,
   };
 }
 
 export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-  const post = await db.blogs.getBySlug(slug);
+  const post = await getBlogBySlug(slug);
 
   if (!post) {
     return (
@@ -46,7 +64,11 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     );
   }
 
-  const relatedProducts = await db.products.getAll();
+  const supabase = makeSupabase();
+  const { data: products } = await supabase
+    .from('products')
+    .select('*');
+  const relatedProducts = products || [];
   const filteredProducts = relatedProducts
     .filter((p: any) => p.status !== 'design')
     .slice(0, 2);
