@@ -14,6 +14,8 @@ const chengduCategories = [
   { id: 'food', name: 'Food', icon: Utensils, color: 'bg-gold' },
   { id: 'travel', name: 'Travel', icon: Plane, color: 'bg-secondary' },
   { id: 'art', name: 'Art', icon: Palette, color: 'bg-accent' },
+  { id: 'gift', name: 'Gift Guide', icon: Music, color: 'bg-primary' },
+  { id: 'craft', name: 'Craft', icon: Palette, color: 'bg-secondary' },
 ];
 
 export default function BlogPage() {
@@ -131,7 +133,7 @@ export default function BlogPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
                     <span className="px-3 py-1 bg-primary/90 text-white text-xs rounded-full">
-                      {categoryLabels[post.category].en}
+                      {(categoryLabels[post.category]?.en || post.category || 'Culture')}
                     </span>
                     {post.audio && (
                       <span className="px-3 py-1 bg-black text-white text-xs rounded-full flex items-center gap-1">

@@ -47,7 +47,7 @@ export default function BlogDetailPage() {
           </Link>
 
           <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm rounded-full mb-4">
-            {categoryLabels[post.category].en}
+            {(categoryLabels[post.category]?.en || post.category || 'Culture')}
           </span>
 
           <h1 className="text-3xl sm:text-4xl font-bold text-secondary mb-4">

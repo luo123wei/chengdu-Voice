@@ -412,6 +412,8 @@ export const categoryLabels = {
   food: { zh: '美食', en: 'Food' },
   travel: { zh: '旅行', en: 'Travel' },
   art: { zh: '艺术', en: 'Art' },
+  gift: { zh: '礼品', en: 'Gift Guide' },
+  craft: { zh: '工艺', en: 'Craft & Making' },
 };
 
 export const productCategoryLabels = {
