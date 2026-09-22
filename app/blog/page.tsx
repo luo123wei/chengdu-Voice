@@ -8,17 +8,20 @@ export const dynamic = 'force-dynamic';
 
 async function getPublishedBlogs(): Promise<any[]> {
   try {
-    const base = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
-    const res = await fetch(`${base}/api/blogs`, { cache: 'no-store', signal: AbortSignal.timeout(15000) });
-    if (!res.ok) {
-      console.error('[BlogPage] /api/blogs returned', res.status);
+    const { data, error } = await db.supabase
+      .from('blogs')
+      .select('*')
+      .order('publish_date', { ascending: false });
+    if (error || !data) {
+      console.error('[BlogPage] supabase query failed:', error);
       return [];
     }
-    const data = await res.json();
-    const arr = Array.isArray(data) ? data : data?.data || [];
-    return arr;
+    const now = new Date();
+    return data.filter(
+      (b: any) => !b.scheduled_at || new Date(b.scheduled_at) <= now
+    );
   } catch (e) {
-    console.error('[BlogPage] fetch blogs failed:', e);
+    console.error('[BlogPage] exception:', e);
     return [];
   }
 }
