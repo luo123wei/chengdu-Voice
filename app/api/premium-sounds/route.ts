@@ -19,22 +19,23 @@ export async function GET(request: NextRequest) {
   }
 
   const nowIso = new Date().toISOString();
-  const supabaseSafeEmail = encodeURIComponent(String(email).toLowerCase().trim());
+  // mark-digital 落库存的是原始小写邮箱（@ 不编码），查询必须保持一致
+  const normalizedEmail = String(email).toLowerCase().trim();
 
   // 1. 验证用户是否真的买过（查 purchased_albums）
   const { data: purchases } = await supabase
     .from('purchased_albums')
     .select('order_number, album_slug')
-    .eq('email', supabaseSafeEmail);
+    .eq('email', normalizedEmail);
 
   let rows = purchases || [];
-  if (rows.length === 0) {
-    // fallback: 邮箱含特殊字符（如 +）时编码存储不一致，用原始邮箱 + orderNumber 精确匹配
+  if (rows.length === 0 && orderNumber) {
+    // fallback: 兼容历史数据里可能存的编码邮箱
     const { data: pa } = await supabase
       .from('purchased_albums')
       .select('order_number, album_slug')
-      .eq('email', String(email).toLowerCase().trim())
-      .eq('order_number', orderNumber || '')
+      .eq('email', encodeURIComponent(normalizedEmail))
+      .eq('order_number', orderNumber)
       .maybeSingle();
     if (pa) rows = [pa];
   }
