@@ -9,9 +9,24 @@ import { useBlogs, useProducts } from '@/hooks/useDataStore';
 
 export default function BlogDetailPage() {
   const params = useParams();
-  const { blogs } = useBlogs();
+  const { blogs, loading } = useBlogs();
   const { products } = useProducts();
-  const post = blogs.find((p) => p.slug === params.slug);
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const post = blogs.find((p) => p.slug === slug);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <div className="pt-24 pb-12">
+          <div className="max-w-4xl mx-auto px-4 text-center text-gray-500">
+            Loading...
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!post) {
     return (

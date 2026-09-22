@@ -83,10 +83,17 @@ export function useBlogs(includeScheduled = false) {
 
   useEffect(() => {
     const url = includeScheduled ? '/api/blogs?includeScheduled=true' : '/api/blogs';
-    fetch(url)
+    const baseUrl = typeof window === 'undefined'
+      ? process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
+      : '';
+    fetch(baseUrl + url, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
-        setBlogs(data.length > 0 ? data : defaultBlogs);
+        if (Array.isArray(data) && data.length > 0) {
+          setBlogs(data);
+        } else {
+          setBlogs(defaultBlogs);
+        }
         setLoading(false);
       })
       .catch(() => {
