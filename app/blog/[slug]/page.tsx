@@ -26,8 +26,8 @@ async function getBlogBySlug(slug: string): Promise<any | null> {
   return data;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const blog = await getBlogBySlug(slug);
 
   if (!blog) {
@@ -43,8 +43,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
-  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const post = await getBlogBySlug(slug);
 
   if (!post) {
@@ -73,7 +73,7 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
     .filter((p: any) => p.status !== 'design')
     .slice(0, 2);
 
-  const catLabel = categoryLabels[post.category]?.en || post.category || 'Culture';
+  const catLabel = categoryLabels[post.category as keyof typeof categoryLabels]?.en || post.category || 'Culture';
 
   return (
     <div className="min-h-screen">

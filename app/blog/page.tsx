@@ -36,12 +36,13 @@ async function getPublishedBlogs(): Promise<any[]> {
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: { q?: string; cat?: string; page?: string };
+  searchParams: Promise<{ q?: string; cat?: string; page?: string }>;
 }) {
+  const sp = await searchParams;
   const allBlogs = await getPublishedBlogs();
-  const rawQ = searchParams.q;
-  const rawCat = searchParams.cat;
-  const rawPage = searchParams.page;
+  const rawQ = sp.q;
+  const rawCat = sp.cat;
+  const rawPage = sp.page;
   const q = (typeof rawQ === 'string' ? rawQ : '').toLowerCase();
   const cat = typeof rawCat === 'string' && rawCat ? rawCat : undefined;
   const currentPage = Math.max(1, parseInt(typeof rawPage === 'string' ? rawPage : '1', 10) || 1);
@@ -149,7 +150,7 @@ export default async function BlogPage({
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-3 left-3">
                       <span className="px-3 py-1 bg-primary/90 text-white text-xs rounded-full">
-                        {(categoryLabels[post.category]?.en || post.category || 'Culture')}
+                        {(categoryLabels[post.category as keyof typeof categoryLabels]?.en || post.category || 'Culture')}
                       </span>
                     </div>
                   </div>

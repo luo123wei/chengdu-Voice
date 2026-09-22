@@ -19,14 +19,19 @@ interface SoundDetail {
 export const revalidate = 0;
 
 export async function generateStaticParams() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'}/api/free-sounds?limit=200&page=1`,
-    { cache: 'no-store' }
-  );
-  const data = await res.json();
-  return (data.data || [])
-    .filter((s: SoundDetail) => s.slug)
-    .map((s: SoundDetail) => ({ slug: s.slug }));
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'}/api/free-sounds?limit=200&page=1`,
+      { cache: 'no-store', signal: AbortSignal.timeout(15000) }
+    );
+    const data = await res.json();
+    return (data.data || [])
+      .filter((s: SoundDetail) => s.slug)
+      .map((s: SoundDetail) => ({ slug: s.slug }));
+  } catch {
+    // Build-time fetch failed (e.g. instance asleep): skip SSG, render pages on demand
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
