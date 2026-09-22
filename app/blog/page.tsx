@@ -6,12 +6,29 @@ import { categoryLabels } from '@/data/mockData';
 
 export const dynamic = 'force-dynamic';
 
+async function getPublishedBlogs(): Promise<any[]> {
+  try {
+    const base = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
+    const res = await fetch(`${base}/api/blogs`, { cache: 'no-store', signal: AbortSignal.timeout(15000) });
+    if (!res.ok) {
+      console.error('[BlogPage] /api/blogs returned', res.status);
+      return [];
+    }
+    const data = await res.json();
+    const arr = Array.isArray(data) ? data : data?.data || [];
+    return arr;
+  } catch (e) {
+    console.error('[BlogPage] fetch blogs failed:', e);
+    return [];
+  }
+}
+
 export default async function BlogPage({
   searchParams,
 }: {
   searchParams: { q?: string; cat?: string; page?: string };
 }) {
-  const allBlogs = await db.blogs.getAll();
+  const allBlogs = await getPublishedBlogs();
   const rawQ = searchParams.q;
   const rawCat = searchParams.cat;
   const rawPage = searchParams.page;
