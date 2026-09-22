@@ -1,32 +1,33 @@
-'use client';
-import { useParams } from 'next/navigation';
-import { ArrowLeft, Music, Video, Calendar, Eye, ShoppingBag, Utensils, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { db } from '@/lib/db';
 import { categoryLabels } from '@/data/mockData';
-import { useBlogs, useProducts } from '@/hooks/useDataStore';
+import { notFound } from 'next/navigation';
 
-export default function BlogDetailPage() {
-  const params = useParams();
-  const { blogs, loading } = useBlogs();
-  const { products } = useProducts();
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: { slug: string } }) {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-  const post = blogs.find((p) => p.slug === slug);
+  const blog = await db.blogs.getBySlug(slug);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <div className="pt-24 pb-12">
-          <div className="max-w-4xl mx-auto px-4 text-center text-gray-500">
-            Loading...
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
+  if (!blog) {
+    return { title: 'Post Not Found' };
   }
+
+  // Strip HTML tags from content for description
+  const textOnly = (blog.contentEn || blog.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const desc = textOnly.slice(0, 160) || blog.titleEn || blog.title;
+
+  return {
+    title: blog.titleEn || blog.title,
+    description: desc,
+  };
+}
+
+export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const post = await db.blogs.getBySlug(slug);
 
   if (!post) {
     return (
@@ -45,7 +46,12 @@ export default function BlogDetailPage() {
     );
   }
 
-  const relatedProducts = products.filter(p => p.status !== 'design').slice(0, 2);
+  const relatedProducts = await db.products.getAll();
+  const filteredProducts = relatedProducts
+    .filter((p: any) => p.status !== 'design')
+    .slice(0, 2);
+
+  const catLabel = categoryLabels[post.category]?.en || post.category || 'Culture';
 
   return (
     <div className="min-h-screen">
@@ -57,12 +63,11 @@ export default function BlogDetailPage() {
             href="/blog"
             className="inline-flex items-center text-gray-600 hover:text-primary transition-colors mb-6"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Discover
+            ← Back to Discover
           </Link>
 
           <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm rounded-full mb-4">
-            {(categoryLabels[post.category]?.en || post.category || 'Culture')}
+            {catLabel}
           </span>
 
           <h1 className="text-3xl sm:text-4xl font-bold text-secondary mb-4">
@@ -70,109 +75,72 @@ export default function BlogDetailPage() {
           </h1>
 
           <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
-            <span className="flex items-center">
-              <Calendar className="w-4 h-4 mr-2" />
-              {post.publishDate.split('T')[0]}
-            </span>
-            <span className="flex items-center">
-              <Eye className="w-4 h-4 mr-2" />
-              {post.views.toLocaleString()} views
-            </span>
-            <span>{post.author}</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="pb-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-xl overflow-hidden mb-8">
-            <img
-              src={post.images[0]}
-              alt={post.titleEn}
-              className="w-full h-80 sm:h-96 object-cover"
-            />
-          </div>
-
-          {post.audio && (
-            <div className="bg-cream rounded-xl p-6 mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <Music className="w-6 h-6 text-black" />
-                <h3 className="font-bold text-secondary">Audio Content</h3>
-              </div>
-              <audio controls className="w-full">
-                <source src={post.audio} type="audio/mpeg" />
-              </audio>
-            </div>
-          )}
-
-          {post.video && (
-            <div className="bg-cream rounded-xl p-6 mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <Video className="w-6 h-6 text-accent" />
-                <h3 className="font-bold text-secondary">Video Content</h3>
-              </div>
-              <div
-                className="w-full rounded-lg overflow-hidden bg-black"
-                style={{
-                  aspectRatio: '16 / 9',
-                  maxHeight: '450px',
-                }}
-              >
-                <video
-                  controls
-                  className="w-full h-full object-contain"
-                  style={{ maxHeight: '450px' }}
-                >
-                  <source src={post.video} type="video/mp4" />
-                </video>
-              </div>
-            </div>
-          )}
-
-          <div className="prose prose-lg max-w-none">
-            <div className="text-gray-600 leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: post.contentEn || '<p>No content available</p>' }} />
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 bg-cream">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-xl font-serif font-bold text-secondary mb-2">Continue your Chengdu journey</h3>
-          <p className="text-gray-600 mb-8">Vote on new designs and explore works made in Chengdu</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link
-              href="/shop?tab=design"
-              className="bg-white rounded-xl p-6 flex items-center gap-4 hover:shadow-lg transition-all group"
-            >
-              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                <ShoppingBag className="w-7 h-7" />
-              </div>
-              <div>
-                <h4 className="font-bold text-secondary group-hover:text-primary transition-colors">Vote for the next work</h4>
-                <p className="text-sm text-gray-500">Designs in progress — decide what we make next</p>
-              </div>
-              <ArrowRight className="w-5 h-5 ml-auto text-gray-400 group-hover:text-primary group-hover:translate-x-2 transition-all" />
-            </Link>
-            
-            {relatedProducts.length > 0 && (
-              <Link
-                href={`/shop/${relatedProducts[0].slug || relatedProducts[0].id}`}
-                className="bg-white rounded-xl p-6 flex items-center gap-4 hover:shadow-lg transition-all group"
-              >
-                <div className="w-14 h-14 bg-gold/10 rounded-full flex items-center justify-center group-hover:bg-gold group-hover:text-white transition-all">
-                  <Utensils className="w-7 h-7" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-secondary group-hover:text-primary transition-colors">Taste the original flavor</h4>
-                  <p className="text-sm text-gray-500">{relatedProducts[0].nameEn}</p>
-                </div>
-                <ArrowRight className="w-5 h-5 ml-auto text-gray-400 group-hover:text-primary group-hover:translate-x-2 transition-all" />
-              </Link>
+            {post.publishDate && (
+              <span>{post.publishDate.split('T')[0]}</span>
             )}
+            {post.views != null && (
+              <span>{post.views.toLocaleString()} views</span>
+            )}
+            {post.author && <span>{post.author}</span>}
           </div>
         </div>
       </section>
+
+      {post.images && post.images[0] && (
+        <section className="pb-8">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative rounded-xl overflow-hidden mb-8">
+              <img
+                src={post.images[0]}
+                alt={post.titleEn}
+                className="w-full h-80 sm:h-96 object-cover"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="pb-12">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div
+            className="prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{
+              __html: (post.contentEn || post.content || '') as string,
+            }}
+          />
+        </div>
+      </section>
+
+      {filteredProducts.length > 0 && (
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold text-secondary mb-6 text-center">
+              Pieces You Might Like
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredProducts.map((product: any) => (
+                <Link
+                  key={product.id}
+                  href={`/shop/${product.slug}`}
+                  className="bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all"
+                >
+                  {product.images && product.images[0] && (
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                    />
+                  )}
+                  <div className="p-4">
+                    <h3 className="font-bold text-secondary">{product.name}</h3>
+                    <p className="text-primary font-bold">${product.price}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>
