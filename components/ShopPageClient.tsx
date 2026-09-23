@@ -179,17 +179,52 @@ export default function ShopPageClient({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {paginatedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-gray-400 text-sm">No products in this section yet.</p>
-            </div>
-          )}
+          {(() => {
+            // Split current page into Digital vs Physical groups for clearer browsing.
+            // Digital (category === 'digital') = instant download sound packs.
+            // Everything else = physical gifts shipped worldwide.
+            const digital = paginatedProducts.filter(p => p.category === 'digital');
+            const physical = paginatedProducts.filter(p => p.category !== 'digital');
+            const renderGrid = (items: Product[]) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {items.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            );
+            // When both groups exist on the current page, show sectioned layout.
+            if (digital.length > 0 && physical.length > 0) {
+              return (
+                <div className="space-y-10">
+                  <div>
+                    <div className="flex items-baseline gap-3 mb-5 pb-2 border-b border-gray-100">
+                      <h2 className="font-serif text-lg font-bold text-gray-900">Digital Sound Packs</h2>
+                      <span className="text-xs text-gray-500">Instant Download</span>
+                    </div>
+                    {renderGrid(digital)}
+                  </div>
+                  <div>
+                    <div className="flex items-baseline gap-3 mb-5 pb-2 border-b border-gray-100">
+                      <h2 className="font-serif text-lg font-bold text-gray-900">Physical Gifts</h2>
+                      <span className="text-xs text-gray-500">Ships Worldwide</span>
+                    </div>
+                    {renderGrid(physical)}
+                  </div>
+                </div>
+              );
+            }
+            // Fallback: single grid (also covers empty state)
+            return (
+              <>
+                {renderGrid(paginatedProducts)}
+                {filteredProducts.length === 0 && (
+                  <div className="text-center py-20">
+                    <p className="text-gray-400 text-sm">No products in this section yet.</p>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           {totalPages > 1 && (
             <div className="flex items-center justify-center mt-12">

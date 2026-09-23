@@ -41,7 +41,7 @@ export interface Product {
   descriptionEn: string;
   price: number;
   originalPrice?: number;
-  category: 'stationery' | 'home' | 'decor' | 'toy';
+  category: 'stationery' | 'home' | 'decor' | 'toy' | 'digital';
   type: 'physical' | 'digital';
   images: string[];
   stock: number;
