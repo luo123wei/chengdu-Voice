@@ -23,6 +23,10 @@ async function getBlogBySlug(slug: string): Promise<any | null> {
     console.error('[BlogDetail] query error:', error);
     return null;
   }
+  // Respect schedule: future posts are invisible even via direct URL
+  if (data && data.scheduled_at && new Date(data.scheduled_at) > new Date()) {
+    return null;
+  }
   return data;
 }
 
