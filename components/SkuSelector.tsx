@@ -34,14 +34,14 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
     });
   }, [variants, selected]);
 
-  // 自动选中第一个 SKU
+  // Auto-select only when there is exactly one SKU.
+  // With multiple SKUs the user must choose explicitly, otherwise
+  // the first variant image would show up in the gallery on page load.
   useEffect(() => {
-    if (variants.length > 0 && !matchedSku) {
+    if (variants.length === 1) {
       onSelect(variants[0]);
-    } else if (matchedSku) {
-      onSelect(matchedSku);
     }
-  }, [matchedSku, variants]);
+  }, [variants, onSelect]);
 
   // 规格维度配置
   const dimensions = useMemo(() => {
