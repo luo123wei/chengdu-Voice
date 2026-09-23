@@ -12,7 +12,7 @@ interface SkuSelectorProps {
     materials?: string[];
     packagings?: string[];
   };
-  onSelect: (sku: SKU) => void;
+  onSelect: (sku: SKU | undefined) => void;
   disabled?: boolean;
 }
 
@@ -34,14 +34,17 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
     });
   }, [variants, selected]);
 
-  // Auto-select only when there is exactly one SKU.
-  // With multiple SKUs the user must choose explicitly, otherwise
-  // the first variant image would show up in the gallery on page load.
+  // Single SKU: auto-select so the cart carries a variantId.
+  // Multi SKU: never auto-select (a variant image must not show before
+  // the user picks), but DO propagate the matched SKU on every change —
+  // undefined until the user selects, so the gallery stays clean on load.
   useEffect(() => {
     if (variants.length === 1) {
       onSelect(variants[0]);
+    } else {
+      onSelect(matchedSku);
     }
-  }, [variants, onSelect]);
+  }, [matchedSku, variants, onSelect]);
 
   // 规格维度配置
   const dimensions = useMemo(() => {
