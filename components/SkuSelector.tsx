@@ -23,11 +23,10 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
   // 根据已选规格找到匹配的 SKU
   const matchedSku = useMemo(() => {
     if (!variants || variants.length === 0) return undefined;
-    if (variants.length === 1) return variants[0];
 
-    // Nothing picked yet: an empty `selected` would make [].every() true
-    // and wrongly match variants[0], auto-selecting it on page load.
-    if (Object.keys(selected).length === 0) return undefined;
+    // Nothing picked yet: default to first variant so the Preview image
+    // and price show immediately on page load.
+    if (Object.keys(selected).length === 0) return variants[0];
 
     // 找到第一个所有已选规格都匹配的 SKU
     return variants.find((sku) => {
@@ -38,17 +37,24 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
     });
   }, [variants, selected]);
 
-  // Single SKU: auto-select so the cart carries a variantId.
-  // Multi SKU: never auto-select (a variant image must not show before
-  // the user picks), but DO propagate the matched SKU on every change —
-  // undefined until the user selects, so the gallery stays clean on load.
+  // Always propagate the matched SKU — defaults to first variant on load.
+  // Also sync internal `selected` state so the SKU buttons show as active.
   useEffect(() => {
-    if (variants.length === 1) {
-      onSelect(variants[0]);
-    } else {
-      onSelect(matchedSku);
+    if (!matchedSku) return;
+    if (Object.keys(selected).length === 0) {
+      // Page load: pick first variant AND mark its attributes as selected
+      // so the SKU buttons render with active state.
+      const defaultSel: Record<string, string> = {};
+      if (matchedSku.attributes?.color) defaultSel.color = matchedSku.attributes.color;
+      if (matchedSku.attributes?.size) defaultSel.size = matchedSku.attributes.size;
+      if (matchedSku.attributes?.material) defaultSel.material = matchedSku.attributes.material;
+      if (matchedSku.attributes?.packaging) defaultSel.packaging = matchedSku.attributes.packaging;
+      if (Object.keys(defaultSel).length === 0) defaultSel.__name = matchedSku.name;
+      setSelected(defaultSel);
     }
-  }, [matchedSku, variants, onSelect]);
+    onSelect(matchedSku);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchedSku]);
 
   // 规格维度配置
   const dimensions = useMemo(() => {
