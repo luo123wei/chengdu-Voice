@@ -24,9 +24,17 @@ async function getPublishedBlogs(): Promise<any[]> {
       return [];
     }
     const now = new Date();
-    return data.filter(
-      (b: any) => !b.scheduled_at || new Date(b.scheduled_at) <= now
-    );
+    return data
+      .filter(
+        (b: any) => !b.scheduled_at || new Date(b.scheduled_at) <= now
+      )
+      .map((b: any) => ({
+        ...b,
+        // Normalize raw Supabase snake_case fields for rendering
+        titleEn: b.title_en || b.titleEn || b.title || '',
+        contentEn: b.content_en || b.contentEn || b.content || '',
+        publishDate: b.publish_date || b.publishDate,
+      }));
   } catch (e) {
     console.error('[BlogPage] exception:', e);
     return [];

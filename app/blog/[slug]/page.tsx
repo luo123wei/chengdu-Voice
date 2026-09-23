@@ -75,6 +75,11 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
 
   const catLabel = categoryLabels[post.category as keyof typeof categoryLabels]?.en || post.category || 'Culture';
 
+  // Normalize raw Supabase snake_case fields (with camelCase fallbacks)
+  const title = post.title_en || post.titleEn || post.title || '';
+  const publishDate = post.publish_date || post.publishDate;
+  const contentHtml = post.content_en || post.contentEn || post.content || '';
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -93,12 +98,12 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
           </span>
 
           <h1 className="text-3xl sm:text-4xl font-bold text-secondary mb-4">
-            {post.titleEn}
+            {title}
           </h1>
 
           <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
-            {post.publishDate && (
-              <span>{post.publishDate.split('T')[0]}</span>
+            {publishDate && (
+              <span>{String(publishDate).split('T')[0]}</span>
             )}
             {post.views != null && (
               <span>{post.views.toLocaleString()} views</span>
@@ -114,7 +119,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
             <div className="relative rounded-xl overflow-hidden mb-8">
               <img
                 src={post.images[0]}
-                alt={post.titleEn}
+                alt={title}
                 className="w-full h-80 sm:h-96 object-cover"
               />
             </div>
@@ -127,7 +132,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
           <div
             className="prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{
-              __html: (post.contentEn || post.content || '') as string,
+              __html: contentHtml as string,
             }}
           />
         </div>
