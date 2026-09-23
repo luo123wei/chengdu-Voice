@@ -25,6 +25,10 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
     if (!variants || variants.length === 0) return undefined;
     if (variants.length === 1) return variants[0];
 
+    // Nothing picked yet: an empty `selected` would make [].every() true
+    // and wrongly match variants[0], auto-selecting it on page load.
+    if (Object.keys(selected).length === 0) return undefined;
+
     // 找到第一个所有已选规格都匹配的 SKU
     return variants.find((sku) => {
       return Object.entries(selected).every(
