@@ -57,7 +57,7 @@ export default function AdminProducts() {
     descriptionEn: '',
     price: 0,
     originalPrice: 0,
-    category: 'decor' as 'stationery' | 'home' | 'decor' | 'toy',
+    category: 'decor' as 'stationery' | 'home' | 'decor' | 'toy' | 'digital',
     type: 'physical' as 'physical' | 'digital',
     images: [] as string[],
     stock: 0,
