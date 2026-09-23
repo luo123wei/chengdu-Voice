@@ -63,25 +63,10 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
   const skuImage = selectedSku?.images?.[0];
   const galleryImages = useMemo(() => {
-    // Base gallery = product-level images only.
-    // Variant images stay hidden until the user selects that SKU,
-    // then the selected variant image takes the first slot.
-    const imgs = [...(product.images || [])];
-    if (skuImage) {
-      const idx = imgs.indexOf(skuImage);
-      if (idx > 0) {
-        imgs.splice(idx, 1);
-        imgs.unshift(skuImage);
-      } else if (idx === -1) {
-        imgs.unshift(skuImage);
-      }
-    }
-    return imgs;
-  }, [product.images, skuImage]);
-
-  useEffect(() => {
-    setSelectedImage(0);
-  }, [skuImage]);
+    // Gallery is always product-level images only.
+    // Variant images live in a separate preview block below SKU selector.
+    return [...(product.images || [])];
+  }, [product.images]);
 
   const displayPrice = selectedSku?.price ?? product.price ?? 0;
   const displayStock = hasVariants
@@ -308,7 +293,28 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
               {(!product.status || product.status === 'on-sale') && (
                 <>
-                  <div className="flex items-center space-x-3 mb-4">
+                  {hasVariants && product.variants && (
+                    <div className="mb-4">
+                      <SkuSelector
+                        productId={product.id}
+                        variants={product.variants}
+                        specs={specs}
+                        onSelect={setSelectedSku}
+                      />
+                      {skuImage && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <span className="text-xs text-gray-400">Preview</span>
+                          <img
+                            src={skuImage}
+                            alt={`Selected ${selectedSku?.name || 'variant'}`}
+                            className="w-20 h-20 rounded-lg object-contain border border-gray-200"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex items-center space-x-3 mb-6">
                     <span className="text-3xl font-bold text-primary">${displayPrice}</span>
                     {product.unit && product.unitType && (
                       <span className="text-lg text-gray-500">/ {product.unit}{product.unitType}</span>
@@ -316,23 +322,6 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     {product.originalPrice && (
                       <span className="text-lg text-gray-400 line-through">${product.originalPrice}</span>
                     )}
-                  </div>
-
-                  {hasVariants && product.variants && (
-                    <div className="mb-6">
-                      <SkuSelector
-                        productId={product.id}
-                        variants={product.variants}
-                        specs={specs}
-                        onSelect={setSelectedSku}
-                      />
-                    </div>
-                  )}
-
-                  <div className="bg-cream/50 rounded-xl p-6 mb-6">
-                    <p className="text-gray-700 font-medium italic text-lg">
-                      Bring a piece of Chengdu craft home.
-                    </p>
                   </div>
 
                   <div className="flex items-center gap-6 mb-8">
