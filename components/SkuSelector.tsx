@@ -89,15 +89,6 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
     });
   };
 
-  // 计算价格区间
-  const priceRange = useMemo(() => {
-    const prices = variants.map((v) => v.price);
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    if (min === max) return `$${min.toFixed(2)}`;
-    return `$${min.toFixed(2)} - $${max.toFixed(2)}`;
-  }, [variants]);
-
   return (
     <div className="space-y-4">
       {dimensions.map((dim) => (
@@ -132,24 +123,6 @@ export default function SkuSelector({ variants, specs, onSelect, disabled }: Sku
           </div>
         </div>
       ))}
-
-      {/* 价格/库存提示 */}
-      <div className="flex items-center justify-between pt-2 text-sm">
-        {matchedSku ? (
-          <>
-            <span>
-              Price: <span className="font-semibold text-red-600">${matchedSku.price.toFixed(2)}</span>
-            </span>
-            <span className={matchedSku.stock === 0 ? 'text-red-500' : 'text-gray-500'}>
-              {matchedSku.stock === 0 ? 'Out of stock' : `${matchedSku.stock} in stock`}
-            </span>
-          </>
-        ) : (
-          <span className="text-gray-400">
-            Price range: {priceRange} · Please select options
-          </span>
-        )}
-      </div>
     </div>
   );
 }
