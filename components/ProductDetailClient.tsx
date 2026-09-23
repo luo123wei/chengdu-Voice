@@ -63,18 +63,21 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
   const skuImage = selectedSku?.images?.[0];
   const galleryImages = useMemo(() => {
+    // Base gallery = product-level images only.
+    // Variant images stay hidden until the user selects that SKU,
+    // then the selected variant image takes the first slot.
     const imgs = [...(product.images || [])];
-    (product.variants || []).forEach((v) => {
-      const vi = v.images?.[0];
-      if (vi && !imgs.includes(vi)) imgs.push(vi);
-    });
     if (skuImage) {
       const idx = imgs.indexOf(skuImage);
-      if (idx > 0) { imgs.splice(idx, 1); imgs.unshift(skuImage); }
-      else if (idx === -1) imgs.unshift(skuImage);
+      if (idx > 0) {
+        imgs.splice(idx, 1);
+        imgs.unshift(skuImage);
+      } else if (idx === -1) {
+        imgs.unshift(skuImage);
+      }
     }
     return imgs;
-  }, [product.images, product.variants, skuImage]);
+  }, [product.images, skuImage]);
 
   useEffect(() => {
     setSelectedImage(0);
