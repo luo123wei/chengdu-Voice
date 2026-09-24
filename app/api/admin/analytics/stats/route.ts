@@ -142,6 +142,82 @@ export async function GET(request: NextRequest) {
     topTargets('product_view', periodStart, periodEnd, 5),
   ]);
 
+  // --- Product intents (votes + preorders) ---
+  // Total counts (current snapshot, not time-bounded — reflects current products.status)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: productsRows } = await (supabase as any)
+    .from('products')
+    .select('id, slug, name_en, status, votes_count');
+  const allProducts = productsRows || [];
+  const votingProducts = allProducts.filter((p: any) => p.status === 'design');
+  const preorderProducts = allProducts.filter((p: any) => p.status === 'preorder');
+  const votingProductCount = votingProducts.length;
+  const preorderProductCount = preorderProducts.length;
+  const votingTotalVotes = votingProducts.reduce(
+    (sum: number, p: any) => sum + (Number(p.votes_count) || 0), 0,
+  );
+  // TOP 5 voting products by votes_count
+  const votingTop = votingProducts
+    .slice()
+    .sort((a: any, b: any) => (Number(b.votes_count) || 0) - (Number(a.votes_count) || 0))
+    .slice(0, 5)
+    .map((p: any) => ({
+      slug: p.slug || p.id,
+      name: p.name_en || p.slug || p.id,
+      votes: Number(p.votes_count) || 0,
+    }));
+
+  // Intent events in the time range (from product_intents table, which has created_at)
+  async function countIntents(type: 'vote' | 'preorder', start: string, end: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { count, error } = await (supabase as any)
+      .from('product_intents')
+      .select('*', { count: 'exact', head: true })
+      .eq('type', type)
+      .gte('created_at', start)
+      .lt('created_at', end);
+    if (error) console.error('[analytics] intents count error:', error);
+    return count || 0;
+  }
+  // TOP 5 preorder products by intent count in the period
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function topIntents(type: 'vote' | 'preorder', start: string, end: string, limit = 5): Promise<any[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from('product_intents')
+      .select('product_id')
+      .eq('type', type)
+      .gte('created_at', start)
+      .lt('created_at', end);
+    if (error) {
+      console.error('[analytics] topIntents error:', error);
+      return [];
+    }
+    const counts = new Map<string, number>();
+    for (const r of data || []) {
+      const pid = r.product_id as string;
+      counts.set(pid, (counts.get(pid) || 0) + 1);
+    }
+    const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+    // Resolve product_id -> slug/name
+    return sorted.map(([pid, n]) => {
+      const p = allProducts.find((x: any) => x.id === pid);
+      return { slug: p?.slug || pid, name: p?.name_en || p?.slug || pid, count: n };
+    });
+  }
+
+  const [
+    votesInPeriod, votesInPrev,
+    preordersInPeriod, preordersInPrev,
+    preorderTop,
+  ] = await Promise.all([
+    countIntents('vote', periodStart, periodEnd),
+    countIntents('vote', prevPeriodStart, prevPeriodEnd),
+    countIntents('preorder', periodStart, periodEnd),
+    countIntents('preorder', prevPeriodStart, prevPeriodEnd),
+    topIntents('preorder', periodStart, periodEnd, 5),
+  ]);
+
   // Daily breakdown for trend chart (per-day buckets across the period)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: dailyRows } = await (supabase as any)
@@ -201,6 +277,15 @@ export async function GET(request: NextRequest) {
     blogTop,
     productTop,
     daily,
+    votingProductCount,
+    preorderProductCount,
+    votingTotalVotes,
+    votingTop,
+    votesInPeriod,
+    votesInPrev,
+    preordersInPeriod,
+    preordersInPrev,
+    preorderTop,
   }, {
     headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
   });

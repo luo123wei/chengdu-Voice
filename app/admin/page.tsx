@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { FileText, ShoppingBag, TrendingUp, Users, Package, Eye, ShoppingCart, DollarSign, Percent } from 'lucide-react';
+import { FileText, ShoppingBag, TrendingUp, Users, Package, Eye, ShoppingCart, DollarSign, Percent, ThumbsUp, BellRing } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 type RangeKey = 'yesterday' | '7d' | '30d';
@@ -27,6 +27,16 @@ type Stats = {
   blogTop: { slug: string; views: number; prevViews: number }[];
   productTop: { slug: string; views: number; prevViews: number }[];
   daily: { date: string; blogViews: number; productViews: number; addToCart: number; orders: number }[];
+  // Product intents (voting + preorder)
+  votingProductCount: number;
+  preorderProductCount: number;
+  votingTotalVotes: number;
+  votingTop: { slug: string; name: string; votes: number }[];
+  votesInPeriod: number;
+  votesInPrev: number;
+  preordersInPeriod: number;
+  preordersInPrev: number;
+  preorderTop: { slug: string; name: string; count: number }[];
 };
 
 function delta(cur: number, prev: number) {
@@ -126,6 +136,97 @@ export default function AdminDashboard() {
                 <p className="text-xs text-gray-500 mt-1">{card.label}</p>
               </div>
             ))}
+          </div>
+
+          {/* Product Intents — Voting & Pre-order snapshot */}
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-base font-serif font-bold text-gray-800 mb-4 flex items-center">
+                <ThumbsUp className="w-4 h-4 mr-2 text-black" />
+                投票商品 (Voting)
+              </h2>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500">在投商品数</p>
+                  <p className="text-xl font-bold text-gray-800 mt-1">{stats.votingProductCount}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500">累计票数</p>
+                  <p className="text-xl font-bold text-gray-800 mt-1">{stats.votingTotalVotes}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500">本期新增投票</p>
+                  <p className="text-xl font-bold text-gray-800 mt-1">{stats.votesInPeriod}</p>
+                  <DeltaBadge cur={stats.votesInPeriod} prev={stats.votesInPrev} />
+                </div>
+              </div>
+              {stats.votingTop.length === 0 ? (
+                <p className="text-sm text-gray-400 py-3 text-center">暂无在投商品</p>
+              ) : (
+                <div className="space-y-2">
+                  {stats.votingTop.map((v, i) => (
+                    <div key={v.slug} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-xs text-gray-400 font-bold">{i + 1}</span>
+                        <a
+                          href={`/shop/${v.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm font-medium text-gray-800 hover:text-primary truncate"
+                        >
+                          {v.name}
+                        </a>
+                      </div>
+                      <span className="text-sm font-bold text-gray-800 ml-2">{v.votes} 票</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-base font-serif font-bold text-gray-800 mb-4 flex items-center">
+                <BellRing className="w-4 h-4 mr-2 text-black" />
+                预订商品 (Pre-order)
+              </h2>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500">在售预订商品数</p>
+                  <p className="text-xl font-bold text-gray-800 mt-1">{stats.preorderProductCount}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500">本期新增预订</p>
+                  <p className="text-xl font-bold text-gray-800 mt-1">{stats.preordersInPeriod}</p>
+                  <DeltaBadge cur={stats.preordersInPeriod} prev={stats.preordersInPrev} />
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500">上期预订</p>
+                  <p className="text-xl font-bold text-gray-800 mt-1">{stats.preordersInPrev}</p>
+                </div>
+              </div>
+              {stats.preorderTop.length === 0 ? (
+                <p className="text-sm text-gray-400 py-3 text-center">本期暂无预订数据</p>
+              ) : (
+                <div className="space-y-2">
+                  {stats.preorderTop.map((p, i) => (
+                    <div key={p.slug} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-xs text-gray-400 font-bold">{i + 1}</span>
+                        <a
+                          href={`/shop/${p.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm font-medium text-gray-800 hover:text-primary truncate"
+                        >
+                          {p.name}
+                        </a>
+                      </div>
+                      <span className="text-sm font-bold text-gray-800 ml-2">{p.count} 人</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* TOP Lists */}
