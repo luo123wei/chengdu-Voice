@@ -1,31 +1,82 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { LayoutDashboard, FileText, ShoppingBag, BarChart3, TrendingUp, Users, Package } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { FileText, ShoppingBag, TrendingUp, Users, Package, Eye, ShoppingCart, DollarSign, Percent } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+
+type RangeKey = 'yesterday' | '7d' | '30d';
+
+type Stats = {
+  range: RangeKey;
+  periodStart: string;
+  periodEnd: string;
+  blogViews: number;
+  blogViewsPrev: number;
+  blogVisitors: number;
+  blogVisitorsPrev: number;
+  productViews: number;
+  productViewsPrev: number;
+  productVisitors: number;
+  productVisitorsPrev: number;
+  addToCart: number;
+  addToCartPrev: number;
+  orders: number;
+  ordersPrev: number;
+  ordersRevenue: number;
+  conversionRate: number;
+  conversionRatePrev: number;
+  blogTop: { slug: string; views: number; prevViews: number }[];
+  productTop: { slug: string; views: number; prevViews: number }[];
+  daily: { date: string; blogViews: number; productViews: number; addToCart: number; orders: number }[];
+};
+
+function delta(cur: number, prev: number) {
+  if (prev === 0) return cur > 0 ? 100 : 0;
+  return Math.round(((cur - prev) / prev) * 100);
+}
+
+function DeltaBadge({ cur, prev }: { cur: number; prev: number }) {
+  const d = delta(cur, prev);
+  const up = d >= 0;
+  return (
+    <span className={`text-xs ${up ? 'text-green-600' : 'text-red-500'}`}>
+      {up ? '▲' : '▼'} {Math.abs(d)}% vs 上期
+    </span>
+  );
+}
 
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    totalOrders: 0,
-    totalRevenue: 0,
-    pendingCount: 0,
-    paidCount: 0,
-    shippedCount: 0,
-    deliveredCount: 0,
-  });
+  const [range, setRange] = useState<RangeKey>('7d');
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/orders/stats')
-      .then((res) => res.json())
+    setLoading(true);
+    fetch(`/api/admin/analytics/stats?range=${range}`)
+      .then((r) => r.json())
       .then((data) => setStats(data))
-      .catch((err) => console.error('Failed to fetch stats:', err));
-  }, []);
+      .catch((err) => console.error('Failed to fetch stats:', err))
+      .finally(() => setLoading(false));
+  }, [range]);
 
-  const statCards = [
-    { label: '总订单数', value: stats.totalOrders, icon: Package, color: 'bg-black', bgLight: 'bg-gray-50', textColor: 'text-black' },
-    { label: '总收入', value: `$${stats.totalRevenue}`, icon: BarChart3, color: 'bg-green-600', bgLight: 'bg-green-50', textColor: 'text-green-600' },
-    { label: '待处理', value: stats.pendingCount, icon: TrendingUp, color: 'bg-yellow-600', bgLight: 'bg-yellow-50', textColor: 'text-yellow-600' },
-    { label: '已送达', value: stats.deliveredCount, icon: Users, color: 'bg-red-600', bgLight: 'bg-red-50', textColor: 'text-red-600' },
+  const cards = useMemo(() => {
+    if (!stats) return [];
+    return [
+      { label: '博客浏览 (PV)', value: stats.blogViews.toLocaleString(), icon: FileText, cur: stats.blogViews, prev: stats.blogViewsPrev },
+      { label: '博客访客 (UV)', value: stats.blogVisitors.toLocaleString(), icon: Users, cur: stats.blogVisitors, prev: stats.blogVisitorsPrev },
+      { label: '商品浏览 (PV)', value: stats.productViews.toLocaleString(), icon: Eye, cur: stats.productViews, prev: stats.productViewsPrev },
+      { label: '商品访客 (UV)', value: stats.productVisitors.toLocaleString(), icon: Users, cur: stats.productVisitors, prev: stats.productVisitorsPrev },
+      { label: '加购人数', value: stats.addToCart.toLocaleString(), icon: ShoppingCart, cur: stats.addToCart, prev: stats.addToCartPrev },
+      { label: '下单人数', value: stats.orders.toLocaleString(), icon: Package, cur: stats.orders, prev: stats.ordersPrev },
+      { label: '成交额', value: `$${stats.ordersRevenue.toFixed(2)}`, icon: DollarSign, cur: stats.ordersRevenue, prev: 0 },
+      { label: '加购→下单转化率', value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent, cur: stats.conversionRate, prev: stats.conversionRatePrev },
+    ];
+  }, [stats]);
+
+  const rangeTabs: { key: RangeKey; label: string }[] = [
+    { key: 'yesterday', label: '昨日' },
+    { key: '7d', label: '近7日' },
+    { key: '30d', label: '近30日' },
   ];
 
   return (
@@ -35,91 +86,182 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-serif font-bold text-gray-800">管理控制台</h1>
           <p className="text-gray-600 mt-1">欢迎回来, {user?.username}!</p>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-500">今天</p>
-          <p className="font-bold text-gray-800">{new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-gray-500 hidden sm:block">
+            数据不含当日，UTC 0点起算
+          </p>
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            {rangeTabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setRange(tab.key)}
+                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+                  range === tab.key ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {statCards.map((card) => (
-          <div key={card.label} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">{card.label}</p>
+      {loading ? (
+        <div className="text-center py-20 text-gray-400">加载中...</div>
+      ) : !stats ? (
+        <div className="text-center py-20 text-red-500">数据加载失败</div>
+      ) : (
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+            {cards.map((card) => (
+              <div key={card.label} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-9 h-9 bg-gray-50 rounded-lg flex items-center justify-center">
+                    <card.icon className="w-5 h-5 text-black" />
+                  </div>
+                  <DeltaBadge cur={card.cur} prev={card.prev} />
+                </div>
                 <p className="text-2xl font-bold text-gray-800">{card.value}</p>
+                <p className="text-xs text-gray-500 mt-1">{card.label}</p>
               </div>
-              <div className={`w-12 h-12 ${card.bgLight} rounded-xl flex items-center justify-center`}>
-                <card.icon className={`w-6 h-6 ${card.textColor}`} />
-              </div>
+            ))}
+          </div>
+
+          {/* TOP Lists */}
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-base font-serif font-bold text-gray-800 mb-4 flex items-center">
+                <FileText className="w-4 h-4 mr-2 text-black" />
+                TOP 5 博客 (按 PV)
+              </h2>
+              {stats.blogTop.length === 0 ? (
+                <p className="text-sm text-gray-400 py-6 text-center">暂无数据</p>
+              ) : (
+                <div className="space-y-3">
+                  {stats.blogTop.map((b, i) => (
+                    <div key={b.slug} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-xs text-gray-400 font-bold">{i + 1}</span>
+                        <a
+                          href={`/blog/${b.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm font-medium text-gray-800 hover:text-primary truncate"
+                        >
+                          {b.slug}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-3 ml-2">
+                        <span className="text-sm font-bold text-gray-800">{b.views}</span>
+                        <DeltaBadge cur={b.views} prev={b.prevViews} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-base font-serif font-bold text-gray-800 mb-4 flex items-center">
+                <ShoppingBag className="w-4 h-4 mr-2 text-black" />
+                TOP 5 商品 (按 PV)
+              </h2>
+              {stats.productTop.length === 0 ? (
+                <p className="text-sm text-gray-400 py-6 text-center">暂无数据</p>
+              ) : (
+                <div className="space-y-3">
+                  {stats.productTop.map((p, i) => (
+                    <div key={p.slug} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-xs text-gray-400 font-bold">{i + 1}</span>
+                        <a
+                          href={`/shop/${p.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm font-medium text-gray-800 hover:text-primary truncate"
+                        >
+                          {p.slug}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-3 ml-2">
+                        <span className="text-sm font-bold text-gray-800">{p.views}</span>
+                        <DeltaBadge cur={p.views} prev={p.prevViews} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Daily Trend Chart (simple SVG sparkline-style) */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-base font-serif font-bold text-gray-800 mb-4 flex items-center">
+              <TrendingUp className="w-4 h-4 mr-2 text-black" />
+              每日趋势 ({stats.daily.length} 天)
+            </h2>
+            {stats.daily.length === 0 ? (
+              <p className="text-sm text-gray-400 py-6 text-center">暂无数据</p>
+            ) : (
+              <DailyChart data={stats.daily} />
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Minimal SVG bar chart (no external chart lib)
+function DailyChart({ data }: { data: { date: string; blogViews: number; productViews: number; addToCart: number; orders: number }[] }) {
+  const maxVal = Math.max(1, ...data.map((d) => Math.max(d.blogViews, d.productViews, d.addToCart, d.orders)));
+  const W = Math.min(900, data.length * 22);
+  const H = 200;
+  const barW = 5;
+  const gap = 22;
+  const series: { key: 'blogViews' | 'productViews' | 'addToCart' | 'orders'; color: string; label: string }[] = [
+    { key: 'blogViews', color: '#0f172a', label: '博客 PV' },
+    { key: 'productViews', color: '#3b82f6', label: '商品 PV' },
+    { key: 'addToCart', color: '#f59e0b', label: '加购' },
+    { key: 'orders', color: '#ef4444', label: '下单' },
+  ];
+  return (
+    <div className="overflow-x-auto">
+      <svg width={W} height={H} className="block">
+        {data.map((d, i) => {
+          const x = i * gap + 2;
+          return (
+            <g key={d.date}>
+              {series.map((s, j) => {
+                const v = d[s.key];
+                const h = (v / maxVal) * (H - 30);
+                const y = H - 20 - h;
+                return (
+                  <rect
+                    key={s.key}
+                    x={x + j * (barW + 1)}
+                    y={y}
+                    width={barW}
+                    height={Math.max(0, h)}
+                    fill={s.color}
+                  />
+                );
+              })}
+              {(i % Math.ceil(data.length / 8) === 0) && (
+                <text x={x} y={H - 4} fontSize="9" fill="#9ca3af">{d.date.slice(5)}</text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+      <div className="flex gap-4 mt-3 text-xs">
+        {series.map((s) => (
+          <span key={s.key} className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 inline-block" style={{ background: s.color }} />
+            {s.label}
+          </span>
         ))}
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-serif font-bold text-gray-800 mb-6 flex items-center">
-            <ShoppingBag className="w-5 h-5 mr-2 text-black" />
-            最近订单
-          </h2>
-          <div className="space-y-4">
-            {[
-              { id: 'ORD-004', customer: 'Sophie Laurent', amount: 85.98, status: '待处理', country: 'France' },
-              { id: 'ORD-003', customer: 'Marcus Weber', amount: 125.94, status: '已付款', country: 'Germany' },
-              { id: 'ORD-002', customer: 'Emily Davis', amount: 299.99, status: '已发货', country: 'United Kingdom' },
-              { id: 'ORD-001', customer: 'John Smith', amount: 148.95, status: '已送达', country: 'United States' },
-            ].map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-bold text-gray-800">{order.id}</p>
-                  <p className="text-sm text-gray-500">{order.customer} - {order.country}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-black">${order.amount}</p>
-                  <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                    order.status === '待处理' ? 'bg-yellow-100 text-yellow-700' :
-                    order.status === '已付款' ? 'bg-amber-100 text-gray-800' :
-                    order.status === '已发货' ? 'bg-green-100 text-green-700' :
-                    'bg-red-100 text-red-700'
-                  }`}>
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-serif font-bold text-gray-800 mb-6 flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-black" />
-            最近博客文章
-          </h2>
-          <div className="space-y-4">
-            {[
-              { id: '1', title: '成都茶文化', category: '文化', date: '2026-07-20' },
-              { id: '2', title: '川菜', category: '美食', date: '2026-07-18' },
-              { id: '3', title: '宽窄巷子', category: '旅行', date: '2026-07-15' },
-              { id: '4', title: '蜀绣', category: '艺术', date: '2026-07-12' },
-            ].map((post) => (
-              <div key={post.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-bold text-gray-800">{post.title}</p>
-                  <p className="text-sm text-gray-500">{post.date} - {post.category}</p>
-                </div>
-                <div className="flex space-x-2">
-                  <button className="px-3 py-1 bg-amber-100 text-gray-800 text-xs rounded-lg hover:bg-black hover:text-white transition-colors">
-                    编辑
-                  </button>
-                  <button className="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-lg hover:bg-red-600 hover:text-white transition-colors">
-                    删除
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

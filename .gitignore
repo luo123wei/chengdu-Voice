@@ -15,3 +15,8 @@ source-audio/
 
 # local product photos (not for git)
 product-images/
+
+# Blog docx sources + generated SQL (uploaded to Supabase directly)
+txt/
+scripts/__pycache__/
+data/seed_blog_*.sql

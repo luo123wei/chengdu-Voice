@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import type { SKU } from '@/data/mockData';
+import { trackEvent } from '@/lib/analytics';
 
 export async function GET(request: NextRequest) {
   const sessionId = request.cookies.get('sessionId')?.value;
@@ -76,6 +77,9 @@ export async function POST(request: NextRequest) {
     }
 
     await db.cart.save(sessionId, cart);
+
+    // Track add-to-cart event for analytics (fire-and-forget)
+    void trackEvent('add_to_cart', product.slug || product.id, sessionId);
 
     const response = NextResponse.json({ success: true, cart });
     response.cookies.set('sessionId', sessionId, {

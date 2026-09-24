@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { sendPaymentReceivedEmail } from '@/lib/email';
+import { trackEvent } from '@/lib/analytics';
 
 export async function GET() {
   const orders = await db.orders.getAll();
@@ -14,6 +15,8 @@ export async function POST(request: Request) {
       ...body,
       createdAt: new Date().toISOString(),
     });
+    // Track order creation event for analytics (fire-and-forget)
+    void trackEvent('order_created', order.id, null);
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 import { productCategoryLabels } from '@/data/mockData';
 import ProductDetailClient from '@/components/ProductDetailClient';
+import { trackEvent } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +45,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   if (!product) {
     notFound();
   }
+
+  // Track product view for analytics (fire-and-forget, never blocks render)
+  const _slug = product.slug || product.id;
+  void trackEvent('product_view', _slug, null);
 
   // JSON-LD Product structured data for Google Merchant Center
   const slug = product.slug || product.id;

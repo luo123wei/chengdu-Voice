@@ -175,9 +175,6 @@ export default async function BlogPage({
                       {post.publishDate && (
                         <span className="mr-3">{post.publishDate.split('T')[0]}</span>
                       )}
-                      {post.views != null && (
-                        <span>{post.views.toLocaleString()} views</span>
-                      )}
                     </div>
                   </div>
                 </Link>

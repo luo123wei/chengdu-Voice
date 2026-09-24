@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import { headers } from 'next/headers';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { categoryLabels } from '@/data/mockData';
+import { trackEvent } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,6 +86,9 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   const publishDate = post.publish_date || post.publishDate;
   const contentHtml = post.content_en || post.contentEn || post.content || '';
 
+  // Track blog view for analytics (fire-and-forget, never blocks render)
+  void trackEvent('blog_view', slug, null);
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -108,9 +113,6 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
           <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
             {publishDate && (
               <span>{String(publishDate).split('T')[0]}</span>
-            )}
-            {post.views != null && (
-              <span>{post.views.toLocaleString()} views</span>
             )}
             {post.author && <span>{post.author}</span>}
           </div>
