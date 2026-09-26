@@ -31,7 +31,7 @@ type Stats = {
   votingProductCount: number;
   preorderProductCount: number;
   votingTotalVotes: number;
-  votingTop: { slug: string; name: string; votes: number }[];
+  votingTop: { slug: string; name: string; votes: number; systemBoosted: number; realVotes: number }[];
   votesInPeriod: number;
   votesInPrev: number;
   preordersInPeriod: number;
@@ -59,6 +59,26 @@ export default function AdminDashboard() {
   const [range, setRange] = useState<RangeKey>('7d');
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [testMode, setTestMode] = useState(false);
+
+  useEffect(() => {
+    // Check if test mode cookie is set (admin-only indicator)
+    setTestMode(document.cookie.includes('cv_test_mode='));
+  }, []);
+
+  const toggleTestMode = () => {
+    if (testMode) {
+      // Clear cookie
+      document.cookie = 'cv_test_mode=; path=/; max-age=0';
+      setTestMode(false);
+    } else {
+      const secret = prompt('请输入测试模式密钥（管理员配置的环境变量 ADMIN_TEST_SECRET）');
+      if (!secret) return;
+      // Set cookie (client-side; server will verify on next SSR/tracked request)
+      document.cookie = `cv_test_mode=${encodeURIComponent(secret)}; path=/; max-age=${30 * 86400}`;
+      setTestMode(true);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -97,6 +117,17 @@ export default function AdminDashboard() {
           <p className="text-gray-600 mt-1">欢迎回来, {user?.username}!</p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={toggleTestMode}
+            className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
+              testMode
+                ? 'bg-amber-50 border-amber-300 text-amber-800'
+                : 'bg-white border-gray-300 text-gray-600 hover:border-black'
+            }`}
+            title={testMode ? '当前为测试模式，你的浏览/操作会被标记' : '开启后，你的浏览/操作会被标记为测试数据'}
+          >
+            {testMode ? '🧪 测试模式 ON' : '测试模式 OFF'}
+          </button>
           <p className="text-sm text-gray-500 hidden sm:block">
             数据不含当日，UTC 0点起算
           </p>
@@ -164,8 +195,14 @@ export default function AdminDashboard() {
                 <p className="text-sm text-gray-400 py-3 text-center">暂无在投商品</p>
               ) : (
                 <div className="space-y-2">
+                  <div className="grid grid-cols-[1fr_60px_60px_60px] gap-2 px-2.5 pb-1 text-[10px] text-gray-400 uppercase">
+                    <span>商品</span>
+                    <span className="text-right">总票</span>
+                    <span className="text-right">真实</span>
+                    <span className="text-right">系统</span>
+                  </div>
                   {stats.votingTop.map((v, i) => (
-                    <div key={v.slug} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                    <div key={v.slug} className="grid grid-cols-[1fr_60px_60px_60px] gap-2 items-center p-2.5 bg-gray-50 rounded-lg">
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="text-xs text-gray-400 font-bold">{i + 1}</span>
                         <a
@@ -177,7 +214,9 @@ export default function AdminDashboard() {
                           {v.name}
                         </a>
                       </div>
-                      <span className="text-sm font-bold text-gray-800 ml-2">{v.votes} 票</span>
+                      <span className="text-sm font-bold text-gray-800 text-right">{v.votes}</span>
+                      <span className="text-sm text-green-700 font-medium text-right">{v.realVotes}</span>
+                      <span className="text-sm text-gray-400 text-right">{v.systemBoosted}</span>
                     </div>
                   ))}
                 </div>

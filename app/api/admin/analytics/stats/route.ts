@@ -50,25 +50,28 @@ export async function GET(request: NextRequest) {
   const prevPeriodStart = new Date(todayStartUtc.getTime() - 2 * days * 86400_000).toISOString();
 
   // Helper: run a count query for an event type within [start, end)
+  // Excludes is_test events (admin's own test data).
   async function countType(eventType: string, start: string, end: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { count, error } = await (supabase as any)
       .from('analytics_events')
       .select('*', { count: 'exact', head: true })
       .eq('event_type', eventType)
+      .eq('is_test', false)
       .gte('created_at', start)
       .lt('created_at', end);
     if (error) console.error('[analytics] count error:', error);
     return count || 0;
   }
 
-  // Helper: unique visitors (distinct session_id, excludes null)
+  // Helper: unique visitors (distinct session_id, excludes null and is_test)
   async function countVisitors(eventType: string, start: string, end: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase as any)
       .from('analytics_events')
       .select('session_id')
       .eq('event_type', eventType)
+      .eq('is_test', false)
       .gte('created_at', start)
       .lt('created_at', end)
       .not('session_id', 'is', null);
@@ -80,7 +83,7 @@ export async function GET(request: NextRequest) {
     return uniq.size;
   }
 
-  // Helper: top targets by views in [start, end)
+  // Helper: top targets by views in [start, end) (excludes is_test)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function topTargets(eventType: string, start: string, end: string, limit = 5): Promise<any[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,6 +91,7 @@ export async function GET(request: NextRequest) {
       .from('analytics_events')
       .select('target_id')
       .eq('event_type', eventType)
+      .eq('is_test', false)
       .gte('created_at', start)
       .lt('created_at', end)
       .not('target_id', 'is', null);
@@ -109,6 +113,7 @@ export async function GET(request: NextRequest) {
         .select('*', { count: 'exact', head: true })
         .eq('event_type', eventType)
         .eq('target_id', slug)
+        .eq('is_test', false)
         .gte('created_at', prevPeriodStart)
         .lt('created_at', prevPeriodEnd);
       return { slug, views, prevViews: count || 0 };
@@ -156,16 +161,31 @@ export async function GET(request: NextRequest) {
   const votingTotalVotes = votingProducts.reduce(
     (sum: number, p: any) => sum + (Number(p.votes_count) || 0), 0,
   );
-  // TOP 5 voting products by votes_count
-  const votingTop = votingProducts
+  // TOP 5 voting products by votes_count, with system boost split
+  const votingTopBase = votingProducts
     .slice()
     .sort((a: any, b: any) => (Number(b.votes_count) || 0) - (Number(a.votes_count) || 0))
-    .slice(0, 5)
-    .map((p: any) => ({
+    .slice(0, 5);
+
+  // For each top voting product, fetch cumulative system boost count from vote_boost_logs
+  const votingTop = await Promise.all(votingTopBase.map(async (p: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: boostRows } = await (supabase as any)
+      .from('vote_boost_logs')
+      .select('boost_count')
+      .eq('product_id', p.id);
+    const systemBoosted = (boostRows || []).reduce(
+      (sum: number, r: { boost_count?: number }) => sum + (Number(r.boost_count) || 0), 0,
+    );
+    const totalVotes = Number(p.votes_count) || 0;
+    return {
       slug: p.slug || p.id,
       name: p.name_en || p.slug || p.id,
-      votes: Number(p.votes_count) || 0,
-    }));
+      votes: totalVotes,
+      systemBoosted,
+      realVotes: Math.max(0, totalVotes - systemBoosted),
+    };
+  }));
 
   // Intent events in the time range (from product_intents table, which has created_at)
   async function countIntents(type: 'vote' | 'preorder', start: string, end: string) {
@@ -223,6 +243,7 @@ export async function GET(request: NextRequest) {
   const { data: dailyRows } = await (supabase as any)
     .from('analytics_events')
     .select('event_type, created_at')
+    .eq('is_test', false)
     .gte('created_at', periodStart)
     .lt('created_at', periodEnd);
   const dailyMap = new Map<string, { blogViews: number; productViews: number; addToCart: number; orders: number }>();
