@@ -72,10 +72,8 @@ export default function AdminDashboard() {
       document.cookie = 'cv_test_mode=; path=/; max-age=0';
       setTestMode(false);
     } else {
-      const secret = prompt('请输入测试模式密钥（管理员配置的环境变量 ADMIN_TEST_SECRET）');
-      if (!secret) return;
-      // Set cookie (client-side; server will verify on next SSR/tracked request)
-      document.cookie = `cv_test_mode=${encodeURIComponent(secret)}; path=/; max-age=${30 * 86400}`;
+      // Set cookie with a fixed marker value; server checks presence only
+      document.cookie = `cv_test_mode=1; path=/; max-age=${30 * 86400}`;
       setTestMode(true);
     }
   };

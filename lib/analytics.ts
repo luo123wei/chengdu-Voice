@@ -34,15 +34,14 @@ export type EventType =
 
 /**
  * Check if current request is in "test mode" (admin's own browser).
- * Reads the `cv_test_mode` cookie and compares to env secret.
+ * Presence of `cv_test_mode` cookie (any value) means test mode is on.
+ * No secret required — admin toggles it from /admin dashboard.
  */
 async function isTestMode(): Promise<boolean> {
-  const secret = process.env.ADMIN_TEST_SECRET;
-  if (!secret) return false;
   try {
     const cookieStore = await cookies();
     const c = cookieStore.get('cv_test_mode');
-    return c?.value === secret;
+    return !!c;
   } catch {
     return false;
   }
