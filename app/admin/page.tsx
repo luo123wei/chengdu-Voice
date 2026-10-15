@@ -482,13 +482,18 @@ export default function AdminDashboard() {
   );
 }
 
-// Minimal SVG bar chart (no external chart lib)
+// Minimal SVG bar chart (no external chart lib).
+// Bars live in a 1000-unit virtual space stretched to the card width, so the
+// chart always fills the container; x-axis labels are plain HTML text so they
+// stay crisp and never overlap.
 function DailyChart({ data }: { data: { date: string; blogViews: number; productViews: number; addToCart: number; orders: number }[] }) {
   const maxVal = Math.max(1, ...data.map((d) => Math.max(d.blogViews, d.productViews, d.addToCart, d.orders)));
-  const W = Math.min(900, data.length * 22);
   const H = 200;
-  const barW = 5;
-  const gap = 22;
+  const PAD_TOP = 16;
+  const PLOT_H = H - PAD_TOP;
+  const slotW = 1000 / Math.max(1, data.length);   // virtual units per day
+  const groupW = slotW * 0.6;                      // width of the 4-bar group
+  const barW = groupW / 4 - 1;
   const series: { key: 'blogViews' | 'productViews' | 'addToCart' | 'orders'; color: string; label: string }[] = [
     { key: 'blogViews', color: '#0f172a', label: '博客 PV' },
     { key: 'productViews', color: '#3b82f6', label: '商品 PV' },
@@ -496,35 +501,44 @@ function DailyChart({ data }: { data: { date: string; blogViews: number; product
     { key: 'orders', color: '#ef4444', label: '下单' },
   ];
   return (
-    <div className="overflow-x-auto">
-      <svg width={W} height={H} className="block">
+    <div className="w-full">
+      <svg
+        viewBox={`0 0 1000 ${H}`}
+        width="100%"
+        height={H}
+        preserveAspectRatio="none"
+        className="block"
+      >
         {data.map((d, i) => {
-          const x = i * gap + 2;
+          const groupX = i * slotW + (slotW - groupW) / 2;
           return (
             <g key={d.date}>
               {series.map((s, j) => {
                 const v = d[s.key];
-                const h = (v / maxVal) * (H - 30);
-                const y = H - 20 - h;
+                const h = (v / maxVal) * PLOT_H;
                 return (
                   <rect
                     key={s.key}
-                    x={x + j * (barW + 1)}
-                    y={y}
-                    width={barW}
+                    x={groupX + j * (barW + 1)}
+                    y={H - h}
+                    width={Math.max(1, barW)}
                     height={Math.max(0, h)}
                     fill={s.color}
                   />
                 );
               })}
-              {(i % Math.ceil(data.length / 8) === 0) && (
-                <text x={x} y={H - 4} fontSize="9" fill="#9ca3af">{d.date.slice(5)}</text>
-              )}
             </g>
           );
         })}
       </svg>
-      <div className="flex gap-4 mt-3 text-xs">
+      <div className="flex w-full mt-1">
+        {data.map((d) => (
+          <span key={d.date} className="flex-1 text-center text-[10px] text-gray-400 truncate">
+            {d.date.slice(5)}
+          </span>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-4 mt-3 text-xs">
         {series.map((s) => (
           <span key={s.key} className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 inline-block" style={{ background: s.color }} />
