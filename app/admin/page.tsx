@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { FileText, ShoppingBag, TrendingUp, Users, Package, Eye, ShoppingCart, DollarSign, Percent, ThumbsUp, BellRing } from 'lucide-react';
+import { FileText, ShoppingBag, TrendingUp, Users, Package, Eye, ShoppingCart, DollarSign, Percent, ThumbsUp, BellRing, Bot } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 type RangeKey = 'yesterday' | '7d' | '30d';
@@ -39,6 +39,36 @@ type Stats = {
   preorderTop: { slug: string; name: string; count: number }[];
 };
 
+type AiCrawlerStats = {
+  range: RangeKey;
+  startIso: string;
+  endIso: string;
+  botHitsInRange: number;
+  botHitsPrev: number;
+  byBot: { bot: string; count: number; firstSeen: string; lastSeen: string }[];
+  everSeen: { bot: string; firstSeen: string }[];
+  topPaths: { path: string; count: number }[];
+};
+
+// AI crawlers we track, in the order they are shown on the dashboard.
+const KNOWN_BOTS: { key: string; label: string }[] = [
+  { key: 'GPTBot', label: 'GPTBot (OpenAI)' },
+  { key: 'OAI-SearchBot', label: 'OAI-SearchBot (ChatGPT 搜索)' },
+  { key: 'PerplexityBot', label: 'PerplexityBot' },
+  { key: 'ClaudeBot', label: 'ClaudeBot' },
+  { key: 'CCBot', label: 'CCBot' },
+  { key: 'Bytespider', label: 'Bytespider' },
+  { key: 'Applebot', label: 'Applebot' },
+  { key: 'Googlebot', label: 'Googlebot' },
+  { key: 'Bingbot', label: 'Bingbot' },
+];
+
+function rangeToDays(range: RangeKey): number {
+  if (range === 'yesterday') return 1;
+  if (range === '30d') return 30;
+  return 7;
+}
+
 function delta(cur: number, prev: number) {
   if (prev === 0) return cur > 0 ? 100 : 0;
   return Math.round(((cur - prev) / prev) * 100);
@@ -58,6 +88,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [range, setRange] = useState<RangeKey>('7d');
   const [stats, setStats] = useState<Stats | null>(null);
+  const [aiStats, setAiStats] = useState<AiCrawlerStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [testMode, setTestMode] = useState(false);
 
@@ -80,11 +111,31 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/admin/analytics/stats?range=${range}`)
-      .then((r) => r.json())
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+
+    fetch(`/api/admin/analytics/stats?range=${range}`, { headers })
+      .then((r) => {
+        if (!r.ok) throw new Error(`stats ${r.status}`);
+        return r.json();
+      })
       .then((data) => setStats(data))
-      .catch((err) => console.error('Failed to fetch stats:', err))
+      .catch((err) => {
+        console.error('Failed to fetch stats:', err);
+        setStats(null);
+      })
       .finally(() => setLoading(false));
+
+    fetch(`/api/admin/analytics/ai-crawlers?range=${range}`, { headers })
+      .then((r) => {
+        if (!r.ok) throw new Error(`ai-crawlers ${r.status}`);
+        return r.json();
+      })
+      .then((data) => setAiStats(data))
+      .catch((err) => {
+        console.error('Failed to fetch AI crawler stats:', err);
+        setAiStats(null);
+      });
   }, [range]);
 
   const cards = useMemo(() => {
@@ -343,6 +394,86 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-400 py-6 text-center">暂无数据</p>
             ) : (
               <DailyChart data={stats.daily} />
+            )}
+          </div>
+
+          {/* AI Visibility */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-8">
+            <h2 className="text-base font-serif font-bold text-gray-800 mb-1 flex items-center">
+              <Bot className="w-4 h-4 mr-2 text-black" />
+              AI 可见度
+            </h2>
+            <p className="text-xs text-gray-500 mb-5">
+              AI 爬虫抓取是「被 AI 引用」的前置信号 — 抓到不代表已经引用，但抓不到就一定不会被引用。
+            </p>
+            {!aiStats ? (
+              <p className="text-sm text-gray-400 py-6 text-center">加载中...</p>
+            ) : (
+              <div className="space-y-6">
+                {/* Summary KPI */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-9 h-9 bg-gray-50 rounded-lg flex items-center justify-center">
+                      <Bot className="w-5 h-5 text-black" />
+                    </div>
+                    <DeltaBadge cur={aiStats.botHitsInRange} prev={aiStats.botHitsPrev} />
+                  </div>
+                  <p className="text-2xl font-bold text-gray-800">{aiStats.botHitsInRange.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 mt-1">近{rangeToDays(range)}日 AI 爬虫抓取</p>
+                </div>
+
+                {/* Known crawlers checklist */}
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-3">已知 AI 爬虫</h3>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {KNOWN_BOTS.map((b) => {
+                      const ever = aiStats.everSeen.find((e) => e.bot === b.key);
+                      const inRange = aiStats.byBot.find((e) => e.bot === b.key);
+                      return (
+                        <div key={b.key} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                          <span className={`text-sm ${ever ? 'text-black font-medium' : 'text-gray-400'}`}>
+                            {b.label}
+                          </span>
+                          {ever ? (
+                            <span className="text-xs text-gray-500 ml-2 text-right">
+                              首次 {ever.firstSeen.slice(0, 10)}
+                              {inRange && inRange.count > 0 ? ` · 本期 ${inRange.count}` : ''}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400 ml-2">尚未抓取</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Top crawled paths */}
+                <div>
+                  <h3 className="text-sm font-bold text-gray-800 mb-3">抓取最多的页面 TOP 5</h3>
+                  {aiStats.topPaths.length === 0 ? (
+                    <p className="text-sm text-gray-400 py-3 text-center">暂无数据</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {aiStats.topPaths.map((p, i) => (
+                        <div key={p.path} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="text-xs text-gray-400 font-bold">{i + 1}</span>
+                            <span className="text-sm font-medium text-gray-800 truncate">{p.path}</span>
+                          </div>
+                          <span className="text-sm font-bold text-gray-800 ml-2">{p.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {aiStats.botHitsInRange === 0 && (
+                  <p className="text-sm text-gray-400 text-center">
+                    暂无 AI 爬虫抓取记录。数据从本次部署起开始累积，不做历史回填。
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </>

@@ -1,7 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'chengdu-voice-secret-key';
+
+function verifyAdmin(request: NextRequest): boolean {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return false;
+  try {
+    const payload = jwt.verify(authHeader.slice(7), JWT_SECRET) as any;
+    return payload?.role === 'admin' || payload?.username !== undefined;
+  } catch {
+    return false;
+  }
+}
 
 type RangeKey = 'yesterday' | '7d' | '30d';
 
@@ -28,6 +42,10 @@ const RANGE_DAYS: Record<RangeKey, number> = {
  * }
  */
 export async function GET(request: NextRequest) {
+  if (!verifyAdmin(request)) {
+    return NextResponse.json({ error: '未授权' }, { status: 401 });
+  }
+
   const rangeParam = (request.nextUrl.searchParams.get('range') || '7d') as RangeKey;
   const range = RANGE_DAYS[rangeParam] ? rangeParam : '7d';
   const days = RANGE_DAYS[range];
@@ -58,6 +76,7 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact', head: true })
       .eq('event_type', eventType)
       .eq('is_test', false)
+      .is('bot_name', null)
       .gte('created_at', start)
       .lt('created_at', end);
     if (error) console.error('[analytics] count error:', error);
@@ -72,6 +91,7 @@ export async function GET(request: NextRequest) {
       .select('session_id')
       .eq('event_type', eventType)
       .eq('is_test', false)
+      .is('bot_name', null)
       .gte('created_at', start)
       .lt('created_at', end)
       .not('session_id', 'is', null);
@@ -92,6 +112,7 @@ export async function GET(request: NextRequest) {
       .select('target_id')
       .eq('event_type', eventType)
       .eq('is_test', false)
+      .is('bot_name', null)
       .gte('created_at', start)
       .lt('created_at', end)
       .not('target_id', 'is', null);
@@ -114,6 +135,7 @@ export async function GET(request: NextRequest) {
         .eq('event_type', eventType)
         .eq('target_id', slug)
         .eq('is_test', false)
+        .is('bot_name', null)
         .gte('created_at', prevPeriodStart)
         .lt('created_at', prevPeriodEnd);
       return { slug, views, prevViews: count || 0 };
@@ -244,6 +266,7 @@ export async function GET(request: NextRequest) {
     .from('analytics_events')
     .select('event_type, created_at')
     .eq('is_test', false)
+    .is('bot_name', null)
     .gte('created_at', periodStart)
     .lt('created_at', periodEnd);
   const dailyMap = new Map<string, { blogViews: number; productViews: number; addToCart: number; orders: number }>();

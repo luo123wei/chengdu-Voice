@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 /**
  * Server-side analytics event logger.
@@ -47,6 +47,48 @@ async function isTestMode(): Promise<boolean> {
   }
 }
 
+/**
+ * Read the raw User-Agent header of the current request.
+ * Defensive like isTestMode(): returns null if headers() is unavailable.
+ */
+async function getUserAgent(): Promise<string | null> {
+  try {
+    const h = await headers();
+    return h.get('user-agent');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Classify a User-Agent string into a known AI/search crawler name.
+ * Case-insensitive substring match, FIRST MATCH WINS.
+ * Returns null for human traffic.
+ */
+export function classifyBot(ua: string | null): string | null {
+  if (!ua) return null;
+  const s = ua.toLowerCase();
+  // NOTE: OpenAI bots must be checked BEFORE "gptbot",
+  // otherwise "OAI-SearchBot"/"ChatGPT-User" would collapse into GPTBot.
+  if (s.includes('oai-searchbot')) return 'OAI-SearchBot';
+  if (s.includes('chatgpt-user')) return 'ChatGPT-User';
+  if (s.includes('gptbot')) return 'GPTBot';
+  if (s.includes('perplexitybot')) return 'PerplexityBot';
+  if (s.includes('perplexity-user')) return 'Perplexity-User';
+  if (s.includes('claudebot')) return 'ClaudeBot';
+  if (s.includes('claude-web')) return 'ClaudeBot';
+  if (s.includes('anthropic-ai')) return 'ClaudeBot';
+  if (s.includes('ccbot')) return 'CCBot';
+  if (s.includes('bytespider')) return 'Bytespider';
+  if (s.includes('meta-externalagent')) return 'Meta';
+  if (s.includes('applebot')) return 'Applebot';
+  if (s.includes('amazonbot')) return 'Amazonbot';
+  if (s.includes('googlebot')) return 'Googlebot';
+  if (s.includes('bingbot')) return 'Bingbot';
+  if (s.includes('bot') || s.includes('crawler') || s.includes('spider')) return 'Other bot';
+  return null;
+}
+
 export async function trackEvent(
   eventType: EventType,
   targetId: string | null,
@@ -58,12 +100,15 @@ export async function trackEvent(
   }
   try {
     const testMode = await isTestMode();
+    const ua = await getUserAgent();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any).from('analytics_events').insert({
       event_type: eventType,
       target_id: targetId,
       session_id: sessionId,
       is_test: testMode,
+      user_agent: ua,
+      bot_name: classifyBot(ua),
     });
   } catch (err) {
     console.error('[analytics] trackEvent failed:', err);
