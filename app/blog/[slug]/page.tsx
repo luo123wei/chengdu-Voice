@@ -89,8 +89,50 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   // Track blog view for analytics (fire-and-forget, never blocks render)
   void trackEvent('blog_view', slug, null);
 
+  // JSON-LD structured data for AI/search engines
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
+  const postUrl = `${siteUrl}/blog/${slug}`;
+  const textOnly = contentHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  const firstImage = post.images?.[0];
+  const imageUrl = firstImage
+    ? (firstImage.startsWith('http') ? firstImage : `${siteUrl}${firstImage}`)
+    : `${siteUrl}/og-image.jpg`;
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description: textOnly.slice(0, 160),
+    image: imageUrl,
+    datePublished: publishDate,
+    dateModified: publishDate,
+    author: { '@type': 'Person', name: post.author || 'Chengdu-Voice' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Voice Culture',
+      logo: { '@type': 'ImageObject', url: `${siteUrl}/og-image.jpg` },
+    },
+    mainEntityOfPage: postUrl,
+  };
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+      { '@type': 'ListItem', position: 2, name: 'Stories', item: `${siteUrl}/blog` },
+      { '@type': 'ListItem', position: 3, name: title, item: postUrl },
+    ],
+  };
+
   return (
     <div className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
 
       <section className="pt-24 pb-8">

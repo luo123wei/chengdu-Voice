@@ -12,6 +12,38 @@ export const dynamic = 'force-dynamic';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
+// Absolute image URL for structured data (product images may be relative or absolute)
+const absImage = (src?: string) =>
+  src ? (src.startsWith('http') ? src : `${siteUrl}${src}`) : `${siteUrl}/og-image.jpg`;
+
+// Homepage FAQ copy — the same array feeds the visible section and the FAQPage JSON-LD
+const homeFaqs = [
+  {
+    q: 'What is Voice Culture?',
+    a: 'Voice Culture is a small design studio based in Chengdu, China. We design small-batch objects and gifts inspired by the city’s culture, everyday life and visual language, and ship them worldwide.',
+  },
+  {
+    q: 'What does Voice Culture sell?',
+    a: 'Two kinds of things. Physical pieces made in small batches from our Chengdu studio — enamel pins and brooches, stationery and small objects for the home — and digital Chengdu sound recordings, including a full Sound Library you can download instantly.',
+  },
+  {
+    q: 'How does the voting model work?',
+    a: 'New designs are published as open concepts before they are made. Visitors vote for the ones they want, and when a concept reaches its vote goal we open pre-orders and put it into small-batch production. You decide what we make next.',
+  },
+  {
+    q: 'Do you ship worldwide?',
+    a: 'Yes. Physical orders ship from Chengdu, China, to addresses worldwide. Pre-orders ship first as soon as a piece goes into production.',
+  },
+  {
+    q: 'What is the Chengdu Sound Library?',
+    a: 'It is a collection of sounds recorded in Chengdu — teahouses, mahjong tables, street life and Sichuan opera percussion — delivered as an instant download after purchase. Selected recordings are also free to listen to on the site.',
+  },
+  {
+    q: 'How do I get 10% off my first order?',
+    a: 'Join the studio list with your email address. You will see a welcome code for 10% off your first order, plus votes on new designs and early access to pre-orders.',
+  },
+];
+
 export const metadata: Metadata = {
   title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture',
   description: "Voice Culture creates small-batch objects inspired by Chengdu's culture, everyday life and visual language. From panda-inspired objects to Chengdu postcards and tea culture gifts, each piece is designed to offer a different way to remember the city.",
@@ -34,11 +66,40 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [products] = await Promise.all([db.products.getAll()]);
+  const [products, blogs] = await Promise.all([db.products.getAll(), db.blogs.getAll()]);
 
   const voteProducts = products.filter(p => p.status === 'design');
-  const onSaleProducts = products.filter(p => !p.status || p.status === 'on-sale').slice(0, 4);
+  const onSaleProducts = products.filter(p => !p.status || p.status === 'on-sale').slice(0, 8);
   const preorderProducts = products.filter(p => p.status === 'preorder');
+  const latestPosts = blogs.slice(0, 3);
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: homeFaqs.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+
+  const inStockJsonLd = onSaleProducts.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'In Stock Now — Voice Culture',
+        itemListElement: onSaleProducts.map((p, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          item: {
+            '@type': 'Product',
+            name: p.nameEn || p.name,
+            url: `${siteUrl}/shop/${p.id}`,
+            image: absImage(p.images?.[0]),
+          },
+        })),
+      }
+    : null;
 
   // Serialize product data for client component
   const preorderData = preorderProducts.map(p => ({
@@ -51,6 +112,17 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white text-ink">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      {inStockJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(inStockJsonLd) }}
+        />
+      )}
+
       <Header />
 
       {/* ===== Hero ===== */}
@@ -61,11 +133,12 @@ export default async function HomePage() {
               <div className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-6">
                 Voice Culture · Chengdu
               </div>
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-[52px] leading-[1.2] font-bold tracking-tight mb-6">
-                Everyday objects,
-                <br />
-                <span className="border-b-4 border-black pb-0.5">designed in Chengdu.</span>
+              <h1 className="font-serif text-4xl md:text-5xl lg:text-[52px] leading-[1.2] font-bold tracking-tight mb-4">
+                Chengdu Cultural Gifts &amp; Souvenirs
               </h1>
+              <p className="font-serif text-lg md:text-xl mb-5 border-b-4 border-black inline-block pb-0.5">
+                Everyday objects, designed in Chengdu.
+              </p>
               <p className="text-base md:text-lg text-gray-700 font-medium mb-3">
                 Discover unique Chengdu gifts, cultural souvenirs and everyday objects inspired by life in Chengdu.
               </p>
@@ -94,31 +167,31 @@ export default async function HomePage() {
       </section>
 
       {/* ===== 理念条 ===== */}
-      <section className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3">
+      <section className="border-b border-gray-200" aria-label="How Voice Culture works">
+        <ol className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 list-none">
           {[
             { n: '01', t: 'We design', d: 'Original studio designs — every piece carries a Chengdu story' },
             { n: '02', t: 'You vote', d: 'Concepts go on display first; production starts once the votes are in' },
             { n: '03', t: 'We make', d: 'Small-batch craftsmanship. Pre-orders ship first' },
           ].map((item, i) => (
-            <div
+            <li
               key={item.n}
               className={`py-9 px-6 text-center ${i < 2 ? 'md:border-r border-b md:border-b-0 border-gray-200' : ''}`}
             >
               <div className="font-serif text-xs text-gray-400 mb-2">{item.n}</div>
               <div className="font-serif text-xl font-bold mb-1.5">{item.t}</div>
               <div className="text-[13px] text-gray-500">{item.d}</div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
       {/* ===== 新品投票 ===== */}
-      <section className="py-16 md:py-20">
+      <section className="py-16 md:py-20" aria-labelledby="vote-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-9 gap-4 flex-wrap">
             <div>
-              <h2 className="font-serif text-2xl md:text-3xl font-bold">What should we make next?</h2>
+              <h2 id="vote-heading" className="font-serif text-2xl md:text-3xl font-bold">What should we make next?</h2>
               <p className="text-sm text-gray-500 mt-1.5">You decide what we make next — when a concept hits its vote goal, the pre-order opens.</p>
             </div>
             <Link href="/shop?tab=design" className="text-[13px] border-b border-black pb-0.5 hover:text-gray-600">
@@ -126,9 +199,13 @@ export default async function HomePage() {
             </Link>
           </div>
           {voteProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {voteProducts.map(p => <ProductCard key={p.id} product={p} />)}
-            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 list-none">
+              {voteProducts.map(p => (
+                <li key={p.id}>
+                  <ProductCard product={p} />
+                </li>
+              ))}
+            </ul>
           ) : (
             <p className="text-sm text-gray-400">No open votes right now.</p>
           )}
@@ -136,7 +213,7 @@ export default async function HomePage() {
       </section>
 
       {/* ===== 三入口 ===== */}
-      <section className="pb-16 md:pb-20">
+      <section className="pb-16 md:pb-20" aria-label="Explore Voice Culture">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link href="/shop" className="block border border-gray-200 p-9 hover:border-black hover:bg-cream transition-all group">
@@ -162,11 +239,11 @@ export default async function HomePage() {
       </section>
 
       {/* ===== 在售精选 ===== */}
-      <section className="pb-16 md:pb-20">
+      <section className="pb-16 md:pb-20" aria-labelledby="stock-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-9 gap-4 flex-wrap">
             <div>
-              <h2 className="font-serif text-2xl md:text-3xl font-bold">In Stock Now</h2>
+              <h2 id="stock-heading" className="font-serif text-2xl md:text-3xl font-bold">In Stock Now</h2>
               <p className="text-sm text-gray-500 mt-1.5">In production · shipped worldwide from Chengdu</p>
             </div>
             <Link href="/shop?tab=on-sale" className="text-[13px] border-b border-black pb-0.5 hover:text-gray-600">
@@ -174,10 +251,81 @@ export default async function HomePage() {
             </Link>
           </div>
           {onSaleProducts.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {onSaleProducts.map(p => <ProductCard key={p.id} product={p} />)}
-            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 list-none">
+              {onSaleProducts.map(p => (
+                <li key={p.id}>
+                  <ProductCard product={p} />
+                </li>
+              ))}
+            </ul>
           )}
+        </div>
+      </section>
+
+      {/* ===== 最新故事 ===== */}
+      {latestPosts.length > 0 && (
+        <section className="pb-16 md:pb-20" aria-labelledby="journal-heading">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-9 gap-4 flex-wrap">
+              <div>
+                <h2 id="journal-heading" className="font-serif text-2xl md:text-3xl font-bold">From the Journal</h2>
+                <p className="text-sm text-gray-500 mt-1.5">Chengdu culture, craft and the stories behind what we make.</p>
+              </div>
+              <Link href="/blog" className="text-[13px] border-b border-black pb-0.5 hover:text-gray-600">
+                Read all stories →
+              </Link>
+            </div>
+            <ul className="grid grid-cols-1 md:grid-cols-3 gap-8 list-none">
+              {latestPosts.map(post => (
+                <li key={post.id}>
+                  <article>
+                    <Link href={`/blog/${post.slug}`} className="group block">
+                      <div className="aspect-[4/3] overflow-hidden bg-cream mb-4">
+                        {post.images?.[0] ? (
+                          <img
+                            src={post.images[0]}
+                            alt={post.titleEn}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100" />
+                        )}
+                      </div>
+                      <h3 className="font-serif text-lg mb-2 group-hover:text-gray-600 transition-colors">
+                        {post.titleEn}
+                      </h3>
+                      {post.contentEn && (
+                        <p className="text-[13px] text-gray-500 line-clamp-2">
+                          {post.contentEn.replace(/<[^>]*>/g, '').slice(0, 110)}
+                        </p>
+                      )}
+                    </Link>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* ===== 常见问题 ===== */}
+      <section className="border-t border-gray-200 py-16 md:py-20" aria-labelledby="faq-heading">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 id="faq-heading" className="font-serif text-2xl md:text-3xl font-bold mb-2">
+            Frequently asked questions
+          </h2>
+          <p className="text-sm text-gray-500 mb-10">
+            Who we are, what we make and how ordering works.
+          </p>
+          <dl className="border-t border-gray-200">
+            {homeFaqs.map(f => (
+              <div key={f.q} className="border-b border-gray-200 py-5">
+                <dt className="font-medium mb-2">{f.q}</dt>
+                <dd className="text-[14px] text-gray-600 leading-relaxed">{f.a}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 

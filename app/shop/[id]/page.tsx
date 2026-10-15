@@ -83,11 +83,27 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     };
   }
 
+  // Breadcrumb structured data for search/AI engines
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/` },
+      { '@type': 'ListItem', position: 2, name: 'Works', item: `${siteUrl}/shop` },
+      { '@type': 'ListItem', position: 3, name: product.nameEn, item: productUrl },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <ProductDetailClient product={product} />
     </>

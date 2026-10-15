@@ -80,15 +80,46 @@ export const metadata: Metadata = {
   },
 }
 
+// Site-wide structured data (Organization + WebSite) for search/AI engines
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${siteUrl}/#organization`,
+  name: 'Voice Culture',
+  url: siteUrl,
+  logo: `${siteUrl}/og-image.jpg`,
+  sameAs: [
+    'https://www.instagram.com/voiceculture.studio/',
+    'https://www.pinterest.com/source/voiceculture.world/',
+  ],
+}
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Voice Culture',
+  url: siteUrl,
+  inLanguage: 'en',
+  publisher: { '@id': `${siteUrl}/#organization` },
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN" className={notoSansSC.className}>
+    <html lang="en" className={notoSansSC.className}>
       <head>
         <meta charSet="UTF-8" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
