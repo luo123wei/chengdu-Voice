@@ -194,7 +194,7 @@ export default function CheckoutPage() {
       return 'Please fill in all shipping address fields.';
     }
     if (hasPhysicalProducts && !customConsent) {
-      return 'Please confirm that you understand the made-to-order production time and hand-finished variations before paying.';
+      return 'Please tick the box above to confirm you understand this piece is made to order, so we can start crafting it for you.';
     }
     return '';
   };
@@ -787,10 +787,12 @@ export default function CheckoutPage() {
 
             {hasPhysicalProducts && (
               <div className={`rounded-xl border p-5 ${customConsent ? 'bg-green-50 border-green-200' : 'bg-cream/50 border-primary/20'}`}>
-                <h3 className="font-bold text-secondary mb-2">Made-to-Order &amp; Custom Pieces</h3>
+                <h3 className="font-bold text-secondary mb-2">Made to Order, Made by Hand</h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  The items in your order are hand-finished after you buy. Please allow
-                  <strong> 3–5 business days </strong>for production before shipping.
+                  Nothing sits in a warehouse — each piece is crafted by hand after you order. Our makers do their
+                  utmost to stay true to the design you see, and because every piece is engraved and finished
+                  individually, small differences in colour, texture or detail are simply the nature of handmade work.
+                  Please allow <strong>3–5 business days</strong> for production before shipping.
                 </p>
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -800,13 +802,16 @@ export default function CheckoutPage() {
                     className="mt-1 w-5 h-5 text-primary rounded border-gray-300 flex-shrink-0"
                   />
                   <span className="text-sm text-gray-700">
-                    I understand this item is <strong>made to order</strong> and may take
-                    <strong> 3–5 business days </strong>to produce. Because each piece is hand-finished,
-                    <strong> small variations in colour, texture and detail are not defects</strong>,
-                    and custom / made-to-order items are <strong>non-returnable and non-exchangeable</strong>
-                    once production has started.
+                    I understand my piece is <strong>made just for me</strong>: it needs
+                    <strong> 3–5 business days </strong>of crafting before it ships, it may differ slightly from the
+                    photos in the natural ways of handmade work, and once crafting has begun it
+                    <strong> can&apos;t be returned or exchanged</strong>.
                   </span>
                 </label>
+                <p className="text-xs text-gray-500 mt-3">
+                  Of course, if your order arrives damaged or not as described, email{' '}
+                  <a href="mailto:hello@voiceculture.world" className="text-primary hover:underline">hello@voiceculture.world</a> — we will make it right.
+                </p>
               </div>
             )}
 
@@ -844,7 +849,7 @@ export default function CheckoutPage() {
                     disabled={!isFormValid || isProcessing}
                     disabledHint={
                       hasPhysicalProducts
-                        ? 'Please complete your personal information, shipping address, and confirm the made-to-order terms to enable PayPal.'
+                        ? 'Please complete your personal information and shipping address, then tick the made-to-order confirmation to enable PayPal.'
                         : 'Please complete your personal information to enable PayPal.'
                     }
                   />

@@ -111,7 +111,7 @@ ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item
 
 ${shippingMethod === 'digital'
       ? 'Your digital order will be delivered to this email address shortly.'
-      : 'We are now producing your hand-finished order. Please allow 3-5 business days for production before it ships. You will receive a shipping confirmation with tracking information once it is on the way.'}
+      : 'We are now producing your hand-finished order. Please allow 3-5 business days for production before it ships. You will receive a shipping confirmation with tracking information once it is on the way. As a handmade piece, small variations in colour and detail are natural — that is exactly what makes yours one of a kind.'}
 
 If you have any questions, please contact us at hello@voiceculture.world.
 
