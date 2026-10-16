@@ -111,7 +111,7 @@ ${items.map(item => `- ${item.nameEn} x ${item.quantity} - $${(item.price * item
 
 ${shippingMethod === 'digital'
       ? 'Your digital order will be delivered to this email address shortly.'
-      : 'We will prepare and ship your order within 24 hours. You will receive a shipping confirmation with tracking information once it is on the way.'}
+      : 'We are now producing your hand-finished order. Please allow 3-5 business days for production before it ships. You will receive a shipping confirmation with tracking information once it is on the way.'}
 
 If you have any questions, please contact us at hello@voiceculture.world.
 
@@ -204,7 +204,7 @@ export async function sendPaymentReceivedEmail(
           </div>
           <p style="color: #4a5568; line-height: 1.6; margin: 0 0 16px;">
             Dear ${customerName},<br><br>
-            We have received your payment for order <strong>#${orderNumber}</strong>. Your order is now being processed and will be shipped within 24 hours.
+            We have received your payment for order <strong>#${orderNumber}</strong>. Your order is now being processed. Hand-finished items require 3-5 business days of production before they ship, and you will receive tracking information once dispatched.
           </p>
           <div style="background: white; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
             <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">Order Number</p>

@@ -48,6 +48,7 @@ export default function CheckoutPage() {
   const [couponMsg, setCouponMsg] = useState('');
   const [couponError, setCouponError] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [customConsent, setCustomConsent] = useState(false);
   const paypalOrderNumberRef = useRef('');
 
   const { rates: shippingRates } = useShippingRates();
@@ -191,6 +192,9 @@ export default function CheckoutPage() {
     }
     if (hasPhysicalProducts && (!formData.address || !formData.city || !formData.country || !formData.postalCode)) {
       return 'Please fill in all shipping address fields.';
+    }
+    if (hasPhysicalProducts && !customConsent) {
+      return 'Please confirm that you understand the made-to-order production time and hand-finished variations before paying.';
     }
     return '';
   };
@@ -376,7 +380,8 @@ export default function CheckoutPage() {
     formData.lastName &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
     formData.phone &&
-    (!hasPhysicalProducts || (formData.address && formData.city && formData.country && formData.postalCode))
+    (!hasPhysicalProducts || (formData.address && formData.city && formData.country && formData.postalCode)) &&
+    (!hasPhysicalProducts || customConsent)
   );
 
   if (isLoadingCart) {
@@ -436,7 +441,7 @@ export default function CheckoutPage() {
               {hasPhysicalProducts ? (
                 <>
                   <p className="text-green-800 text-sm mb-3">
-                    <strong>Step 1:</strong> We will prepare and ship your order within 24 hours.
+                    <strong>Step 1:</strong> We are now producing your hand-finished order. Please allow <strong>3–5 business days</strong> for production before it ships.
                   </p>
                   <p className="text-green-800 text-sm mb-3">
                     <strong>Step 2:</strong> You will receive a shipping confirmation email with tracking information.
@@ -457,7 +462,7 @@ export default function CheckoutPage() {
                 <strong>Step 1:</strong> Our customer service team will contact you via email within 24 hours to arrange payment details.
               </p>
               <p className="text-amber-800 text-sm mb-3">
-                <strong>Step 2:</strong> After confirming payment, we will ship your order within 24 hours.
+                <strong>Step 2:</strong> After confirming payment, we will start producing your hand-finished order — please allow <strong>3–5 business days</strong> for production before it ships.
               </p>
               <div className="mt-4 pt-4 border-t border-amber-200">
                 <p className="text-sm text-amber-900">
@@ -780,6 +785,31 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {hasPhysicalProducts && (
+              <div className={`rounded-xl border p-5 ${customConsent ? 'bg-green-50 border-green-200' : 'bg-cream/50 border-primary/20'}`}>
+                <h3 className="font-bold text-secondary mb-2">Made-to-Order &amp; Custom Pieces</h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  The items in your order are hand-finished after you buy. Please allow
+                  <strong> 3–5 business days </strong>for production before shipping.
+                </p>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={customConsent}
+                    onChange={(e) => setCustomConsent(e.target.checked)}
+                    className="mt-1 w-5 h-5 text-primary rounded border-gray-300 flex-shrink-0"
+                  />
+                  <span className="text-sm text-gray-700">
+                    I understand this item is <strong>made to order</strong> and may take
+                    <strong> 3–5 business days </strong>to produce. Because each piece is hand-finished,
+                    <strong> small variations in colour, texture and detail are not defects</strong>,
+                    and custom / made-to-order items are <strong>non-returnable and non-exchangeable</strong>
+                    once production has started.
+                  </span>
+                </label>
+              </div>
+            )}
+
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-serif font-bold text-secondary mb-4 flex items-center">
                 <CreditCard className="w-5 h-5 mr-2 text-primary" />
@@ -814,7 +844,7 @@ export default function CheckoutPage() {
                     disabled={!isFormValid || isProcessing}
                     disabledHint={
                       hasPhysicalProducts
-                        ? 'Please complete your personal information and shipping address to enable PayPal.'
+                        ? 'Please complete your personal information, shipping address, and confirm the made-to-order terms to enable PayPal.'
                         : 'Please complete your personal information to enable PayPal.'
                     }
                   />
