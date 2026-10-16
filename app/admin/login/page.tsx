@@ -15,7 +15,7 @@ export default function LoginPage() {
     // Read the query string directly instead of useSearchParams() so this page
     // does not need a Suspense boundary at build time.
     if (new URLSearchParams(window.location.search).get('expired') === '1') {
-      setError('登录已过期（后台登录有效期为 24 小时），请重新登录。');
+      setError('登录已过期（后台登录有效期为 7 天），请重新登录。');
     }
   }, []);
 

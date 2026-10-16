@@ -117,7 +117,7 @@ export default function AdminDashboard() {
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
 
-    // The admin JWT expires after 24h. When it does, every authorised API returns
+    // The admin JWT expires after 7 days. When it does, every authorised API returns
     // 401 while the UI still looks logged in via localStorage — so send the user
     // back to the login page instead of showing a silent "数据加载失败".
     const handleExpiredSession = () => {
