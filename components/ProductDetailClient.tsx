@@ -10,23 +10,7 @@ import type { SKU, Product } from '@/data/mockData';
 import { VoteButton, PreorderBlock } from '@/components/IntentButtons';
 import { productCategoryLabels } from '@/data/mockData';
 import { statusBadge } from '@/lib/productStatus';
-
-// 从视频 URL 提取嵌入信息
-function getVideoEmbed(url: string): { type: 'iframe' | 'mp4'; src: string } | null {
-  if (!url) return null;
-  const biliMatch = url.match(/bilibili\.com\/video\/(BV\w+)/) || url.match(/b23\.tv\/(\w+)/);
-  if (biliMatch) {
-    return { type: 'iframe', src: `https://player.bilibili.com/player.html?bvid=${biliMatch[1]}&high_quality=1&autoplay=0` };
-  }
-  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([\w-]+)/);
-  if (ytMatch) {
-    return { type: 'iframe', src: `https://www.youtube.com/embed/${ytMatch[1]}` };
-  }
-  if (url.match(/^https?:\/\/.+\.(mp4|webm)(\?|$)/i)) {
-    return { type: 'mp4', src: url };
-  }
-  return null;
-}
+import { getVideoEmbed } from '@/lib/videoEmbed';
 
 function formatRichText(text: string): string {
   if (!text) return '';

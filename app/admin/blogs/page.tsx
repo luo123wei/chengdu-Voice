@@ -617,35 +617,34 @@ export default function AdminBlogs() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">视频上传</label>
-                {formData.video ? (
-                  <div className="flex items-center space-x-3">
-                    <span className="flex-1 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 truncate">
-                      {formData.video}
-                    </span>
-                    <button
-                      onClick={() => setFormData({ ...formData, video: '' })}
-                      className="px-3 py-2 bg-red-100 text-red-600 rounded-lg text-sm hover:bg-red-200 transition-colors"
-                    >
-                      移除
-                    </button>
-                  </div>
-                ) : (
-                  <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
-                    {formData.videoUploading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                        <span className="text-gray-500">上传中...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <Video className="w-6 h-6 text-gray-400" />
-                        <span className="text-gray-500">点击上传视频文件</span>
-                      </div>
-                    )}
-                    <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" />
-                  </label>
-                )}
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  视频链接（YouTube / B站 / mp4 直链）
+                </label>
+                <input
+                  type="text"
+                  value={formData.video}
+                  onChange={(e) => setFormData({ ...formData, video: e.target.value })}
+                  placeholder="粘贴 YouTube 链接，例如 https://www.youtube.com/watch?v=xxxxxxxxxxx"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none"
+                />
+                <p className="text-xs text-gray-400 mt-1 mb-2">
+                  推荐用 YouTube 托管：不占本站存储，视频还能被 YouTube 与 Google 搜索收录。
+                  也支持 B站链接和 mp4 直链。已支持的链接会自动嵌入博客页并生成 VideoObject 结构化数据。
+                </p>
+                <label className="flex items-center justify-center w-full h-16 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
+                  {formData.videoUploading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                      <span className="text-gray-500">上传中...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Video className="w-6 h-6 text-gray-400" />
+                      <span className="text-gray-500">或点击上传视频文件（会填入上方链接栏）</span>
+                    </div>
+                  )}
+                  <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" />
+                </label>
               </div>
 
               <div>

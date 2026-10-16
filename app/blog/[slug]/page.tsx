@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { categoryLabels } from '@/data/mockData';
 import { trackEvent } from '@/lib/analytics';
+import { getVideoEmbed, getYouTubeId } from '@/lib/videoEmbed';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,6 +124,30 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     ],
   };
 
+  // Video: a hand-shot clip hosted on YouTube / Bilibili, or an uploaded file.
+  // getVideoEmbed() returns null for anything we cannot play, so the section
+  // simply disappears when the field is empty or unsupported.
+  const videoUrl = post.video || '';
+  const videoEmbed = getVideoEmbed(videoUrl);
+  const youtubeId = getYouTubeId(videoUrl);
+  const videoJsonLd = videoEmbed && {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: title,
+    description: textOnly.slice(0, 200),
+    // maxresdefault is not guaranteed to exist for every upload, but YouTube
+    // serves a fallback, so this is the safest thumbnail to reference.
+    thumbnailUrl: youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg` : imageUrl,
+    uploadDate: publishDate,
+    contentUrl: youtubeId ? `https://www.youtube.com/watch?v=${youtubeId}` : videoUrl,
+    embedUrl: videoEmbed.type === 'iframe' ? videoEmbed.src : undefined,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Voice Culture',
+      logo: { '@type': 'ImageObject', url: `${siteUrl}/og-image.jpg` },
+    },
+  };
+
   return (
     <div className="min-h-screen">
       <script
@@ -133,6 +158,12 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      {videoJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
+        />
+      )}
       <Header />
 
       <section className="pt-24 pb-8">
@@ -170,6 +201,32 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                 alt={title}
                 className="w-full h-80 sm:h-96 object-cover"
               />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {videoEmbed && (
+        <section className="pb-8">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
+              {videoEmbed.type === 'iframe' ? (
+                <iframe
+                  src={videoEmbed.src}
+                  title={`${title} — video`}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              ) : (
+                <video
+                  src={videoEmbed.src}
+                  controls
+                  playsInline
+                  className="absolute inset-0 w-full h-full"
+                />
+              )}
             </div>
           </div>
         </section>
