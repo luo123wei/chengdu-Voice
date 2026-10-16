@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Lock, User, LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -10,6 +10,14 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Read the query string directly instead of useSearchParams() so this page
+    // does not need a Suspense boundary at build time.
+    if (new URLSearchParams(window.location.search).get('expired') === '1') {
+      setError('登录已过期（后台登录有效期为 24 小时），请重新登录。');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

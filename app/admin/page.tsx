@@ -90,6 +90,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [aiStats, setAiStats] = useState<AiCrawlerStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [testMode, setTestMode] = useState(false);
 
   useEffect(() => {
@@ -110,32 +111,51 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
+    setError('');
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
 
-    fetch(`/api/admin/analytics/stats?range=${range}`, { headers })
-      .then((r) => {
-        if (!r.ok) throw new Error(`stats ${r.status}`);
-        return r.json();
-      })
-      .then((data) => setStats(data))
-      .catch((err) => {
-        console.error('Failed to fetch stats:', err);
-        setStats(null);
-      })
-      .finally(() => setLoading(false));
+    // The admin JWT expires after 24h. When it does, every authorised API returns
+    // 401 while the UI still looks logged in via localStorage — so send the user
+    // back to the login page instead of showing a silent "数据加载失败".
+    const handleExpiredSession = () => {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      window.location.replace('/admin/login?expired=1');
+    };
 
-    fetch(`/api/admin/analytics/ai-crawlers?range=${range}`, { headers })
-      .then((r) => {
-        if (!r.ok) throw new Error(`ai-crawlers ${r.status}`);
-        return r.json();
-      })
-      .then((data) => setAiStats(data))
-      .catch((err) => {
+    (async () => {
+      try {
+        const r = await fetch(`/api/admin/analytics/stats?range=${range}`, { headers, cache: 'no-store' });
+        if (r.status === 401) return handleExpiredSession();
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = await r.json();
+        if (!cancelled) setStats(data);
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+        if (!cancelled) {
+          setStats(null);
+          setError(err instanceof Error ? err.message : '请求失败');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+
+      try {
+        const r = await fetch(`/api/admin/analytics/ai-crawlers?range=${range}`, { headers, cache: 'no-store' });
+        if (r.status === 401) return;
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = await r.json();
+        if (!cancelled) setAiStats(data);
+      } catch (err) {
         console.error('Failed to fetch AI crawler stats:', err);
-        setAiStats(null);
-      });
+        if (!cancelled) setAiStats(null);
+      }
+    })();
+
+    return () => { cancelled = true; };
   }, [range]);
 
   const cards = useMemo(() => {
@@ -199,7 +219,18 @@ export default function AdminDashboard() {
       {loading ? (
         <div className="text-center py-20 text-gray-400">加载中...</div>
       ) : !stats ? (
-        <div className="text-center py-20 text-red-500">数据加载失败</div>
+        <div className="text-center py-20 text-red-500">
+          数据加载失败{error ? `（${error}）` : ''}
+          <p className="text-sm text-gray-500 mt-3">
+            若提示 401，说明登录已过期，请重新登录；其他状态码请稍后重试。
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 text-sm bg-black text-white rounded-lg hover:bg-gray-800"
+          >
+            重试
+          </button>
+        </div>
       ) : (
         <>
           {/* KPI Cards */}
