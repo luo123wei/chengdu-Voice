@@ -37,8 +37,9 @@ const faqs = [
     q: 'What is your return and refund policy?',
     a: (
       <p>
-        We accept returns within 30 days of delivery. If something isn&apos;t right, contact us and
-        we&apos;ll sort it out. Full details and conditions are described in our{' '}
+        We accept returns within 30 days of delivery. Custom or personalized pieces and digital products
+        can&apos;t be returned, and any item that arrived damaged is always covered. Full details and
+        conditions are described in our{' '}
         <Link href="/return-refund-policy" className="underline underline-offset-2 hover:text-gray-600">Return &amp; Refund Policy</Link>.
       </p>
     ),
@@ -68,9 +69,10 @@ const faqs = [
     a: (
       <p>
         Every piece follows the same path: we design it, you vote on it, the winning designs open for
-        pre-order, and then we produce in small batches. In-stock items ship within 24 hours.
-        Pre-order items are made after the pre-order window closes and ship by the timeframe noted on
-        each product page.
+        pre-order, and then we produce in small batches. In-stock items are packed and dispatched within
+        24 hours, while made-to-order and custom pieces need 3–5 business days of hand-crafting before
+        they ship. Pre-order items are made after the pre-order window closes and ship by the timeframe
+        noted on each product page.
       </p>
     ),
   },
@@ -121,7 +123,7 @@ const faqJsonLd = {
       name: 'What is your return and refund policy?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: "We accept returns within 30 days of delivery. If something isn't right, contact us and we'll sort it out. Full details and conditions are described in our Return & Refund Policy.",
+        text: "We accept returns within 30 days of delivery. Custom or personalized pieces and digital products can't be returned, and any item that arrived damaged is always covered. Full details and conditions are described in our Return & Refund Policy.",
       },
     },
     {
@@ -145,7 +147,7 @@ const faqJsonLd = {
       name: 'What is the difference between pre-order and in-stock items?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Every piece follows the same path: we design it, you vote on it, the winning designs open for pre-order, and then we produce in small batches. In-stock items ship within 24 hours. Pre-order items are made after the pre-order window closes and ship by the timeframe noted on each product page.',
+        text: 'Every piece follows the same path: we design it, you vote on it, the winning designs open for pre-order, and then we produce in small batches. In-stock items are packed and dispatched within 24 hours, while made-to-order and custom pieces need 3\u20135 business days of hand-crafting before they ship. Pre-order items are made after the pre-order window closes and ship by the timeframe noted on each product page.',
       },
     },
     {

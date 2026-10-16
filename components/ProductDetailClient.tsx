@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Truck, Shield, RotateCcw, Check, BookOpen, Globe, ChefHat, FileText, Video } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Truck, Shield, Hammer, Check, BookOpen, Globe, ChefHat, FileText, Video } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -380,6 +380,25 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 </>
               )}
 
+              {product.type === 'physical' && (
+                <div className="mt-6 bg-cream/40 border border-primary/15 rounded-xl p-5">
+                  <h3 className="font-bold text-secondary mb-2 flex items-center gap-2">
+                    <Hammer className="w-5 h-5 text-primary" />
+                    Made to Order, Made by Hand
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    We don&apos;t keep stock — your piece is crafted by hand after you order. Our makers do their
+                    utmost to stay true to the design shown here, and because every piece is engraved and finished
+                    individually, small differences in colour, texture or detail are natural to handmade work.
+                    Please allow <strong>3–5 business days</strong> for production before shipping.
+                  </p>
+                  <p className="text-xs text-gray-500 mt-3">
+                    If your order arrives damaged or not as described, email{' '}
+                    <a href="mailto:hello@voiceculture.world" className="text-primary hover:underline">hello@voiceculture.world</a> — we will make it right.
+                  </p>
+                </div>
+              )}
+
               <div className="grid grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-200">
                 <div className="text-center">
                   <Truck className="w-8 h-8 text-primary mx-auto mb-2" />
@@ -390,8 +409,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   <span className="text-sm text-gray-600">Secure Payment</span>
                 </div>
                 <div className="text-center">
-                  <RotateCcw className="w-8 h-8 text-primary mx-auto mb-2" />
-                  <span className="text-sm text-gray-600">30 Day Return</span>
+                  <Hammer className="w-8 h-8 text-primary mx-auto mb-2" />
+                  <span className="text-sm text-gray-600">Made to Order</span>
                 </div>
               </div>
 
