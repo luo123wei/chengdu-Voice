@@ -80,9 +80,10 @@ const faqs = [
     q: 'Are the products handmade?',
     a: (
       <p>
-        All of our products are designed in-house at our studio in Chengdu and produced in small
-        batches with local artisan partners, so many steps involve handwork. Products that are fully
-        or partly handmade are marked as such on their product pages.
+        Everything is designed in-house at our studio in Chengdu. Wax seal dies are machine-engraved for
+        crisp, clean lines, then deburred and finished by hand; other pieces are assembled, checked and
+        finished by hand as well. So while most items involve handwork, only pieces that are fully
+        hand-made are labelled that way on their product pages.
       </p>
     ),
   },
@@ -155,7 +156,7 @@ const faqJsonLd = {
       name: 'Are the products handmade?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'All of our products are designed in-house at our studio in Chengdu and produced in small batches with local artisan partners, so many steps involve handwork. Products that are fully or partly handmade are marked as such on their product pages.',
+        text: 'Everything is designed in-house at our studio in Chengdu. Wax seal dies are machine-engraved for crisp, clean lines, then deburred and finished by hand; other pieces are assembled, checked and finished by hand as well. So while most items involve handwork, only pieces that are fully hand-made are labelled that way on their product pages.',
       },
     },
     {

@@ -441,7 +441,7 @@ export default function CheckoutPage() {
               {hasPhysicalProducts ? (
                 <>
                   <p className="text-green-800 text-sm mb-3">
-                    <strong>Step 1:</strong> We are now producing your hand-finished order. Please allow <strong>3–5 business days</strong> for production before it ships.
+                    <strong>Step 1:</strong> We are now producing your made-to-order item. Please allow <strong>3–5 business days</strong> for production before it ships.
                   </p>
                   <p className="text-green-800 text-sm mb-3">
                     <strong>Step 2:</strong> You will receive a shipping confirmation email with tracking information.
@@ -462,7 +462,7 @@ export default function CheckoutPage() {
                 <strong>Step 1:</strong> Our customer service team will contact you via email within 24 hours to arrange payment details.
               </p>
               <p className="text-amber-800 text-sm mb-3">
-                <strong>Step 2:</strong> After confirming payment, we will start producing your hand-finished order — please allow <strong>3–5 business days</strong> for production before it ships.
+                <strong>Step 2:</strong> After confirming payment, we will start producing your made-to-order item — please allow <strong>3–5 business days</strong> for production before it ships.
               </p>
               <div className="mt-4 pt-4 border-t border-amber-200">
                 <p className="text-sm text-amber-900">
@@ -787,12 +787,12 @@ export default function CheckoutPage() {
 
             {hasPhysicalProducts && (
               <div className={`rounded-xl border p-5 ${customConsent ? 'bg-green-50 border-green-200' : 'bg-cream/50 border-primary/20'}`}>
-                <h3 className="font-bold text-secondary mb-2">Made to Order, Made by Hand</h3>
+                <h3 className="font-bold text-secondary mb-2">Made to Order · Finished by Hand</h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Nothing sits in a warehouse — each piece is crafted by hand after you order. Our makers do their
-                  utmost to stay true to the design you see, and because every piece is engraved and finished
-                  individually, small differences in colour, texture or detail are simply the nature of handmade work.
-                  Please allow <strong>3–5 business days</strong> for production before shipping.
+                  Nothing sits in a warehouse — your piece is produced after you order. Machine-cut detail is
+                  deburred, checked and finished by hand at our workshop, so colour and fine detail can vary
+                  slightly from piece to piece. Please allow <strong>3–5 business days</strong> for production
+                  before shipping.
                 </p>
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -803,8 +803,8 @@ export default function CheckoutPage() {
                   />
                   <span className="text-sm text-gray-700">
                     I understand my piece is <strong>made just for me</strong>: it needs
-                    <strong> 3–5 business days </strong>of crafting before it ships, it may differ slightly from the
-                    photos in the natural ways of handmade work, and once crafting has begun it
+                    <strong> 3–5 business days </strong>of production before it ships, it may differ slightly from
+                    the photos in colour and fine detail, and once production has begun it
                     <strong> can&apos;t be returned or exchanged</strong>.
                   </span>
                 </label>

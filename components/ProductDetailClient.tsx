@@ -368,13 +368,13 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 <div className="mt-6 bg-cream/40 border border-primary/15 rounded-xl p-5">
                   <h3 className="font-bold text-secondary mb-2 flex items-center gap-2">
                     <Hammer className="w-5 h-5 text-primary" />
-                    Made to Order, Made by Hand
+                    Made to Order · Finished by Hand
                   </h3>
                   <p className="text-sm text-gray-600">
-                    We don&apos;t keep stock — your piece is crafted by hand after you order. Our makers do their
-                    utmost to stay true to the design shown here, and because every piece is engraved and finished
-                    individually, small differences in colour, texture or detail are natural to handmade work.
-                    Please allow <strong>3–5 business days</strong> for production before shipping.
+                    We don&apos;t keep stock — your piece is produced after you order. Machine-cut detail is
+                    deburred, checked and finished by hand at our workshop. Our makers stay as close to the design
+                    shown here as the process allows, so colour and fine detail can vary slightly from piece to
+                    piece. Please allow <strong>3–5 business days</strong> for production before shipping.
                   </p>
                   <p className="text-xs text-gray-500 mt-3">
                     If your order arrives damaged or not as described, email{' '}
