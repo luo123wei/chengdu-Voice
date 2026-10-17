@@ -26,7 +26,7 @@ export default function AboutPage() {
   const steps = [
     { icon: PenTool, num: '01', title: 'We design', text: 'The studio sketches and prototypes around everyday memories of Chengdu — a panda, a segment of bamboo, anything can become the next piece.' },
     { icon: Vote, num: '02', title: 'You vote', text: 'Designs go to a public vote and the top-voted pieces move to pre-order. You are not just a customer — you are the product planner.' },
-    { icon: Package, num: '03', title: 'We make', text: 'Once a pre-order hits its goal, we produce in small batches with local Chengdu artisans and ship straight to you.' },
+    { icon: Package, num: '03', title: 'We make', text: 'Once a pre-order hits its goal, we produce in small batches with our production partner in Chengdu and ship straight to you.' },
   ];
 
   return (
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 starts as a design draft and is put to a vote — only the designs with the most votes go into production.
               </p>
               <p>
-                Small batches, slow craft, made by local artisans in Chengdu. May your desk carry a little bit of Chengdu too.
+                Small batches, slow craft, made in Chengdu. May your desk carry a little bit of Chengdu too.
               </p>
             </div>
           )}
