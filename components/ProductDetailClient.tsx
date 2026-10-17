@@ -338,7 +338,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   <button
                     onClick={handleAddToCart}
                     disabled={isAdding}
-                    className={`w-full py-4 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-3 ${
+                    translate="no"
+                    className={`notranslate w-full py-4 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-3 ${
                       addedSuccess
                         ? 'bg-green-600 text-white'
                         : 'bg-primary text-white hover:bg-primary-dark'

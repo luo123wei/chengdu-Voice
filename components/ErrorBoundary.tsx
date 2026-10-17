@@ -13,6 +13,10 @@ interface State {
   retryCount: number;
 }
 
+// 浏览器自动翻译（Google 翻译）改写 DOM 后，React 移除节点时会抛出这类错误
+const isDomMutationError = (error: Error) =>
+  /removeChild|insertBefore|NotFoundError/i.test(error?.message || '');
+
 class ErrorBoundary extends Component<Props, State> {
   retryTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -21,13 +25,18 @@ class ErrorBoundary extends Component<Props, State> {
     this.state = { hasError: false, error: null, retryCount: 0 };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     console.error('Error Boundary caught error:', error);
-    return { hasError: true, error, retryCount: 0 };
+    // 注意：不要重置 retryCount，否则会形成「崩溃 → 3 秒后重试 → 再崩溃」的死循环
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error Boundary componentDidCatch:', error, errorInfo);
+    // 浏览器网页翻译（Google 翻译）会把文本节点包进 <font> 里，
+    // 导致 React 更新 DOM 时抛出 removeChild/insertBefore 这类错误。
+    // 这是确定性的 DOM 结构问题，自动重试必然再次失败，因此直接停在兜底页等用户手动刷新。
+    if (isDomMutationError(error)) return;
     this.scheduleRetry();
   }
 
@@ -69,9 +78,11 @@ class ErrorBoundary extends Component<Props, State> {
             <h2 className="text-2xl font-bold text-secondary mb-4">Something went wrong</h2>
             <p className="text-gray-600 mb-6">
               We apologize for the inconvenience.{' '}
-              {this.state.retryCount < 3 && (
-                <span className="text-primary">Retrying in 3 seconds...</span>
-              )}
+              {this.state.error &&
+                !isDomMutationError(this.state.error) &&
+                this.state.retryCount < 3 && (
+                  <span className="text-primary">Retrying in 3 seconds...</span>
+                )}
             </p>
             <button
               onClick={this.handleRetry}
@@ -83,6 +94,12 @@ class ErrorBoundary extends Component<Props, State> {
             {this.state.error && (
               <p className="text-xs text-gray-400 mt-4 max-w-xs mx-auto break-all">
                 {this.state.error.message}
+              </p>
+            )}
+            {this.state.error && isDomMutationError(this.state.error) && (
+              <p className="text-xs text-gray-500 mt-4 max-w-xs mx-auto">
+                If your browser is auto-translating this page, please turn the translation off and
+                refresh.
               </p>
             )}
           </div>
