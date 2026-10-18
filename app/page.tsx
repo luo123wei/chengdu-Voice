@@ -17,8 +17,8 @@ const absImage = (src?: string) =>
   src ? (src.startsWith('http') ? src : `${siteUrl}${src}`) : `${siteUrl}/og-image.jpg`;
 
 // Cards keep one fixed size no matter how many products a row holds, so a short
-// list can never stretch into oversized cards. A partly filled row is centred
-// by the parent ul instead of being stretched to fill.
+// list can never stretch into oversized cards. Rows flow from the left; a partly
+// filled row simply stops early instead of being stretched to fill.
 const cardWidth = 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]';
 
 export const metadata: Metadata = {
@@ -162,7 +162,7 @@ export default async function HomePage() {
             </Link>
           </div>
           {voteProducts.length > 0 ? (
-            <ul className="flex flex-wrap justify-center gap-6 list-none">
+            <ul className="flex flex-wrap justify-start gap-6 list-none">
               {voteProducts.map(p => (
                 <li key={p.id} className={cardWidth}>
                   <ProductCard product={p} />
