@@ -17,7 +17,7 @@ export default function TermsOfServicePage() {
           <p className="text-gray-500 mb-8">Last updated: September 11, 2026</p>
 
           <div className="prose prose-gray max-w-none space-y-6 text-gray-700 leading-relaxed">
-            <p>These Terms of Service (&quot;Terms&quot;) govern your use of voiceculture.world (the &quot;Site&quot;) operated by Voice Culture (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). By using this Site, you agree to these Terms.</p>
+            <p>These Terms of Service (&quot;Terms&quot;) govern your use of voiceculture.world (the &quot;Site&quot;), operated by <strong>Sichuan Tanshu Technology Co., Ltd.</strong> (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), trading as Voice Culture. By using this Site, you agree to these Terms.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">1. Use of the Site</h2>
             <p>You may use this Site for lawful purposes only. You agree not to:</p>
@@ -76,6 +76,7 @@ export default function TermsOfServicePage() {
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">14. Contact</h2>
             <p>For questions about these Terms, email <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</p>
+            <p className="mt-3">Legal entity: Sichuan Tanshu Technology Co., Ltd., Chengdu, Sichuan, China.</p>
           </div>
         </div>
       </div>

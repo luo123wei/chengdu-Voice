@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
           <p className="text-gray-500 mb-8">Last updated: September 11, 2026</p>
 
           <div className="prose prose-gray max-w-none space-y-6 text-gray-700 leading-relaxed">
-            <p>Voice Culture (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) operates voiceculture.world. This policy explains what data we collect, how we use it, and your rights.</p>
+            <p>Sichuan Tanshu Technology Co., Ltd. (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), trading as Voice Culture, operates voiceculture.world. This policy explains what data we collect, how we use it, and your rights.</p>
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">1. Information We Collect</h2>
             <ul className="list-disc pl-6 space-y-1">
@@ -90,6 +90,7 @@ export default function PrivacyPolicyPage() {
 
             <h2 className="text-xl font-bold text-secondary mt-8 mb-3">12. Contact</h2>
             <p>For privacy questions or requests, email <a href="mailto:hello@voiceculture.world" className="text-primary underline">hello@voiceculture.world</a>.</p>
+            <p className="mt-3">Legal entity: Sichuan Tanshu Technology Co., Ltd., Chengdu, Sichuan, China.</p>
           </div>
         </div>
       </div>

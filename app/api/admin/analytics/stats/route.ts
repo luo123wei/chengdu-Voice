@@ -17,16 +17,17 @@ function verifyAdmin(request: NextRequest): boolean {
   }
 }
 
-type RangeKey = 'yesterday' | '7d' | '30d';
+type RangeKey = 'yesterday' | '7d' | '30d' | '365d';
 
 const RANGE_DAYS: Record<RangeKey, number> = {
   yesterday: 1,
   '7d': 7,
   '30d': 30,
+  '365d': 365,
 };
 
 /**
- * GET /api/admin/analytics/stats?range=yesterday|7d|30d
+ * GET /api/admin/analytics/stats?range=yesterday|7d|30d|365d
  *
  * Returns aggregated analytics for the requested time range.
  * Time range is exclusive of today (UTC day boundary), as required.
@@ -271,7 +272,7 @@ export async function GET(request: NextRequest) {
     .lt('created_at', periodEnd);
   const dailyMap = new Map<string, { blogViews: number; productViews: number; addToCart: number; orders: number }>();
   for (const r of dailyRows || []) {
-    const day = (r.created_at as string).slice(0, 10);
+    const day = (r.created_at as string).slice(0, days > 31 ? 7 : 10);
     if (!dailyMap.has(day)) dailyMap.set(day, { blogViews: 0, productViews: 0, addToCart: 0, orders: 0 });
     const bucket = dailyMap.get(day)!;
     if (r.event_type === 'blog_view') bucket.blogViews++;

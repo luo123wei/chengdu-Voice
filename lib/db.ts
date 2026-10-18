@@ -24,6 +24,16 @@ const defaultSettings = {
   orderEmailSubjectZh: '我们已收到您的订单 - 成都造物',
   orderEmailBodyZh: '尊敬的 {customerName}，\n\n感谢您的订单！我们已收到您的订单 #{orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。\n\n付款尚未完成。我们支持 PayPal、Payoneer 和国际电汇。\n\n如有任何问题，请联系我们：hello@voiceculture.world。',
   aboutContent: '<h2>Everyday objects, designed in Chengdu.</h2><p>Voice Culture · a small design studio crafting gifts inspired by Chengdu.</p>',
+  // Legal / store-entity details, shown on the admin settings page so they can be
+  // screenshotted for marketplace onboarding (e.g. TikTok Shop seller review).
+  storeEntity: {
+    storeName: 'Voice Culture',
+    legalName: 'Sichuan Tanshu Technology Co., Ltd.',
+    address: '',
+    phone: '',
+    email: 'hello@voiceculture.world',
+    currency: 'USD',
+  },
 };
 
 const defaultShippingRates: ShippingRate[] = [
@@ -472,6 +482,7 @@ export const db = {
         orderEmailSubjectZh: data.order_email_subject_zh,
         orderEmailBodyZh: data.order_email_body_zh,
         aboutContent: data.about_content || defaultSettings.aboutContent,
+        storeEntity: data.store_entity || defaultSettings.storeEntity,
       };
     },
     save: async (settings: typeof defaultSettings) => {
@@ -489,6 +500,7 @@ export const db = {
         order_email_subject_zh: settings.orderEmailSubjectZh,
         order_email_body_zh: settings.orderEmailBodyZh,
         about_content: settings.aboutContent,
+        store_entity: settings.storeEntity,
       });
       if (error) {
         console.error('Failed to save settings:', error);

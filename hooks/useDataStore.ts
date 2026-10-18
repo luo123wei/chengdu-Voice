@@ -204,6 +204,14 @@ export function useSettings() {
     orderEmailSubjectZh: '我们已收到您的订单 - 成都造物',
     orderEmailBodyZh: '尊敬的 {customerName}，\n\n感谢您的订单！我们已收到您的订单 #{orderNumber}。我们的客服团队将在 24 小时内通过邮件与您联系，安排付款事宜。\n\n付款尚未完成。我们支持 PayPal、Payoneer 和国际电汇。\n\n如有任何问题，请联系我们：hello@voiceculture.world。',
     aboutContent: '<h2>Experience Chengdu</h2><p>Through Sound &amp; Flavor</p>',
+    storeEntity: {
+      storeName: 'Voice Culture',
+      legalName: 'Sichuan Tanshu Technology Co., Ltd.',
+      address: '',
+      phone: '',
+      email: 'hello@voiceculture.world',
+      currency: 'USD',
+    },
   });
   const [loading, setLoading] = useState(true);
 

@@ -17,16 +17,17 @@ function verifyAdmin(request: NextRequest): boolean {
   }
 }
 
-type RangeKey = 'yesterday' | '7d' | '30d';
+type RangeKey = 'yesterday' | '7d' | '30d' | '365d';
 
 const RANGE_DAYS: Record<RangeKey, number> = {
   yesterday: 1,
   '7d': 7,
   '30d': 30,
+  '365d': 365,
 };
 
 /**
- * GET /api/admin/analytics/ai-crawlers?range=yesterday|7d|30d
+ * GET /api/admin/analytics/ai-crawlers?range=yesterday|7d|30d|365d
  *
  * Reports which AI / search crawlers (GPTBot, PerplexityBot, etc.) hit the site.
  * Time range is exclusive of today (UTC day boundary), same as the stats route.

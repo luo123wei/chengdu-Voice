@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { FileText, ShoppingBag, TrendingUp, Users, Package, Eye, ShoppingCart, DollarSign, Percent, ThumbsUp, BellRing, Bot } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-type RangeKey = 'yesterday' | '7d' | '30d';
+type RangeKey = 'yesterday' | '7d' | '30d' | '365d';
 
 type Stats = {
   range: RangeKey;
@@ -66,7 +66,13 @@ const KNOWN_BOTS: { key: string; label: string }[] = [
 function rangeToDays(range: RangeKey): number {
   if (range === 'yesterday') return 1;
   if (range === '30d') return 30;
+  if (range === '365d') return 365;
   return 7;
+}
+
+// Chart buckets are daily (YYYY-MM-DD) for short ranges, monthly (YYYY-MM) for long ones.
+function bucketLabel(date: string): string {
+  return date.length === 7 ? date.slice(2) : date.slice(5);
 }
 
 function delta(cur: number, prev: number) {
@@ -176,6 +182,7 @@ export default function AdminDashboard() {
     { key: 'yesterday', label: '昨日' },
     { key: '7d', label: '近7日' },
     { key: '30d', label: '近30日' },
+    { key: '365d', label: '近12个月' },
   ];
 
   return (
@@ -419,7 +426,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-base font-serif font-bold text-gray-800 mb-4 flex items-center">
               <TrendingUp className="w-4 h-4 mr-2 text-black" />
-              每日趋势 ({stats.daily.length} 天)
+              {range === '365d' ? '月度趋势' : '每日趋势'} ({stats.daily.length} {range === '365d' ? '个月' : '天'})
             </h2>
             {stats.daily.length === 0 ? (
               <p className="text-sm text-gray-400 py-6 text-center">暂无数据</p>
@@ -565,7 +572,7 @@ function DailyChart({ data }: { data: { date: string; blogViews: number; product
       <div className="flex w-full mt-1">
         {data.map((d) => (
           <span key={d.date} className="flex-1 text-center text-[10px] text-gray-400 truncate">
-            {d.date.slice(5)}
+            {bucketLabel(d.date)}
           </span>
         ))}
       </div>

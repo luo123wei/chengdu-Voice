@@ -99,6 +99,7 @@ export default function ContactPage() {
           <div className="mt-10 text-center text-gray-500 text-sm">
             <p>For order inquiries, please include your order number for faster assistance.</p>
             <p className="mt-2">We typically respond within 24 hours, Monday–Friday (China Standard Time).</p>
+            <p className="mt-4">Voice Culture is a brand operated by Sichuan Tanshu Technology Co., Ltd., Chengdu, Sichuan, China.</p>
           </div>
         </div>
       </div>

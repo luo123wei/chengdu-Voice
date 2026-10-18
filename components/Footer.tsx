@@ -99,8 +99,11 @@ export default function Footer() {
             <span className="text-gray-600">·</span>
             <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
           </div>
-          <p>© 2026 Voice Culture. All rights reserved.</p>
-          <span className="text-gray-500">Chengdu, Sichuan, China · Worldwide shipping · <Link href="/admin" className="text-gray-600 hover:text-gray-400 transition-colors">Admin</Link></span>
+          <p>© 2026 Sichuan Tanshu Technology Co., Ltd. All rights reserved.</p>
+          <p className="text-gray-500 mt-1">
+            Voice Culture is a brand operated by Sichuan Tanshu Technology Co., Ltd. · Chengdu, Sichuan, China · Worldwide shipping ·{' '}
+            <Link href="/admin" className="text-gray-600 hover:text-gray-400 transition-colors">Admin</Link>
+          </p>
         </div>
       </div>
     </footer>

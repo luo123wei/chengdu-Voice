@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Settings, Save, Download, Mail, Globe, FileText, Check, MessageSquare, Truck, Plus, Trash2, Lock, Eye, EyeOff, Image, Upload, X, Info } from 'lucide-react';
+import { Settings, Save, Download, Mail, Globe, FileText, Check, MessageSquare, Truck, Plus, Trash2, Lock, Eye, EyeOff, Image, Upload, X, Info, Building2 } from 'lucide-react';
 import { useSettings, useShippingRates } from '@/hooks/useDataStore';
 import RichTextEditor from '@/components/RichTextEditor';
 
@@ -108,6 +108,10 @@ export default function AdminSettings() {
     }
   };
 
+  const updateStoreEntity = (field: keyof typeof localSettings.storeEntity, value: string) => {
+    setLocalSettings({ ...localSettings, storeEntity: { ...localSettings.storeEntity, [field]: value } });
+  };
+
   if (settingsLoading || ratesLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -126,6 +130,96 @@ export default function AdminSettings() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+          <div className="flex items-center space-x-3 mb-6">
+            <Building2 className="w-6 h-6 text-black" />
+            <h2 className="text-xl font-bold text-gray-800">店铺主体信息</h2>
+          </div>
+
+          <div className="p-4 bg-blue-50 rounded-lg mb-6">
+            <p className="text-sm text-blue-800">
+              <strong>用途：</strong>申请平台入驻（如 TikTok Shop）时需提交「店铺账户信息截图」，
+              截图中的<strong>法定公司名必须与营业执照上的名称完全一致</strong>。请按营业执照原文填写，不要翻译或简写。
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">店铺名称 Store name</label>
+              <input
+                type="text"
+                value={localSettings.storeEntity.storeName}
+                onChange={(e) => updateStoreEntity('storeName', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="Voice Culture"
+              />
+              <p className="text-xs text-gray-400 mt-1">对外展示的品牌 / 店铺名</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">法定公司名 Legal business name</label>
+              <input
+                type="text"
+                value={localSettings.storeEntity.legalName}
+                onChange={(e) => updateStoreEntity('legalName', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="Sichuan Tanshu Technology Co., Ltd."
+              />
+              <p className="text-xs text-gray-400 mt-1">必须与营业执照上的名称一致</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">公司注册地址 Business address</label>
+              <input
+                type="text"
+                value={localSettings.storeEntity.address}
+                onChange={(e) => updateStoreEntity('address', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="按营业执照登记的注册地址填写"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">联系电话 Phone</label>
+              <input
+                type="text"
+                value={localSettings.storeEntity.phone}
+                onChange={(e) => updateStoreEntity('phone', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="+86 ..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">联系邮箱 Email</label>
+              <input
+                type="text"
+                value={localSettings.storeEntity.email}
+                onChange={(e) => updateStoreEntity('email', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="hello@voiceculture.world"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">结算货币 Store currency</label>
+              <input
+                type="text"
+                value={localSettings.storeEntity.currency}
+                onChange={(e) => updateStoreEntity('currency', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="USD"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-amber-800">
+              <strong>提示：</strong>填写后点击页面底部的「保存设置」生效。截图时请让浏览器地址栏、系统时间与本页面同时出现在画面内。
+            </p>
+          </div>
+        </div>
+
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-6">
             <Globe className="w-6 h-6 text-black" />
