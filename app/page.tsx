@@ -16,14 +16,10 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 const absImage = (src?: string) =>
   src ? (src.startsWith('http') ? src : `${siteUrl}${src}`) : `${siteUrl}/og-image.jpg`;
 
-// Card width that adapts to how many products a row actually has, so a short
-// list never leaves a half-empty grid row. Rows are centered by the parent ul.
-const cardBasis = (count: number) => {
-  if (count >= 4) return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]';
-  if (count === 3) return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]';
-  if (count === 2) return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(50%-12px)]';
-  return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]';
-};
+// Cards keep one fixed size no matter how many products a row holds, so a short
+// list can never stretch into oversized cards. A partly filled row is centred
+// by the parent ul instead of being stretched to fill.
+const cardWidth = 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]';
 
 export const metadata: Metadata = {
   title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture',
@@ -168,7 +164,7 @@ export default async function HomePage() {
           {voteProducts.length > 0 ? (
             <ul className="flex flex-wrap justify-center gap-6 list-none">
               {voteProducts.map(p => (
-                <li key={p.id} className={cardBasis(voteProducts.length)}>
+                <li key={p.id} className={cardWidth}>
                   <ProductCard product={p} />
                 </li>
               ))}
@@ -220,7 +216,7 @@ export default async function HomePage() {
           {onSaleProducts.length > 0 && (
             <ul className="flex flex-wrap justify-center gap-6 list-none">
               {onSaleProducts.map(p => (
-                <li key={p.id} className={cardBasis(onSaleProducts.length)}>
+                <li key={p.id} className={cardWidth}>
                   <ProductCard product={p} />
                 </li>
               ))}
