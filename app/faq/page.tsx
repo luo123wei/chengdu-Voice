@@ -11,6 +11,59 @@ export const metadata: Metadata = {
 
 const faqs = [
   {
+    q: 'What is Voice Culture?',
+    a: (
+      <p>
+        Voice Culture is a small design studio based in Chengdu, China. We design small-batch objects and
+        gifts inspired by the city&apos;s culture, everyday life and visual language, and ship them
+        worldwide. Read more on our{' '}
+        <Link href="/about" className="underline underline-offset-2 hover:text-gray-600">About page</Link>.
+      </p>
+    ),
+  },
+  {
+    q: 'What does Voice Culture sell?',
+    a: (
+      <p>
+        Two kinds of things. Physical pieces made in small batches from our Chengdu studio — enamel pins
+        and brooches, stationery and small objects for the home — and digital Chengdu sound recordings,
+        including a full Sound Library you can download instantly. Browse everything in the{' '}
+        <Link href="/shop" className="underline underline-offset-2 hover:text-gray-600">shop</Link>.
+      </p>
+    ),
+  },
+  {
+    q: 'How does the voting model work?',
+    a: (
+      <p>
+        New designs are published as open concepts before they are made. Visitors vote for the ones they
+        want, and when a concept reaches its vote goal we open pre-orders and put it into small-batch
+        production. You decide what we make next — see the{' '}
+        <Link href="/shop?tab=design" className="underline underline-offset-2 hover:text-gray-600">open votes</Link>.
+      </p>
+    ),
+  },
+  {
+    q: 'What is the Chengdu Sound Library?',
+    a: (
+      <p>
+        It is a collection of sounds recorded in Chengdu — teahouses, mahjong tables, street life and
+        Sichuan opera percussion — delivered as an instant download after purchase. Selected recordings
+        are also free to listen to on the{' '}
+        <Link href="/free-sounds" className="underline underline-offset-2 hover:text-gray-600">free sounds page</Link>.
+      </p>
+    ),
+  },
+  {
+    q: 'Do you ship worldwide?',
+    a: (
+      <p>
+        Yes. Physical orders ship from Chengdu, China, to addresses worldwide, and pre-orders ship first
+        as soon as a piece goes into production.
+      </p>
+    ),
+  },
+  {
     q: 'How long does shipping take, and what does it cost?',
     a: (
       <>
@@ -88,6 +141,15 @@ const faqs = [
     ),
   },
   {
+    q: 'How do I get 10% off my first order?',
+    a: (
+      <p>
+        Join the studio list with your email address on any page of the site. You will see a welcome code
+        for 10% off your first order, plus votes on new designs and early access to pre-orders.
+      </p>
+    ),
+  },
+  {
     q: 'How do I contact you?',
     a: (
       <p>
@@ -103,6 +165,46 @@ const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is Voice Culture?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Voice Culture is a small design studio based in Chengdu, China. We design small-batch objects and gifts inspired by the city's culture, everyday life and visual language, and ship them worldwide. Read more on our About page.",
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What does Voice Culture sell?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Two kinds of things. Physical pieces made in small batches from our Chengdu studio \u2014 enamel pins and brooches, stationery and small objects for the home \u2014 and digital Chengdu sound recordings, including a full Sound Library you can download instantly. Browse everything in the shop.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does the voting model work?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'New designs are published as open concepts before they are made. Visitors vote for the ones they want, and when a concept reaches its vote goal we open pre-orders and put it into small-batch production. You decide what we make next \u2014 see the open votes.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the Chengdu Sound Library?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'It is a collection of sounds recorded in Chengdu \u2014 teahouses, mahjong tables, street life and Sichuan opera percussion \u2014 delivered as an instant download after purchase. Selected recordings are also free to listen to on the free sounds page.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Do you ship worldwide?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Physical orders ship from Chengdu, China, to addresses worldwide, and pre-orders ship first as soon as a piece goes into production.',
+      },
+    },
     {
       '@type': 'Question',
       name: 'How long does shipping take, and what does it cost?',
@@ -157,6 +259,14 @@ const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Everything is designed in-house at our studio in Chengdu. Wax seal dies are machine-engraved for crisp, clean lines, then deburred and finished by hand; other pieces are assembled, checked and finished by hand as well. So while most items involve handwork, only pieces that are fully hand-made are labelled that way on their product pages.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do I get 10% off my first order?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Join the studio list with your email address on any page of the site. You will see a welcome code for 10% off your first order, plus votes on new designs and early access to pre-orders.',
       },
     },
     {

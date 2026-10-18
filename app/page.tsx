@@ -16,33 +16,14 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 const absImage = (src?: string) =>
   src ? (src.startsWith('http') ? src : `${siteUrl}${src}`) : `${siteUrl}/og-image.jpg`;
 
-// Homepage FAQ copy — the same array feeds the visible section and the FAQPage JSON-LD
-const homeFaqs = [
-  {
-    q: 'What is Voice Culture?',
-    a: 'Voice Culture is a small design studio based in Chengdu, China. We design small-batch objects and gifts inspired by the city’s culture, everyday life and visual language, and ship them worldwide.',
-  },
-  {
-    q: 'What does Voice Culture sell?',
-    a: 'Two kinds of things. Physical pieces made in small batches from our Chengdu studio — enamel pins and brooches, stationery and small objects for the home — and digital Chengdu sound recordings, including a full Sound Library you can download instantly.',
-  },
-  {
-    q: 'How does the voting model work?',
-    a: 'New designs are published as open concepts before they are made. Visitors vote for the ones they want, and when a concept reaches its vote goal we open pre-orders and put it into small-batch production. You decide what we make next.',
-  },
-  {
-    q: 'Do you ship worldwide?',
-    a: 'Yes. Physical orders ship from Chengdu, China, to addresses worldwide. Pre-orders ship first as soon as a piece goes into production.',
-  },
-  {
-    q: 'What is the Chengdu Sound Library?',
-    a: 'It is a collection of sounds recorded in Chengdu — teahouses, mahjong tables, street life and Sichuan opera percussion — delivered as an instant download after purchase. Selected recordings are also free to listen to on the site.',
-  },
-  {
-    q: 'How do I get 10% off my first order?',
-    a: 'Join the studio list with your email address. You will see a welcome code for 10% off your first order, plus votes on new designs and early access to pre-orders.',
-  },
-];
+// Card width that adapts to how many products a row actually has, so a short
+// list never leaves a half-empty grid row. Rows are centered by the parent ul.
+const cardBasis = (count: number) => {
+  if (count >= 4) return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]';
+  if (count === 3) return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]';
+  if (count === 2) return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(50%-12px)]';
+  return 'w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]';
+};
 
 export const metadata: Metadata = {
   title: 'Chengdu Cultural Gifts & Souvenirs | Voice Culture',
@@ -73,16 +54,6 @@ export default async function HomePage() {
   const preorderProducts = products.filter(p => p.status === 'preorder');
   const latestPosts = blogs.slice(0, 3);
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: homeFaqs.map(f => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
-  };
-
   const inStockJsonLd = onSaleProducts.length > 0
     ? {
         '@context': 'https://schema.org',
@@ -112,10 +83,6 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white text-ink">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
       {inStockJsonLd && (
         <script
           type="application/ld+json"
@@ -199,9 +166,9 @@ export default async function HomePage() {
             </Link>
           </div>
           {voteProducts.length > 0 ? (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 list-none">
+            <ul className="flex flex-wrap justify-center gap-6 list-none">
               {voteProducts.map(p => (
-                <li key={p.id}>
+                <li key={p.id} className={cardBasis(voteProducts.length)}>
                   <ProductCard product={p} />
                 </li>
               ))}
@@ -251,9 +218,9 @@ export default async function HomePage() {
             </Link>
           </div>
           {onSaleProducts.length > 0 && (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 list-none">
+            <ul className="flex flex-wrap justify-center gap-6 list-none">
               {onSaleProducts.map(p => (
-                <li key={p.id}>
+                <li key={p.id} className={cardBasis(onSaleProducts.length)}>
                   <ProductCard product={p} />
                 </li>
               ))}
@@ -308,26 +275,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      {/* ===== 常见问题 ===== */}
-      <section className="border-t border-gray-200 py-16 md:py-20" aria-labelledby="faq-heading">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 id="faq-heading" className="font-serif text-2xl md:text-3xl font-bold mb-2">
-            Frequently asked questions
-          </h2>
-          <p className="text-sm text-gray-500 mb-10">
-            Who we are, what we make and how ordering works.
-          </p>
-          <dl className="border-t border-gray-200">
-            {homeFaqs.map(f => (
-              <div key={f.q} className="border-b border-gray-200 py-5">
-                <dt className="font-medium mb-2">{f.q}</dt>
-                <dd className="text-[14px] text-gray-600 leading-relaxed">{f.a}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
 
       {/* ===== 订阅 ===== */}
       <section className="py-16 bg-black">
