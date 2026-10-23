@@ -3,9 +3,12 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { db } from '@/lib/db'
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
+
 export const metadata: Metadata = {
   title: 'Shipping Policy',
   description: 'Voice Culture shipping policy — worldwide delivery from Chengdu, China.',
+  alternates: { canonical: `${siteUrl}/shipping-policy` },
 }
 
 type RateRow = {

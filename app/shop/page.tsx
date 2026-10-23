@@ -7,10 +7,12 @@ import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
+
 export const metadata: Metadata = {
   title: 'Chengdu Gifts & Souvenirs | Voice Culture',
   description: 'Voice Culture creates small-batch objects inspired by Chengdu culture — panda gifts, tea ware, wax seal stamps, and cultural souvenirs shipped worldwide.',
-  alternates: { canonical: 'https://www.voiceculture.world/shop' },
+  alternates: { canonical: `${siteUrl}/shop` },
 };
 
 export default async function ShopPage() {

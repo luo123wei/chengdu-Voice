@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
 
 export const metadata: Metadata = {
   title: 'Stories · Design Stories — Voice Culture',

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { db } from '@/lib/db'
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://voiceculture.world'
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params

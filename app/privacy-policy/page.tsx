@@ -2,9 +2,12 @@ import { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
+
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'Voice Culture privacy policy — how we collect, use, and protect your data.',
+  alternates: { canonical: `${siteUrl}/privacy-policy` },
 }
 
 export default function PrivacyPolicyPage() {

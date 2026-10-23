@@ -2,9 +2,12 @@ import { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
+
 export const metadata: Metadata = {
   title: 'Return & Refund Policy',
   description: 'Voice Culture return and refund policy for Chengdu cultural gifts and souvenirs.',
+  alternates: { canonical: `${siteUrl}/return-refund-policy` },
 }
 
 export default function ReturnRefundPolicyPage() {

@@ -3,9 +3,12 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Mail, MapPin, Clock } from 'lucide-react'
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
+
 export const metadata: Metadata = {
   title: 'Contact Us',
   description: 'Get in touch with Voice Culture — Chengdu cultural gifts and souvenirs studio.',
+  alternates: { canonical: `${siteUrl}/contact` },
 }
 
 export default function ContactPage() {

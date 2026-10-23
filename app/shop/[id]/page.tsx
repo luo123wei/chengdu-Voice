@@ -14,8 +14,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return { title: 'Product Not Found | Voice Culture' };
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
   const slug = product.slug || product.id;
-  const url = `https://www.voiceculture.world/shop/${slug}`;
+  const url = `${siteUrl}/shop/${slug}`;
   const description = (product.descriptionEn || product.nameEn).slice(0, 160);
 
   return {
@@ -51,8 +52,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   void trackEvent('product_view', _slug, null);
 
   // JSON-LD Product structured data for Google Merchant Center
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
   const slug = product.slug || product.id;
-  const productUrl = `https://www.voiceculture.world/shop/${slug}`;
+  const productUrl = `${siteUrl}/shop/${slug}`;
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org/',
     '@type': 'Product',
@@ -84,7 +86,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   }
 
   // Breadcrumb structured data for search/AI engines
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

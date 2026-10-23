@@ -34,9 +34,6 @@ export const metadata: Metadata = {
   authors: [{ name: 'Voice Culture', url: siteUrl }],
   creator: 'Voice Culture',
   publisher: 'Voice Culture',
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     url: siteUrl,

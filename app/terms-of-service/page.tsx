@@ -2,9 +2,12 @@ import { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world'
+
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'Voice Culture terms of service — the rules and conditions for using our website.',
+  alternates: { canonical: `${siteUrl}/terms-of-service` },
 }
 
 export default function TermsOfServicePage() {

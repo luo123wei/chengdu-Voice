@@ -10,7 +10,7 @@ import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.voiceculture.world';
 
 // Absolute image URL for structured data (product images may be relative or absolute)
 const absImage = (src?: string) =>
